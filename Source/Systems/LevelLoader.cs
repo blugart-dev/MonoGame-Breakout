@@ -28,10 +28,20 @@ public static class LevelLoader
 
     public static List<Brick> Load(string path)
     {
-        var bricks = new List<Brick>();
-
         using Stream stream = TitleContainer.OpenStream(path);
         using var reader = new StreamReader(stream);
+        return Parse(reader);
+    }
+
+    /// <summary>
+    /// The actual parser, split from the file access so that anything able to
+    /// produce the text format can feed it — a file via Load above, or
+    /// BoardGenerator's output via a StringReader. The grid format is the
+    /// contract; where the characters come from is nobody's business.
+    /// </summary>
+    public static List<Brick> Parse(TextReader reader)
+    {
+        var bricks = new List<Brick>();
 
         int row = 0;
         string line;

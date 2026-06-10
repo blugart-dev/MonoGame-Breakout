@@ -20,7 +20,7 @@ public sealed class GameOverState : GameState
         // "this just happened" hook, and Update would re-submit every tick.
         // Unless this is a replay ending: the run already scored when it was
         // played live, and a recording must never bank its points twice.
-        _rank = Manager.IsPlayingBack ? -1 : HighScores.Record(Session.Mode, Session.Score);
+        _rank = Manager.IsPlayingBack ? -1 : HighScores.Record(Session.ScoreTable, Session.Score);
 
         // Duck the music so the verdict jingle owns the moment.
         MusicPlayer.SetDucked(true);
@@ -69,7 +69,7 @@ public sealed class GameOverState : GameState
                 center + new Vector2(0, 92), Color.Gold, 0.9f);
 
         // The mode's top five, with this run's entry picked out in gold.
-        IReadOnlyList<int> top = HighScores.For(Session.Mode);
+        IReadOnlyList<int> top = HighScores.For(Session.ScoreTable);
         for (int i = 0; i < top.Count; i++)
             spriteBatch.DrawCenteredText(Font, $"{i + 1}.  {top[i]}",
                 center + new Vector2(0, 130 + i * 28),

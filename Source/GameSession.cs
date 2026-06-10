@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -28,6 +29,11 @@ public class GameSession
     };
 
     public static int LevelCount => LevelPaths.Length; // the title screen's level select needs the range
+
+    // Start level one past the real levels = generated boards, forever. A
+    // sentinel rather than a flag so it travels everywhere a start level
+    // already goes (restart, replays) without widening any signature.
+    public bool IsProcedural => StartLevelIndex >= LevelPaths.Length;
 
     // Seeded, and the seed is kept. `new Random()` is time-seeded anyway —
     // the run was always going to be "random from some seed"; *naming* that
@@ -71,6 +77,11 @@ public class GameSession
     public GameMode Mode { get; }
     public int StartLevelIndex { get; } // modern: where the title screen started this run
 
+    // Which high-score table this run competes in. Endless generated runs
+    // get their own — comparing an unbounded score against a three-level
+    // ceiling isn't a contest. Built once: Draw asks every frame.
+    public string ScoreTable { get; }
+
     // Classic-mode wall progression. The 1976 game is exactly two walls: when
     // the first is cleared, AwaitingSecondWall arms, and the wall materializes
     // mid-volley on the ball's next paddle-or-backwall contact (the manual's
@@ -87,7 +98,8 @@ public class GameSession
     public bool IsSuper => Mode is GameMode.SuperDouble
         or GameMode.SuperCavity or GameMode.SuperProgressive;
 
-    public bool HasNextLevel => LevelIndex + 1 < LevelPaths.Length;
+    // A generated run has no last board — it ends when the lives do.
+    public bool HasNextLevel => IsProcedural || LevelIndex + 1 < LevelPaths.Length;
 
     // Cached HUD text: $"SCORE {Score}" allocates a new string every call, and
     // DrawHud runs every frame. Desktop GC absorbs this easily, but rebuilding
@@ -108,7 +120,8 @@ public class GameSession
 
         Mode = mode;
         StartLevelIndex = startLevel;
-        LevelIndex = startLevel;
+        LevelIndex = IsProcedural ? 0 : startLevel; // generated runs count boards from one
+        ScoreTable = IsProcedural ? $"{mode}-Random" : mode.ToString();
         Shake = new ScreenShake(Rng);
         Bricks = mode switch
         {
@@ -116,7 +129,7 @@ public class GameSession
             GameMode.SuperDouble => SuperWall.BuildDouble(),
             GameMode.SuperCavity => SuperWall.BuildCavity(),
             GameMode.SuperProgressive => SuperWall.BuildProgressiveBoard(),
-            _ => LevelLoader.Load(LevelPaths[startLevel]),
+            _ => IsProcedural ? GenerateBoard() : LevelLoader.Load(LevelPaths[startLevel]),
         };
 
         if (mode == GameMode.Coop)
@@ -268,8 +281,15 @@ public class GameSession
     {
         LevelIndex++;
         PowerUps.Clear(); // falling pickups belong to the previous board
-        Bricks = LevelLoader.Load(LevelPaths[LevelIndex]);
+        Bricks = IsProcedural ? GenerateBoard() : LevelLoader.Load(LevelPaths[LevelIndex]);
     }
+
+    // Same parser as the .txt levels, fed from a string instead of a file —
+    // see BoardGenerator for why that reuse is the whole point. Drawing from
+    // Rng keeps generated runs replayable: the replay's session re-seeds the
+    // same stream, so it re-rolls the same boards.
+    private List<Brick> GenerateBoard()
+        => LevelLoader.Parse(new StringReader(BoardGenerator.Generate(Rng, LevelIndex)));
 
     // Destroyed bricks are removed from the list, so "cleared" means only
     // unbreakable ones remain.
@@ -325,6 +345,7 @@ public class GameSession
                 GameMode.SuperDouble => "SUPER - DOUBLE",
                 GameMode.SuperCavity => "SUPER - CAVITY",
                 GameMode.SuperProgressive => "SUPER - PROGRESSIVE",
+                _ when IsProcedural => $"RANDOM - BOARD {LevelIndex + 1}",
                 _ => $"LEVEL {LevelIndex + 1}",
             };
         }

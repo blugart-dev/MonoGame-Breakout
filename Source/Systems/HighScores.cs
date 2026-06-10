@@ -28,35 +28,38 @@ public static class HighScores
     // Mode name → scores, descending. Loaded lazily on first use.
     private static Dictionary<string, List<int>> _tables;
 
-    public static IReadOnlyList<int> For(GameMode mode)
+    // Tables are keyed by name, not by GameMode: a key is "whatever makes
+    // scores comparable", and that's finer-grained than the mode enum — an
+    // endless generated run can't fairly share a table with a three-level
+    // one, so GameSession.ScoreTable adds a suffix for those.
+    public static IReadOnlyList<int> For(string table)
     {
         Load();
-        return _tables.TryGetValue(mode.ToString(), out List<int> list)
+        return _tables.TryGetValue(table, out List<int> list)
             ? list
             : Array.Empty<int>();
     }
 
-    public static int Best(GameMode mode)
+    public static int Best(string table)
     {
-        IReadOnlyList<int> list = For(mode);
+        IReadOnlyList<int> list = For(table);
         return list.Count > 0 ? list[0] : 0;
     }
 
     /// <summary>
     /// Submit a finished run. Returns the 0-based rank it earned in the
-    /// mode's top five, or -1 if it didn't place (or scored nothing).
+    /// table's top five, or -1 if it didn't place (or scored nothing).
     /// </summary>
-    public static int Record(GameMode mode, int score)
+    public static int Record(string table, int score)
     {
         if (score <= 0)
             return -1;
 
         Load();
-        string key = mode.ToString();
-        if (!_tables.TryGetValue(key, out List<int> list))
-            _tables[key] = list = new List<int>();
+        if (!_tables.TryGetValue(table, out List<int> list))
+            _tables[table] = list = new List<int>();
 
-        int rank = list.FindIndex(s => score > s);
+        int rank = list.FindIndex(existing => score > existing);
         if (rank < 0)
         {
             if (list.Count >= Capacity)

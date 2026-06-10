@@ -42,13 +42,16 @@ public sealed class TitleState : GameState
         // Left/right reuse the move actions — on a menu they read as "adjust".
         // Modern and co-op share the level boards, so both get level select;
         // the arcade modes' walls are fixed by their manuals.
+        // One slot past the real levels selects endless generated boards —
+        // the sentinel GameSession.IsProcedural reads. The clamp's upper bound
+        // is LevelCount itself, not LevelCount - 1, to include that slot.
         bool hasLevelSelect = _selected is ModernEntry or CoopEntry;
         if (hasLevelSelect)
         {
             if (input.WasActionJustPressed(GameAction.MoveLeft))
-                _startLevel = MathHelper.Clamp(_startLevel - 1, 0, GameSession.LevelCount - 1);
+                _startLevel = MathHelper.Clamp(_startLevel - 1, 0, GameSession.LevelCount);
             if (input.WasActionJustPressed(GameAction.MoveRight))
-                _startLevel = MathHelper.Clamp(_startLevel + 1, 0, GameSession.LevelCount - 1);
+                _startLevel = MathHelper.Clamp(_startLevel + 1, 0, GameSession.LevelCount);
         }
 
         if (input.WasActionJustPressed(GameAction.Launch)
@@ -70,7 +73,9 @@ public sealed class TitleState : GameState
         // black-and-white monitor, so the title wears the same four bands.
         DrawColorBands(spriteBatch);
 
-        string level = $"< LEVEL {_startLevel + 1} >";
+        string level = _startLevel == GameSession.LevelCount
+            ? "< RANDOM >"
+            : $"< LEVEL {_startLevel + 1} >";
         DrawEntry(spriteBatch, $"MODERN GAME    {level}", 240, _selected == ModernEntry);
         DrawEntry(spriteBatch, $"CO-OP  2P      {level}", 270, _selected == CoopEntry);
         DrawEntry(spriteBatch, "CLASSIC 1976", 300, _selected == ClassicEntry);
@@ -79,7 +84,11 @@ public sealed class TitleState : GameState
         DrawEntry(spriteBatch, "SUPER 1978  PROGRESSIVE", 390, _selected == ProgressiveEntry);
 
         // The highlighted mode's record, straight from the JSON save file.
-        int best = HighScores.Best(SelectedMode);
+        // The RANDOM slot competes in its own table — match GameSession's key.
+        bool randomSelected = _selected is ModernEntry or CoopEntry
+            && _startLevel == GameSession.LevelCount;
+        int best = HighScores.Best(
+            randomSelected ? $"{SelectedMode}-Random" : SelectedMode.ToString());
         if (best > 0)
             spriteBatch.DrawCenteredText(Font, $"BEST  {best}",
                 center + new Vector2(0, 418), Color.Gold, 0.75f);
