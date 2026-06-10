@@ -113,13 +113,13 @@ public sealed class GameStateManager
     /// <summary>
     /// Called by the shell when the window loses focus. Auto-pausing the live
     /// game is the professional default — nobody wants to lose a ball while
-    /// alt-tabbed. Only Playing needs it: every other state is already static.
+    /// alt-tabbed. "Live" is exactly IsSimulation: the same bit the replay
+    /// system uses to mean "this state is part of the run", so new modes get
+    /// auto-pause for free instead of joining a type list here.
     /// </summary>
     public void NotifyFocusLost()
     {
-        // SuperPlayingState is abstract, so this `is` covers all three of
-        // its variant subclasses at once.
-        if (_current is PlayingState or ClassicPlayingState or SuperPlayingState)
+        if (_current.IsSimulation)
             ChangeState(new PauseState(this, _current));
     }
 

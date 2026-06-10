@@ -57,11 +57,6 @@ public sealed class InputHelper
         _virtualMousePosition = virtualScreen.WindowToVirtual(new Point(_mouse.X, _mouse.Y));
     }
 
-    public bool IsKeyDown(Keys key) => _keyboard.IsKeyDown(key);
-
-    public bool WasKeyJustPressed(Keys key)
-        => _keyboard.IsKeyDown(key) && _previousKeyboard.IsKeyUp(key);
-
     // The action-level queries: any bound key OR gamepad button satisfies the
     // action. These loop over arrays instead of allocating LINQ enumerators
     // because they run every tick on the hot path. Note that gameplay code

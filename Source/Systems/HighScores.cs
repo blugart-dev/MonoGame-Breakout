@@ -6,7 +6,8 @@ using System.Text.Json;
 namespace Breakout.Systems;
 
 /// <summary>
-/// Top-five score tables, one per game mode, persisted as JSON. The key
+/// Top-five score tables, one per named table (see GameSession.ScoreTableFor),
+/// persisted as JSON. The key
 /// lesson: reading and writing game data are different problems. Levels load
 /// through TitleContainer, which is READ-ONLY by design (on some platforms
 /// the game's install directory cannot be written at all). Save data needs a

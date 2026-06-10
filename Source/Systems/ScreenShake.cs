@@ -18,10 +18,9 @@ public sealed class ScreenShake
 
     private readonly Random _rng;
     private float _trauma;
+    private Vector2 _offset;
 
     public ScreenShake(Random rng) => _rng = rng;
-
-    private Vector2 _offset;
 
     /// <param name="amount">0..1; stacks, capped at 1.</param>
     public void Add(float amount) => _trauma = MathF.Min(1f, _trauma + amount);

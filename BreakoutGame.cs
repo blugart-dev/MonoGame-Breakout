@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Breakout.States;
@@ -170,7 +171,7 @@ public class BreakoutGame : Game
         _graphics.ApplyChanges(); // device exists now — this is the case that needs it
     }
 
-    private void OnClientSizeChanged(object sender, System.EventArgs e)
+    private void OnClientSizeChanged(object sender, EventArgs e)
     {
         if (_isResizing || Window.ClientBounds.Width == 0 || Window.ClientBounds.Height == 0)
             return;

@@ -34,7 +34,11 @@ public sealed class LevelClearedState : GameState
         if (_timer >= Duration)
         {
             Session.AdvanceLevel();
-            Manager.ChangeState(new ReadyState(Manager));
+            // CreateServeState rather than new ReadyState() — today only the
+            // modern modes have levels, but every back-to-the-serve transition
+            // routing through the one mode switch point is what keeps that an
+            // implementation detail instead of a trap.
+            Manager.ChangeState(Manager.CreateServeState());
         }
     }
 

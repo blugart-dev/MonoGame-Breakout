@@ -84,11 +84,10 @@ public sealed class TitleState : GameState
         DrawEntry(spriteBatch, "SUPER 1978  PROGRESSIVE", 390, _selected == ProgressiveEntry);
 
         // The highlighted mode's record, straight from the JSON save file.
-        // The RANDOM slot competes in its own table — match GameSession's key.
+        // The RANDOM slot competes in its own table.
         bool randomSelected = _selected is ModernEntry or CoopEntry
             && _startLevel == GameSession.LevelCount;
-        int best = HighScores.Best(
-            randomSelected ? $"{SelectedMode}-Random" : SelectedMode.ToString());
+        int best = HighScores.Best(GameSession.ScoreTableFor(SelectedMode, randomSelected));
         if (best > 0)
             spriteBatch.DrawCenteredText(Font, $"BEST  {best}",
                 center + new Vector2(0, 418), Color.Gold, 0.75f);

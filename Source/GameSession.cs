@@ -82,6 +82,12 @@ public class GameSession
     // ceiling isn't a contest. Built once: Draw asks every frame.
     public string ScoreTable { get; }
 
+    /// <summary>The table key for a mode/procedural pair — static so the
+    /// title screen can ask before any session exists, and so the key is
+    /// spelled in exactly one place.</summary>
+    public static string ScoreTableFor(GameMode mode, bool procedural)
+        => procedural ? $"{mode}-Random" : mode.ToString();
+
     // Classic-mode wall progression. The 1976 game is exactly two walls: when
     // the first is cleared, AwaitingSecondWall arms, and the wall materializes
     // mid-volley on the ball's next paddle-or-backwall contact (the manual's
@@ -121,7 +127,7 @@ public class GameSession
         Mode = mode;
         StartLevelIndex = startLevel;
         LevelIndex = IsProcedural ? 0 : startLevel; // generated runs count boards from one
-        ScoreTable = IsProcedural ? $"{mode}-Random" : mode.ToString();
+        ScoreTable = ScoreTableFor(mode, IsProcedural);
         Shake = new ScreenShake(Rng);
         Bricks = mode switch
         {

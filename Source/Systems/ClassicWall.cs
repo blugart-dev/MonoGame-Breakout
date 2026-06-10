@@ -17,7 +17,6 @@ public static class ClassicWall
 {
     public const int Rows = 8;
     public const int Columns = 14;
-    public const int PointsPerWall = 448;
 
     private const int CellWidth = Screen.Width / Columns;
     private const int CellHeight = 18;
