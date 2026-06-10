@@ -26,4 +26,27 @@ public enum GameMode
     /// per trip, and exactly two walls for a 896-point maximum.
     /// </summary>
     Classic,
+
+    // The three Super Breakout (1978) games, from the sequel's operation
+    // manual. They share SuperReadyState and the SuperPlayingState physics
+    // (five speeds, pass-through rule, shrink on top contact, score times
+    // balls in play); each gets one playing-state subclass for what differs.
+
+    /// <summary>
+    /// Super Breakout "Double": two stacked paddles on one set of controls,
+    /// two balls per serve, double points while both balls fly.
+    /// </summary>
+    SuperDouble,
+
+    /// <summary>
+    /// Super Breakout "Cavity": two captive balls sealed inside the wall;
+    /// freeing them puts up to three balls in play for x2/x3 scoring.
+    /// </summary>
+    SuperCavity,
+
+    /// <summary>
+    /// Super Breakout "Progressive": an endless wall that scrolls toward the
+    /// paddle, with brick values priced by screen position.
+    /// </summary>
+    SuperProgressive,
 }

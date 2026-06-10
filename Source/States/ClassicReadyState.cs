@@ -35,10 +35,8 @@ public sealed class ClassicReadyState : GameState
     {
         var ball = Session.Balls[0]; // PrepareClassicServe guarantees exactly one
 
-        // "About midway along the TV screen" (manual) — vertically midway,
-        // safely below the wall. The X is random so the player can't camp.
-        ball.Position = new Vector2(
-            200 + (float)Session.Rng.NextDouble() * (Screen.Width - 400), 280);
+        // "About midway along the TV screen" (manual) — see ServePosition.
+        ball.Position = ClassicRules.ServePosition(Session.Rng);
 
         ball.OverrideSpeed(ClassicRules.Speeds[0]); // every serve restarts the speed ladder
         ball.Velocity = ClassicRules.ServeDirection(Session.Rng) * ball.Speed;

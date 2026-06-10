@@ -44,8 +44,8 @@ public sealed class GameStateManager
     /// adding a mode never means hunting down transitions.
     /// </summary>
     public GameState CreateServeState()
-        => Session.Mode == GameMode.Classic
-            ? new ClassicReadyState(this)
+        => Session.Mode == GameMode.Classic ? new ClassicReadyState(this)
+            : Session.IsSuper ? new SuperReadyState(this)
             : new ReadyState(this);
 
     public void ChangeState(GameState next)
@@ -68,7 +68,9 @@ public sealed class GameStateManager
     /// </summary>
     public void NotifyFocusLost()
     {
-        if (_current is PlayingState or ClassicPlayingState)
+        // SuperPlayingState is abstract, so this `is` covers all three of
+        // its variant subclasses at once.
+        if (_current is PlayingState or ClassicPlayingState or SuperPlayingState)
             ChangeState(new PauseState(this, _current));
     }
 

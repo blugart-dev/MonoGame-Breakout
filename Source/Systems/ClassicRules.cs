@@ -85,6 +85,15 @@ public static class ClassicRules
     }
 
     /// <summary>
+    /// Where a served ball materializes: "about midway along the TV screen"
+    /// (vertically midway, safely below the wall), random X so the player
+    /// can't camp. Super Breakout serves from the same spot, so SuperRules
+    /// delegates here — one encoding of a rule two games share.
+    /// </summary>
+    public static Vector2 ServePosition(Random rng)
+        => new(200f + (float)rng.NextDouble() * (Screen.Width - 400), 280f);
+
+    /// <summary>
     /// Unit direction for a fresh serve: downward (the 1976 ball is served
     /// *at* you, not launched by you), random side, 12-50 degrees off
     /// vertical so it is neither perpendicular nor a near-horizontal crawl.

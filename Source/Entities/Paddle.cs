@@ -10,15 +10,16 @@ namespace Breakout.Entities;
 /// as a center X plus a width (not a rectangle) because both input and the
 /// wide power-up think in terms of "where is the middle" and "how wide right
 /// now" — the Bounds rectangle is derived on read. Which actions move it,
-/// whether the mouse drives it, and which slice of the court it may occupy
-/// are all constructor data: the multiball lesson again, applied to input —
-/// an entity that reads *its own* bindings multiplies cleanly, one that
-/// hard-codes "the" bindings does not.
+/// whether the mouse drives it, which slice of the court it may occupy, and
+/// which row it sits on (Super Breakout's Double stacks a second paddle
+/// above the first) are all constructor data: the multiball lesson again,
+/// applied to input — an entity that reads *its own* bindings multiplies
+/// cleanly, one that hard-codes "the" bindings does not.
 /// </summary>
 public class Paddle
 {
     public const int Height = 14;
-    public const int Y = Screen.Height - 40;
+    public const int DefaultY = Screen.Height - 40;
 
     private const float BaseWidth = 100f;
     private const float WideWidth = 160f;
@@ -32,6 +33,7 @@ public class Paddle
     private readonly bool _useMouse;
     private readonly float _minX, _maxX; // court slice (full screen in 1P)
     private readonly Color _bodyColor;
+    private readonly int _y;
 
     private float _centerX;
     private float _width = BaseWidth;
@@ -45,7 +47,7 @@ public class Paddle
         : this(GameAction.MoveLeft, GameAction.MoveRight, useMouse: true, 0f, Screen.Width) { }
 
     public Paddle(GameAction moveLeft, GameAction moveRight, bool useMouse,
-        float minX, float maxX, Color? bodyColor = null)
+        float minX, float maxX, Color? bodyColor = null, int y = DefaultY)
     {
         _moveLeft = moveLeft;
         _moveRight = moveRight;
@@ -53,10 +55,11 @@ public class Paddle
         _minX = minX;
         _maxX = maxX;
         _bodyColor = bodyColor ?? DefaultBodyColor;
+        _y = y;
         _centerX = (minX + maxX) / 2f;
     }
 
-    public Rectangle Bounds => new((int)(_centerX - _width / 2f), Y, (int)_width, Height);
+    public Rectangle Bounds => new((int)(_centerX - _width / 2f), _y, (int)_width, Height);
 
     public void Update(float dt, InputHelper input)
     {

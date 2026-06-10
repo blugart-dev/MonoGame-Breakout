@@ -10,8 +10,10 @@ namespace Breakout.Entities;
 /// "tier", 1-5) drives everything — hit points, color, and score value; the
 /// classic 1976 wall instead scores by *row*, so the general constructor takes
 /// the three values independently and the tier constructor is just a preset.
-/// Bricks never move, so the bounds rectangle is computed once and stays
-/// immutable.
+/// This class once promised "bricks never move" — then Progressive Super
+/// Breakout scrolled the wall, and the promise became ShiftDown/Reclassify
+/// instead. The same lesson multiball taught about "the ball": an assumption
+/// holds only until one feature needs the opposite.
 /// </summary>
 public class Brick
 {
@@ -27,11 +29,11 @@ public class Brick
     };
     private static readonly Color UnbreakableColor = new(128, 130, 140);
 
-    public Rectangle Bounds { get; }
+    public Rectangle Bounds { get; private set; }
     public bool IsUnbreakable { get; }
     public int HitPoints { get; private set; }
-    public int ScoreValue { get; }
-    public Color BaseColor { get; }
+    public int ScoreValue { get; private set; }
+    public Color BaseColor { get; private set; }
 
     private readonly int _maxHitPoints; // for the damage tint in Draw
 
@@ -103,6 +105,31 @@ public class Brick
             float eased = 1f - MathF.Pow(1f - t, 3f);
             return -(Bounds.Bottom + 8) * (1f - eased); // start fully above the screen
         }
+    }
+
+    /// <summary>
+    /// Progressive Super Breakout's scroll. Note the contrast with the
+    /// entrance animation above: that one offsets only the *drawing* while
+    /// Bounds stay put; this one moves the real rectangle, collision and all,
+    /// because the scroll is simulation, not presentation.
+    /// </summary>
+    public void ShiftDown(int pixels)
+    {
+        Rectangle moved = Bounds;
+        moved.Y += pixels;
+        Bounds = moved;
+    }
+
+    /// <summary>
+    /// Re-stamp value and color. In Progressive a brick is worth whatever
+    /// screen zone it currently occupies — "a new point score for that brick
+    /// at that instant of time" (the 1978 manual) — so each scroll step
+    /// re-prices the whole wall.
+    /// </summary>
+    public void Reclassify(int scoreValue, Color color)
+    {
+        ScoreValue = scoreValue;
+        BaseColor = color;
     }
 
     /// <returns>true if this hit destroyed the brick.</returns>

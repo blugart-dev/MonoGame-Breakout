@@ -44,6 +44,13 @@ public class GameSession
     public readonly List<Ball> Balls = new();
 
     public List<Brick> Bricks { get; private set; }
+
+    // Cavity Super Breakout only: balls sealed inside the wall's two holes.
+    // Deliberately NOT in Balls, because they are not "in play" — they can't
+    // be lost, don't score, and don't count toward the score multiplier.
+    // Freeing one means moving it from this list to Balls.
+    public readonly List<Ball> CaptiveBalls = new();
+
     public readonly List<PowerUp> PowerUps = new();
     public readonly ParticleSystem Particles = new();
     public readonly ScreenShake Shake;
@@ -61,6 +68,15 @@ public class GameSession
     // rule — no interstitial, no new serve).
     public int WallNumber { get; private set; } = 1;
     public bool AwaitingSecondWall { get; set; }
+
+    // Progressive Super Breakout only: how many rows have entered at the top
+    // so far. Session data, not playing-state data: the endless four-bricks/
+    // four-blanks pattern must continue seamlessly across serves, and a
+    // playing state dies with its serve.
+    public int ProgressiveRowPhase;
+
+    public bool IsSuper => Mode is GameMode.SuperDouble
+        or GameMode.SuperCavity or GameMode.SuperProgressive;
 
     public bool HasNextLevel => LevelIndex + 1 < LevelPaths.Length;
 
@@ -80,9 +96,14 @@ public class GameSession
         StartLevelIndex = startLevel;
         LevelIndex = startLevel;
         Shake = new ScreenShake(Rng);
-        Bricks = mode == GameMode.Classic
-            ? ClassicWall.Build()
-            : LevelLoader.Load(LevelPaths[startLevel]);
+        Bricks = mode switch
+        {
+            GameMode.Classic => ClassicWall.Build(),
+            GameMode.SuperDouble => SuperWall.BuildDouble(),
+            GameMode.SuperCavity => SuperWall.BuildCavity(),
+            GameMode.SuperProgressive => SuperWall.BuildProgressiveBoard(),
+            _ => LevelLoader.Load(LevelPaths[startLevel]),
+        };
 
         if (mode == GameMode.Coop)
         {
@@ -93,13 +114,29 @@ public class GameSession
             Paddles.Add(new Paddle(GameAction.P2MoveLeft, GameAction.P2MoveRight,
                 useMouse: false, Screen.Width / 2f, Screen.Width, new Color(170, 190, 255)));
         }
+        else if (mode == GameMode.SuperDouble)
+        {
+            // The 1978 "Double" cabinet: two paddles stacked on ONE knob, so
+            // both read the same default bindings — contrast with co-op
+            // above, where two paddles mean two players. The manual never
+            // documents the vertical gap; this spacing matches footage.
+            Paddles.Add(new Paddle());
+            Paddles.Add(new Paddle(GameAction.MoveLeft, GameAction.MoveRight,
+                useMouse: true, 0f, Screen.Width,
+                new Color(170, 190, 255), Paddle.DefaultY - 36));
+        }
         else
         {
             Paddles.Add(new Paddle());
         }
 
+        if (mode == GameMode.SuperCavity)
+            SpawnCaptiveBalls();
+
         if (mode == GameMode.Classic)
             PrepareClassicServe();
+        else if (IsSuper)
+            PrepareSuperServe();
         else
             ResetForServe();
     }
@@ -129,6 +166,23 @@ public class GameSession
         Paddles[0].ResetWidth(); // classic is one-player by definition
     }
 
+    /// <summary>
+    /// The Super Breakout serve prep: park the ball like classic (the 1978
+    /// serve also materializes mid-screen), heal every paddle from the
+    /// half-width penalty (the manual: "until the next serve"), and freeze
+    /// Cavity's captives ("they stop moving, and remain motionless ... until
+    /// the next ball is served").
+    /// </summary>
+    public void PrepareSuperServe()
+    {
+        EnsureSingleBall();
+        Balls[0].Park();
+        foreach (Paddle paddle in Paddles)
+            paddle.ResetWidth();
+        foreach (Ball captive in CaptiveBalls)
+            captive.Velocity = Vector2.Zero;
+    }
+
     private void EnsureSingleBall()
     {
         if (Balls.Count == 0)
@@ -143,6 +197,49 @@ public class GameSession
         WallNumber = 2;
         AwaitingSecondWall = false;
         Bricks = ClassicWall.Build();
+    }
+
+    /// <summary>
+    /// Double/Cavity: a fresh wall, forever — the 1978 cabinet has no 1976
+    /// two-wall cap ("when they are all gone a new wall forms"). Cavity's
+    /// rebuild brings fresh captive balls with it; they spawn motionless and
+    /// a state decides when they wake.
+    /// </summary>
+    public void RebuildSuperWall()
+    {
+        if (Mode == GameMode.SuperDouble)
+        {
+            Bricks = SuperWall.BuildDouble();
+        }
+        else if (Mode == GameMode.SuperCavity)
+        {
+            Bricks = SuperWall.BuildCavity();
+            SpawnCaptiveBalls();
+        }
+    }
+
+    private void SpawnCaptiveBalls()
+    {
+        CaptiveBalls.Clear();
+        foreach (Rectangle hole in SuperWall.CavityHoles)
+        {
+            var captive = new Ball();
+            captive.Park(); // motionless "prior to serving the ball"
+            captive.Position = hole.Center.ToVector2();
+            CaptiveBalls.Add(captive);
+        }
+    }
+
+    /// <summary>Cavity: set any motionless captive bouncing — on serve, and
+    /// when a mid-volley wall rebuild brings fresh captives into a live one.</summary>
+    public void WakeCaptiveBalls()
+    {
+        foreach (Ball captive in CaptiveBalls)
+            if (captive.Velocity == Vector2.Zero)
+            {
+                captive.OverrideSpeed(SuperRules.Speeds[0]);
+                captive.Velocity = SuperRules.CaptiveDirection(Rng) * captive.Speed;
+            }
     }
 
     /// <summary>
@@ -190,6 +287,8 @@ public class GameSession
             paddle.Draw(spriteBatch);
         foreach (Ball ball in Balls)
             ball.Draw(spriteBatch);
+        foreach (Ball captive in CaptiveBalls)
+            captive.Draw(spriteBatch); // sealed in, but drawn like any ball
         Particles.Draw(spriteBatch);
     }
 
@@ -206,9 +305,14 @@ public class GameSession
         if (_levelTextValue != levelValue)
         {
             _levelTextValue = levelValue;
-            _levelText = Mode == GameMode.Classic
-                ? $"CLASSIC - WALL {WallNumber}"
-                : $"LEVEL {LevelIndex + 1}";
+            _levelText = Mode switch
+            {
+                GameMode.Classic => $"CLASSIC - WALL {WallNumber}",
+                GameMode.SuperDouble => "SUPER - DOUBLE",
+                GameMode.SuperCavity => "SUPER - CAVITY",
+                GameMode.SuperProgressive => "SUPER - PROGRESSIVE",
+                _ => $"LEVEL {LevelIndex + 1}",
+            };
         }
         spriteBatch.DrawCenteredText(font, _levelText,
             new Vector2(Screen.Width / 2f, 16), new Color(150, 150, 165), 0.75f);

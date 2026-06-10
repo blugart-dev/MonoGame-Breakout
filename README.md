@@ -37,7 +37,7 @@ automatically and the content pipeline runs as part of the build.
 | `↑` `↓` / `W` `S` (title) | Select mode |
 | `←` `→` (title) | Pick starting level (modern / co-op) |
 | Mouse / `←` `→` / `A` `D` | Move paddle (gamepad: D-pad / left stick) |
-| `Space` / Left click / `A` button | Launch ball (modern) / serve (classic) |
+| `Space` / Left click / `A` button | Launch ball (modern) / serve (classic, super) |
 | `Enter` / Click (on game over) | Play again |
 | `T` (on game over) | Back to the title screen |
 | `B` (while paused) | Key rebinding screen |
@@ -71,7 +71,7 @@ the right half (arrows, or a gamepad's D-pad/stick).
 
 ## Features
 
-- **Three ways to play, one engine.** A title screen (with level select)
+- **Six ways to play, one engine.** A title screen (with level select)
   picks the mode; a mode is just which states drive the shared entities
 - **Modern mode:** three tiered boards, power-ups, multiball, continuous
   paddle aiming, per-brick speed ramp, staggered brick drop-in entrance
@@ -84,6 +84,17 @@ the right half (arrows, or a gamepad's D-pad/stick).
   orange/red), four fixed paddle rebound exits (never perpendicular), one
   brick per trip, half-width paddle after breaking through, hostile
   mid-screen serve, and exactly two walls: max score 896
+- **Super Breakout 1978 modes:** the sequel's three games, from its operation
+  manual (TM-118). Shared 1978 physics: five discrete speeds (4th/8th/12th
+  return, instant max on a 5/7-point brick), the pass-through rule (an
+  unreturned ball sails through bricks; after each kill the ball *bores* for
+  four rows), paddle halves on top-boundary contact until the next serve, and
+  scores multiply by balls in play. **Double:** two stacked paddles on one
+  set of controls, two balls per serve (only the first costs a serve), ×2
+  points while both fly. **Cavity:** two captive balls sealed in the wall
+  escape through the holes you open and join play for ×2/×3 scoring.
+  **Progressive:** an endless wall scrolls toward you, re-priced by screen
+  zone (blue 7 → orange 5 → green 3 → yellow 1) every step
 - Arcade loop: Title → Ready → Playing → LifeLost → GameOver (plus Pause and
   LevelCleared), 3 lives/serves, score + level HUD
 - Three levels as plain-text grids (`Content/Levels/*.txt`);
@@ -113,16 +124,17 @@ Program.cs             entry point — two lines
 BreakoutGame.cs        application shell: window, loop, two-pass draw
 Source/
   Screen.cs            virtual resolution constants
-  GameMode.cs          Modern vs Classic — which states drive the session
+  GameMode.cs          Modern / Co-op / Classic / 3× Super — which states drive the session
   GameSession.cs       the world: entities, score, lives, level/wall index
   Entities/            Paddle, Ball, Brick, PowerUp
   Systems/             input + action map (kbd/pad), collision, levels,
-                       classic 1976 rules + wall, high scores, virtual
-                       screen, particles, shake, audio synth + music,
-                       debug overlay
+                       classic 1976 rules + wall, super 1978 rules + walls,
+                       high scores, virtual screen, particles, shake,
+                       audio synth + music, debug overlay
   States/              GameState base + Title/Ready/Playing/ClassicReady/
-                       ClassicPlaying/Pause/Rebind/LifeLost/LevelCleared/
-                       GameOver
+                       ClassicPlaying/SuperReady/SuperPlaying (abstract,
+                       + Double/Cavity/Progressive)/Pause/Rebind/LifeLost/
+                       LevelCleared/GameOver
 Content/
   Content.mgcb         pipeline manifest (font only)
   Fonts/Hud.spritefont rasterized at build time by the pipeline
