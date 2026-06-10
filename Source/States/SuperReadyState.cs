@@ -11,8 +11,10 @@ namespace Breakout.States;
 /// already falling toward you — so this state is ClassicReadyState's twin.
 /// One ready state covers all three variants: they differ in play, not in
 /// how a serve begins. It restocks Double's and Cavity's wall between serves
-/// if the last volley stripped it bare, charges Progressive's one-row
-/// re-serve penalty, and picks which playing state runs the volley.
+/// if the last volley stripped it bare, and picks which playing state runs
+/// the volley. (Progressive's one-row re-serve penalty is deliberately NOT
+/// here — the miss is the event, so it lives in the playing state's
+/// OnBallLost.)
 /// </summary>
 public sealed class SuperReadyState : GameState
 {
