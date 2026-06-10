@@ -676,7 +676,7 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
 <section id="juice">
   <div class="kicker" style="color:var(--tier5)">09 / GAME FEEL</div>
   <h2>Juice: Shake, Sparks, Square Waves</h2>
-  <p class="files">open: <code>Source/Systems/ScreenShake.cs</code> · <code>ParticleSystem.cs</code> · <code>AudioBank.cs</code></p>
+  <p class="files">open: <code>Source/Systems/ScreenShake.cs</code> · <code>ParticleSystem.cs</code> · <code>AudioBank.cs</code> · <code>MusicPlayer.cs</code></p>
 
   <h3>Trauma-based screen shake</h3>
   <p>Impacts add <em>trauma</em> (0–1, capped); displayed intensity is
@@ -712,6 +712,18 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
   <p><code>SoundEffect</code> is for fire-and-forget polyphonic SFX. Music is a different
   API entirely: <code>Song</code> + <code>MediaPlayer</code>, streamed, one at a time.
   Loading music as a SoundEffect decompresses the whole file into RAM. Don't mix them up.</p></div>
+
+  <h3>Music is nothing but the handle</h3>
+  <p><code>MusicPlayer</code> pushes the PCM trick one step further: eight bars of
+  Am–F–C–G — square bass, 25%-duty arpeggio, noise hats, mixed by literal addition into
+  one 16-second buffer — played through a <code>SoundEffectInstance</code>. That's the
+  half of the audio API the SFX never needed: <code>Play()</code> returns no handle, so a
+  fired SFX can't be stopped or re-volumed; <code>CreateInstance()</code> returns the
+  handle you keep — <code>IsLooped</code>, <code>Pause()</code>, and a <em>live</em>
+  <code>Volume</code>, which is how the pause screen <em>ducks</em> the track instead of
+  stopping it. (A real three-minute track would still be <code>Song</code> +
+  <code>MediaPlayer</code> — whole-file PCM in RAM only works because the loop is
+  seconds, not minutes.)</p>
 
   <div class="box try"><span class="tag">TRY IT</span>
   <p>Press <b>F3</b> in game and watch the particle count while you break a brick. Then
@@ -766,7 +778,8 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
       <td><code>AudioBank.Initialize</code></td>
       <td>No audio device? Catch <code>NoAudioHardwareException</code>, leave the
       properties null, and every call site uses <code>?.Play()</code>. The game runs
-      silent instead of crashing.</td>
+      silent instead of crashing. <code>MusicPlayer.Initialize</code> makes the same
+      promise: a null instance turns every music call into a no-op.</td>
     </tr>
     <tr>
       <td><strong>Honest naming</strong></td>
@@ -819,6 +832,7 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
     │   ├── ParticleSystem.cs   <i>struct pool, premultiplied fade</i>
     │   ├── ScreenShake.cs      <i>trauma² shake as a transform matrix</i>
     │   ├── AudioBank.cs        <i>synthesized square-wave PCM, pitch-varied playback</i>
+    │   ├── MusicPlayer.cs      <i>synthesized chip-tune loop on a SoundEffectInstance</i>
     │   ├── SpriteBatchExtensions.cs <i>1×1 pixel DrawRect + centered text</i>
     │   └── DebugOverlay.cs     <i>F3: fps, ball count + top speed, live counts</i>
     └── States/
@@ -853,7 +867,7 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
     <tr><td>global singleton for cross-scene data</td><td>a session object that outlives states</td><td><code>GameSession</code></td></tr>
     <tr><td>resolution stretch / scale setting</td><td><code>RenderTarget2D</code> + letterbox + mouse inverse transform</td><td><code>VirtualScreen</code></td></tr>
     <tr><td>"draw a rectangle" primitive</td><td>1×1 white texture, stretched and tinted</td><td><code>SpriteBatchExtensions</code></td></tr>
-    <tr><td>one audio player for everything</td><td><code>SoundEffect</code> (SFX) vs <code>Song</code>+<code>MediaPlayer</code> (music)</td><td><code>AudioBank</code></td></tr>
+    <tr><td>one audio player for everything</td><td><code>SoundEffect</code> (SFX) vs <code>Song</code>+<code>MediaPlayer</code> (music) vs <code>SoundEffectInstance</code> (the controllable handle)</td><td><code>AudioBank</code> · <code>MusicPlayer</code></td></tr>
     <tr><td>project display settings</td><td><code>GraphicsDeviceManager</code> preferences + <code>ApplyChanges()</code></td><td><code>BreakoutGame</code> ctor</td></tr>
     <tr><td>built-in particle system</td><td>a list of structs and forty lines</td><td><code>ParticleSystem</code></td></tr>
     <tr><td>built-in pause / time scale</td><td>a state that updates nothing</td><td><code>PauseState</code></td></tr>
@@ -870,14 +884,16 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
   <em>implemented in the codebase, one commit each</em>. That makes the git history a
   second study guide: <code>git log --oneline</code> is the index, and each diff shows
   exactly how much (or little) one real feature costs. Read the multiball commit in
-  particular to watch a single-to-many assumption ripple through every consumer.</p>
+  particular to watch a single-to-many assumption ripple through every consumer.
+  From the round below, <strong>music</strong> has since joined them: the asset-free
+  variant, a synthesized chip-tune loop on a looping <code>SoundEffectInstance</code> —
+  see <code>Source/Systems/MusicPlayer.cs</code> and its commit.</p>
 
   <p>The next round, again ordered roughly by how much existing code each one touches —
   every item is a real feature, not a toy exercise.</p>
 
   <table>
     <tr><th>Exercise</th><th>What it teaches</th></tr>
-    <tr><td><strong>Music.</strong> A looping background track via <code>Song</code> + <code>MediaPlayer</code> (or keep it asset-free: write a longer PCM buffer and loop a <code>SoundEffectInstance</code>).</td><td>The other half of MonoGame's audio split — and why SFX and music go through different APIs at all.</td></tr>
     <tr><td><strong>Brick entrance.</strong> On level load, drop bricks in from above the screen over ~half a second (lerp from a start offset, staggered by column).</td><td>Tween-style animation without a tween library; one more place where "animate toward target" beats "snap".</td></tr>
     <tr><td><strong>Gamepad support.</strong> Extend <code>ActionMap</code> with a second dictionary action → <code>Buttons[]</code>, polled from <code>GamePad.GetState(PlayerIndex.One)</code>.</td><td>Why the action layer was worth building: paddle code does not change at all.</td></tr>
     <tr><td><strong>Rebinding screen.</strong> From PauseState, a menu that waits for "any key just pressed" and calls <code>ActionMap.Rebind</code>.</td><td>Polling for an unknown key (compare full <code>GetPressedKeys()</code> sets) and writing your first menu state.</td></tr>
@@ -894,7 +910,7 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
 
 <footer>
   <span>BREAKOUT — MonoGame learning project · built &amp; documented 2026</span>
-  <span>dotnet run · P pause · F11 fullscreen · F10 pixel-perfect · F3 debug · Esc quit</span>
+  <span>dotnet run · P pause · M music · F11 fullscreen · F10 pixel-perfect · F3 debug · Esc quit</span>
 </footer>
 
 </main>

@@ -10,6 +10,8 @@ namespace Breakout.Systems;
 /// handy, retro is fine" route — and it teaches what a sound actually is.
 /// MonoGame's audio split: SoundEffect = short, fire-and-forget, polyphonic
 /// SFX; Song + MediaPlayer = one streamed music track. Don't mix them up.
+/// (This project's music takes a third, asset-free route — the same PCM
+/// synthesis on a looping SoundEffectInstance; see MusicPlayer.)
 /// </summary>
 public static class AudioBank
 {

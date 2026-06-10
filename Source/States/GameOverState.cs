@@ -14,6 +14,8 @@ public sealed class GameOverState : GameState
 
     public override void Enter()
     {
+        // Duck the music so the verdict jingle owns the moment.
+        MusicPlayer.SetDucked(true);
         if (_won)
             AudioBank.Win?.Play();
         else
@@ -23,7 +25,10 @@ public sealed class GameOverState : GameState
     public override void Update(float dt, InputHelper input)
     {
         if (input.WasActionJustPressed(GameAction.Restart) || input.WasLeftClickJustPressed)
+        {
+            MusicPlayer.SetDucked(false);
             Manager.StartNewGame();
+        }
     }
 
     public override void Draw(SpriteBatch spriteBatch)

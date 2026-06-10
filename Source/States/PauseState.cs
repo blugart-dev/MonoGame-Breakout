@@ -25,10 +25,19 @@ public sealed class PauseState : GameState
     // *and* its garnish stopped.
     public override bool FreezesEffects => true;
 
+    // The world freezes but the music only dims: a quiet track still playing
+    // says "paused"; total silence says "hung". Unducking lives here too —
+    // resume bypasses Enter() by design, so the interrupted state never knows
+    // the volume changed.
+    public override void Enter() => MusicPlayer.SetDucked(true);
+
     public override void Update(float dt, InputHelper input)
     {
         if (input.WasActionJustPressed(GameAction.Pause))
+        {
+            MusicPlayer.SetDucked(false);
             Manager.ResumeState(_resumeTo);
+        }
     }
 
     public override void Draw(SpriteBatch spriteBatch)

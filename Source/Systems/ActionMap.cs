@@ -24,6 +24,7 @@ public sealed class ActionMap
         [GameAction.ToggleFullscreen] = new[] { Keys.F11 },
         [GameAction.ToggleDebugOverlay] = new[] { Keys.F3 },
         [GameAction.ToggleIntegerScaling] = new[] { Keys.F10 },
+        [GameAction.ToggleMusic] = new[] { Keys.M },
         [GameAction.Quit] = new[] { Keys.Escape },
     };
 

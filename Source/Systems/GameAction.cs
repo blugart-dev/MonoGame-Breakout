@@ -15,5 +15,6 @@ public enum GameAction
     ToggleFullscreen,
     ToggleDebugOverlay,
     ToggleIntegerScaling,
+    ToggleMusic,
     Quit,
 }

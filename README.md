@@ -9,8 +9,8 @@ it uses and the reasoning behind non-obvious choices. No prior game-engine
 experience is assumed — the repo teaches MonoGame from first principles.
 
 It is also entirely **asset-free**: every visual is a tinted 1×1 white texture,
-every sound is a square wave synthesized at startup, and the only content
-pipeline asset is the HUD font.
+every sound — the SFX *and* the looping music track — is synthesized at
+startup, and the only content pipeline asset is the HUD font.
 
 > 📖 **[Read the study guide](https://blugart-dev.github.io/MonoGame-Breakout/)** —
 > ten concept sections, a project map, an engine-concepts glossary, and
@@ -38,6 +38,7 @@ automatically and the content pipeline runs as part of the build.
 | `Space` / Left click | Launch ball |
 | `Enter` / Click (on game over) | Play again |
 | `P` | Pause / resume (also auto-pauses when the window loses focus) |
+| `M` | Music on / off |
 | `F11` | Borderless fullscreen |
 | `F10` | Integer ("pixel perfect") scaling toggle |
 | `F3` | Debug overlay (FPS, ball speed, entity counts) |
@@ -73,6 +74,8 @@ automatically and the content pipeline runs as part of the build.
   multiball (cyan) — a life is lost only when the *last* ball drops
 - Juice: brick-break particles, trauma-based screen shake, ball trail,
   synthesized SFX with random pitch variation
+- Music: a synthesized chiptune loop on a looping `SoundEffectInstance` —
+  ducks (drops low, doesn't stop) on pause and game over, `M` mutes
 - Action map: gameplay reads named intents (`GameAction`), not keys —
   bindings live in one runtime-rebindable dictionary (`ActionMap`)
 - Production layer: virtual 800×480 resolution rendered to a `RenderTarget2D`
@@ -90,7 +93,7 @@ Source/
   GameSession.cs       the world: entities, score, lives, level index
   Entities/            Paddle, Ball, Brick, PowerUp
   Systems/             input + action map, collision, levels, virtual screen,
-                       particles, shake, audio synth, debug overlay
+                       particles, shake, audio synth + music, debug overlay
   States/              GameState base + Ready/Playing/Pause/LifeLost/
                        LevelCleared/GameOver
 Content/

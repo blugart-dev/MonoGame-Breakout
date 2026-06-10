@@ -68,6 +68,12 @@ public class BreakoutGame : Game
         SpriteBatchExtensions.Initialize(GraphicsDevice);
         AudioBank.Initialize();
 
+        // Music loops from the first frame and never stops: states *duck* it
+        // (pause, game over) and M mutes it, but nobody re-Plays it — one
+        // long-lived SoundEffectInstance instead of per-screen track juggling.
+        MusicPlayer.Initialize();
+        MusicPlayer.Play();
+
         // Pipeline asset names are path-without-extension relative to Content/.
         _font = Content.Load<SpriteFont>("Fonts/Hud");
         _states = new GameStateManager(_font);
@@ -95,6 +101,8 @@ public class BreakoutGame : Game
             _showDebugOverlay = !_showDebugOverlay;
         if (_input.WasActionJustPressed(GameAction.ToggleIntegerScaling))
             _virtualScreen.IntegerScaling = !_virtualScreen.IntegerScaling;
+        if (_input.WasActionJustPressed(GameAction.ToggleMusic))
+            MusicPlayer.ToggleMuted();
 
         float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
         _states.Update(dt, _input);
