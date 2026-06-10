@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Breakout.States;
 using Breakout.Systems;
 
@@ -88,13 +87,13 @@ public class BreakoutGame : Game
 
         _input.Update(_virtualScreen);
 
-        if (_input.IsKeyDown(Keys.Escape))
+        if (_input.IsActionDown(GameAction.Quit))
             Exit();
-        if (_input.WasKeyJustPressed(Keys.F11))
+        if (_input.WasActionJustPressed(GameAction.ToggleFullscreen))
             ToggleFullscreen();
-        if (_input.WasKeyJustPressed(Keys.F3))
+        if (_input.WasActionJustPressed(GameAction.ToggleDebugOverlay))
             _showDebugOverlay = !_showDebugOverlay;
-        if (_input.WasKeyJustPressed(Keys.F10))
+        if (_input.WasActionJustPressed(GameAction.ToggleIntegerScaling))
             _virtualScreen.IntegerScaling = !_virtualScreen.IntegerScaling;
 
         float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;

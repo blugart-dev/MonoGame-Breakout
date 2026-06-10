@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Breakout.Systems;
 
 namespace Breakout.States;
@@ -28,7 +27,7 @@ public sealed class PauseState : GameState
 
     public override void Update(float dt, InputHelper input)
     {
-        if (input.WasKeyJustPressed(Keys.P))
+        if (input.WasActionJustPressed(GameAction.Pause))
             Manager.ResumeState(_resumeTo);
     }
 

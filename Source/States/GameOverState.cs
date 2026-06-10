@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Breakout.Systems;
 
 namespace Breakout.States;
@@ -23,7 +22,7 @@ public sealed class GameOverState : GameState
 
     public override void Update(float dt, InputHelper input)
     {
-        if (input.WasKeyJustPressed(Keys.Enter) || input.WasLeftClickJustPressed)
+        if (input.WasActionJustPressed(GameAction.Restart) || input.WasLeftClickJustPressed)
             Manager.StartNewGame();
     }
 

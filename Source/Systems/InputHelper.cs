@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -9,10 +10,14 @@ namespace Breakout.Systems;
 /// "Was this key *just* pressed?" therefore requires memory: keep last frame's
 /// snapshot and compare. Engines that offer a built-in "just pressed" query
 /// are doing exactly this comparison under the hood; here it is two lines you
-/// can read.
+/// can read. The ActionMap (exposed as Actions) adds the second layer engines
+/// bundle: naming inputs by intent so gameplay never mentions a key.
 /// </summary>
 public sealed class InputHelper
 {
+    /// <summary>Key bindings; gameplay reads input via actions, not Keys.</summary>
+    public ActionMap Actions { get; } = new();
+
     private KeyboardState _keyboard, _previousKeyboard;
     private MouseState _mouse, _previousMouse;
     private Point _virtualMousePosition;
@@ -35,6 +40,28 @@ public sealed class InputHelper
 
     public bool WasKeyJustPressed(Keys key)
         => _keyboard.IsKeyDown(key) && _previousKeyboard.IsKeyUp(key);
+
+    // The action-level queries: any bound key satisfies the action. These
+    // loop over an array instead of allocating LINQ enumerators because they
+    // run every tick on the hot path.
+
+    public bool IsActionDown(GameAction action)
+    {
+        IReadOnlyList<Keys> keys = Actions.KeysFor(action);
+        for (int i = 0; i < keys.Count; i++)
+            if (_keyboard.IsKeyDown(keys[i]))
+                return true;
+        return false;
+    }
+
+    public bool WasActionJustPressed(GameAction action)
+    {
+        IReadOnlyList<Keys> keys = Actions.KeysFor(action);
+        for (int i = 0; i < keys.Count; i++)
+            if (_keyboard.IsKeyDown(keys[i]) && _previousKeyboard.IsKeyUp(keys[i]))
+                return true;
+        return false;
+    }
 
     public bool WasLeftClickJustPressed
         => _mouse.LeftButton == ButtonState.Pressed

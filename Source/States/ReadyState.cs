@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Breakout.Systems;
 
 namespace Breakout.States;
@@ -14,7 +13,7 @@ public sealed class ReadyState : GameState
 
     public override void Update(float dt, InputHelper input)
     {
-        if (input.WasKeyJustPressed(Keys.P))
+        if (input.WasActionJustPressed(GameAction.Pause))
         {
             Manager.ChangeState(new PauseState(Manager, this));
             return;
@@ -23,7 +22,7 @@ public sealed class ReadyState : GameState
         Session.Paddle.Update(dt, input);
         Session.Balls[0].Update(dt); // ResetForServe guarantees exactly one
 
-        if (input.WasKeyJustPressed(Keys.Space) || input.WasLeftClickJustPressed)
+        if (input.WasActionJustPressed(GameAction.Launch) || input.WasLeftClickJustPressed)
         {
             Session.Balls[0].Launch(Session.Rng);
             Manager.ChangeState(new PlayingState(Manager));

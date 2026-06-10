@@ -1,7 +1,6 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Breakout.Systems;
 
 namespace Breakout.Entities;
@@ -37,9 +36,9 @@ public class Paddle
         if (input.MouseMoved)
             _centerX = input.MouseX;
 
-        if (input.IsKeyDown(Keys.Left) || input.IsKeyDown(Keys.A))
+        if (input.IsActionDown(GameAction.MoveLeft))
             _centerX -= KeyboardSpeed * dt;
-        if (input.IsKeyDown(Keys.Right) || input.IsKeyDown(Keys.D))
+        if (input.IsActionDown(GameAction.MoveRight))
             _centerX += KeyboardSpeed * dt;
 
         if (_wideTimer > 0f)
