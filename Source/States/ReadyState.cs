@@ -10,7 +10,7 @@ public sealed class ReadyState : GameState
 {
     public ReadyState(GameStateManager manager) : base(manager) { }
 
-    public override void Enter() => Session.Ball.AttachTo(Session.Paddle);
+    public override void Enter() => Session.ResetForServe();
 
     public override void Update(float dt, InputHelper input)
     {
@@ -21,11 +21,11 @@ public sealed class ReadyState : GameState
         }
 
         Session.Paddle.Update(dt, input);
-        Session.Ball.Update(dt); // follows the paddle while attached
+        Session.Balls[0].Update(dt); // ResetForServe guarantees exactly one
 
         if (input.WasKeyJustPressed(Keys.Space) || input.WasLeftClickJustPressed)
         {
-            Session.Ball.Launch(Session.Rng);
+            Session.Balls[0].Launch(Session.Rng);
             Manager.ChangeState(new PlayingState(Manager));
         }
     }

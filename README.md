@@ -67,7 +67,8 @@ automatically and the content pipeline runs as part of the build.
   tier digit = hit points = color, `X` = unbreakable; score and lives
   carry across levels, ball speed resets per board
 - Paddle-position-controlled bounce angle (the aiming mechanic)
-- Speed ramp per brick, wide-paddle power-up drops
+- Speed ramp per brick; power-up drops: wide paddle (pink) and
+  multiball (cyan) — a life is lost only when the *last* ball drops
 - Juice: brick-break particles, trauma-based screen shake, synthesized SFX
 - Production layer: virtual 800×480 resolution rendered to a `RenderTarget2D`
   and letterboxed to any window size, resizable window, borderless

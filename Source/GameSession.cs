@@ -29,7 +29,13 @@ public class GameSession
 
     public readonly Random Rng = new();
     public readonly Paddle Paddle = new();
-    public readonly Ball Ball = new();
+
+    // A list, not a single Ball — the multiball power-up was the feature that
+    // forced this. Worth noticing how far the one-to-many change rippled:
+    // every consumer that said "the ball" (serve, collision, loss check,
+    // debug overlay) had to decide what it means when there are several.
+    public readonly List<Ball> Balls = new();
+
     public List<Brick> Bricks { get; private set; }
     public readonly List<PowerUp> PowerUps = new();
     public readonly ParticleSystem Particles = new();
@@ -55,7 +61,22 @@ public class GameSession
     {
         Shake = new ScreenShake(Rng);
         Bricks = LevelLoader.Load(LevelPaths[0]);
-        Ball.AttachTo(Paddle);
+        ResetForServe();
+    }
+
+    /// <summary>
+    /// Back to exactly one ball, attached to the paddle — the serve position.
+    /// Runs on every ReadyState entry, which is what cleans up leftover
+    /// multiballs after a lost life (Balls may be empty) or a cleared level
+    /// (Balls may hold several).
+    /// </summary>
+    public void ResetForServe()
+    {
+        if (Balls.Count == 0)
+            Balls.Add(new Ball());
+        else if (Balls.Count > 1)
+            Balls.RemoveRange(1, Balls.Count - 1);
+        Balls[0].AttachTo(Paddle);
     }
 
     /// <summary>
@@ -94,7 +115,8 @@ public class GameSession
         foreach (PowerUp powerUp in PowerUps)
             powerUp.Draw(spriteBatch);
         Paddle.Draw(spriteBatch);
-        Ball.Draw(spriteBatch);
+        foreach (Ball ball in Balls)
+            ball.Draw(spriteBatch);
         Particles.Draw(spriteBatch);
     }
 

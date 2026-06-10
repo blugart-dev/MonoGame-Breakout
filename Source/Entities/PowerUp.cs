@@ -8,6 +8,7 @@ namespace Breakout.Entities;
 public enum PowerUpType
 {
     WidePaddle,
+    Multiball,
 }
 
 /// <summary>
@@ -47,11 +48,17 @@ public class PowerUp
 
     public void Draw(SpriteBatch spriteBatch)
     {
+        // With no sprites, color *is* the identity: pink ring = wide paddle,
+        // cyan ring = multiball. Players learn a color code in one catch.
+        Color ring = Type == PowerUpType.WidePaddle
+            ? new Color(255, 80, 200)
+            : new Color(80, 200, 255);
+
         // Pulse so it reads as "catch me", not as a falling brick.
         int pulse = (int)(MathF.Sin(_age * 8f) * 2f);
         Rectangle b = Bounds;
         b.Inflate(pulse, pulse / 2);
-        spriteBatch.DrawRect(b, new Color(255, 80, 200));
+        spriteBatch.DrawRect(b, ring);
         b.Inflate(-3, -3);
         spriteBatch.DrawRect(b, Color.White);
     }

@@ -26,14 +26,29 @@ public sealed class PlayingState : GameState
         }
 
         Session.Paddle.Update(dt, input);
-        Session.Ball.Update(dt);
 
-        BounceOffWalls();
-        BounceOffPaddle();
-        HandleBrickCollision();
+        // Backwards so RemoveAt never shifts a ball we haven't visited yet.
+        for (int i = Session.Balls.Count - 1; i >= 0; i--)
+        {
+            Ball ball = Session.Balls[i];
+            ball.Update(dt);
+            BounceOffWalls(ball);
+            BounceOffPaddle(ball);
+            HandleBrickCollision(ball);
+
+            // With multiball, dropping a ball is only fatal when it's the last.
+            if (ball.Position.Y - Ball.Size > Screen.Height)
+                Session.Balls.RemoveAt(i);
+        }
+
+        // Dead bricks are culled once per tick, after every ball has had its
+        // collision pass — mutating the list inside the per-ball loop would
+        // invalidate the iteration for the balls still waiting.
+        Session.Bricks.RemoveAll(b => !b.Alive);
+
         UpdatePowerUps(dt);
 
-        if (Session.Ball.Position.Y - Ball.Size > Screen.Height)
+        if (Session.Balls.Count == 0)
         {
             OnBallLost();
         }
@@ -50,9 +65,8 @@ public sealed class PlayingState : GameState
 
     public override void Draw(SpriteBatch spriteBatch) => DrawWorldAndHud(spriteBatch);
 
-    private void BounceOffWalls()
+    private void BounceOffWalls(Ball ball)
     {
-        Ball ball = Session.Ball;
         const float half = Ball.Size / 2f;
         bool bounced = false;
 
@@ -80,10 +94,8 @@ public sealed class PlayingState : GameState
             AudioBank.WallHit?.PlayVaried(Session.Rng);
     }
 
-    private void BounceOffPaddle()
+    private void BounceOffPaddle(Ball ball)
     {
-        Ball ball = Session.Ball;
-
         // Only while descending: once the ball bounces it overlaps the paddle
         // for a few frames, and re-bouncing every one of them would glue it down.
         if (ball.Velocity.Y <= 0f)
@@ -95,12 +107,16 @@ public sealed class PlayingState : GameState
         AudioBank.PaddleHit?.PlayVaried(Session.Rng);
     }
 
-    private void HandleBrickCollision()
+    private void HandleBrickCollision(Ball ball)
     {
-        Ball ball = Session.Ball;
-
         foreach (Brick brick in Session.Bricks)
         {
+            // A brick another ball already destroyed this tick is still in
+            // the list (culling happens after the ball loop) — hitting it
+            // again would pay its score twice.
+            if (!brick.Alive)
+                continue;
+
             HitSide side = CollisionHelper.GetCollisionSide(ball.Bounds, brick.Bounds);
             if (side == HitSide.None)
                 continue;
@@ -112,7 +128,7 @@ public sealed class PlayingState : GameState
                 Session.Score += brick.ScoreValue;
                 Session.Particles.Emit(brick.Bounds.Center.ToVector2(), brick.BaseColor, 18, Session.Rng);
                 Session.Shake.Add(0.3f);
-                Session.Ball.RampSpeed(); // difficulty ramps with progress
+                ball.RampSpeed(); // difficulty ramps with progress — per ball
                 AudioBank.BrickBreak?.PlayVaried(Session.Rng);
                 MaybeDropPowerUp(brick.Bounds.Center.ToVector2());
             }
@@ -122,13 +138,11 @@ public sealed class PlayingState : GameState
                 AudioBank.BrickHit?.PlayVaried(Session.Rng);
             }
 
-            // One brick per tick: after reflecting, a second simultaneous
-            // overlap resolves cleanly on the next 60 Hz step anyway, and
-            // processing both would double-flip the velocity.
+            // One brick per ball per tick: after reflecting, a second
+            // simultaneous overlap resolves cleanly on the next 60 Hz step
+            // anyway, and processing both would double-flip the velocity.
             break;
         }
-
-        Session.Bricks.RemoveAll(b => !b.Alive);
     }
 
     /// <summary>
@@ -164,7 +178,12 @@ public sealed class PlayingState : GameState
     {
         if (Session.Rng.NextDouble() > PowerUpDropChance)
             return;
-        Session.PowerUps.Add(new PowerUp(PowerUpType.WidePaddle, origin));
+
+        // Wide is the safer prize, so it's the more common one.
+        PowerUpType type = Session.Rng.NextDouble() < 0.6
+            ? PowerUpType.WidePaddle
+            : PowerUpType.Multiball;
+        Session.PowerUps.Add(new PowerUp(type, origin));
     }
 
     private void UpdatePowerUps(float dt)
@@ -177,7 +196,7 @@ public sealed class PlayingState : GameState
 
             if (powerUp.Bounds.Intersects(Session.Paddle.Bounds))
             {
-                Session.Paddle.ApplyWide(PowerUp.WidePaddleDuration);
+                ApplyPowerUp(powerUp);
                 AudioBank.PowerUpCatch?.Play();
                 Session.PowerUps.RemoveAt(i);
             }
@@ -185,6 +204,39 @@ public sealed class PlayingState : GameState
             {
                 Session.PowerUps.RemoveAt(i);
             }
+        }
+    }
+
+    private void ApplyPowerUp(PowerUp powerUp)
+    {
+        switch (powerUp.Type)
+        {
+            case PowerUpType.WidePaddle:
+                Session.Paddle.ApplyWide(PowerUp.WidePaddleDuration);
+                break;
+            case PowerUpType.Multiball:
+                SpawnMultiball();
+                break;
+        }
+    }
+
+    private void SpawnMultiball()
+    {
+        // Caught on the very tick the last ball dropped: nothing to clone,
+        // and the life is already lost — let it fizzle.
+        if (Session.Balls.Count == 0)
+            return;
+
+        // Cap the swarm: beyond this the screen is chaos, not challenge,
+        // and every extra ball doubles the collision noise.
+        const int maxBalls = 6;
+
+        Ball source = Session.Balls[0];
+        Session.Shake.Add(0.2f);
+        for (int i = 0; i < 2 && Session.Balls.Count < maxBalls; i++)
+        {
+            float angle = (i == 0 ? 1f : -1f) * MathHelper.ToRadians(25f);
+            Session.Balls.Add(source.Split(angle));
         }
     }
 

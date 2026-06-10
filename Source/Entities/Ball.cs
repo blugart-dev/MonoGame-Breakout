@@ -98,6 +98,30 @@ public class Ball
         Position.Y = p.Top - Size / 2f; // lift clear so we can't hit twice
     }
 
+    /// <summary>
+    /// A second live ball for the multiball power-up: same position, same
+    /// speed, velocity rotated by the given offset so the pack fans out
+    /// instead of flying as one invisible stack. Standard 2D rotation —
+    /// MonoGame has Vector2.Transform, but for a single rotation the two
+    /// multiplies are clearer than building a Matrix.
+    /// </summary>
+    public Ball Split(float angleOffsetRadians)
+    {
+        float cos = MathF.Cos(angleOffsetRadians);
+        float sin = MathF.Sin(angleOffsetRadians);
+
+        // Speed's private setter is reachable here: `private` is per-class,
+        // not per-instance, so Ball code may touch another Ball's internals.
+        return new Ball
+        {
+            Position = Position,
+            Speed = Speed,
+            Velocity = new Vector2(
+                Velocity.X * cos - Velocity.Y * sin,
+                Velocity.X * sin + Velocity.Y * cos),
+        };
+    }
+
     public void RampSpeed()
     {
         Speed = MathF.Min(Speed + SpeedRampPerBrick, MaxSpeed);
