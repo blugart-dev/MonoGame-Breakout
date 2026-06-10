@@ -56,8 +56,12 @@ public sealed class VirtualScreen
         _crtEffect = effect;
         effect.Parameters["VirtualSize"].SetValue(new Vector2(VirtualWidth, VirtualHeight));
         effect.Parameters["Curvature"].SetValue(0.08f);
-        effect.Parameters["ScanlineStrength"].SetValue(0.18f);
-        effect.Parameters["VignetteStrength"].SetValue(0.16f);
+        // Gentle on purpose: at the default window size the game presents at
+        // exactly 1x, where the scanline period is a single physical pixel —
+        // any stronger and the effect reads as a dark comb over the image
+        // instead of a memory of phosphor rows.
+        effect.Parameters["ScanlineStrength"].SetValue(0.09f);
+        effect.Parameters["VignetteStrength"].SetValue(0.14f);
     }
 
     public VirtualScreen(GraphicsDevice device, int virtualWidth, int virtualHeight)
