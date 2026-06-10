@@ -163,7 +163,26 @@ public sealed class GameStateManager
 
         if (!_current.FreezesEffects)
             Session.UpdateEffects(dt); // effects run in (almost) every state
+
+        GameState before = _current;
         _current.Update(dt, input);
+
+        // The pause-entry correction. A simulation state that sees the pause
+        // press changes state and returns WITHOUT simulating — so the tick we
+        // just spent on the tape (recorded above, or consumed from it) never
+        // actually happened in the world. Left alone, that off-by-one tick is
+        // a replay desync: the recorder banks a frame its run never simulated,
+        // and on playback that frame simulates anyway, putting the movie one
+        // tick ahead of the original from the pause onward (the viewer pausing
+        // has the mirror effect — a consumed frame that never ran). Un-spend
+        // it, and "pause ticks are not part of the run" is true on both sides.
+        if (before.IsSimulation && _current is PauseState)
+        {
+            if (IsPlayingBack)
+                _playbackIndex--;
+            else
+                _recording?.Frames.RemoveAt(_recording.Frames.Count - 1);
+        }
     }
 
     public void Draw(SpriteBatch spriteBatch)
