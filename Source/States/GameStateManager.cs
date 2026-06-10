@@ -193,9 +193,18 @@ public sealed class GameStateManager
         // by definition, indistinguishable from play. 1 Hz arcade-style blink.
         // The banner is also where the viewer learns the movie controls: both
         // are live (unrecorded) actions, so they work mid-playback by design.
+        // Bottom-RIGHT corner, below the paddle line: centered at the bottom
+        // it blinked directly on top of the paddle — the one thing a replay
+        // viewer is watching — and collided with the debug overlay's
+        // bottom-left readout.
         if (IsPlayingBack && (int)(_replayBannerTimer * 2f) % 2 == 0)
-            spriteBatch.DrawCenteredText(Font, "REPLAY - T STOP / P PAUSE",
-                new Vector2(Screen.Width / 2f, Screen.Height - 20),
-                Color.Gold, 0.75f);
+        {
+            const string banner = "REPLAY - T STOP / P PAUSE";
+            const float scale = 0.75f;
+            float width = Font.MeasureString(banner).X * scale;
+            spriteBatch.DrawShadowedText(Font, banner,
+                new Vector2(Screen.Width - 12 - width, Screen.Height - 26),
+                Color.Gold, scale);
+        }
     }
 }

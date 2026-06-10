@@ -29,7 +29,26 @@ public static class SpriteBatchExtensions
         string text, Vector2 center, Color color, float scale = 1f)
     {
         Vector2 size = font.MeasureString(text) * scale;
-        spriteBatch.DrawString(font, text, center - size / 2f, color,
+        spriteBatch.DrawShadowedText(font, text, center - size / 2f, color, scale);
+    }
+
+    /// <summary>
+    /// Text with a drop shadow. SpriteFont has no outline or shadow support —
+    /// the standard idiom is simply drawing the string twice: a dark copy
+    /// offset down-right, then the real one on top. Over a dark background the
+    /// shadow disappears; over a bright brick it keeps the glyphs legible.
+    /// Every piece of text in this game routes through here, because almost
+    /// all of it can end up on top of a busy playfield.
+    /// </summary>
+    public static void DrawShadowedText(this SpriteBatch spriteBatch, SpriteFont font,
+        string text, Vector2 position, Color color, float scale = 1f)
+    {
+        // Offset scales with the text so big banners get proportionally
+        // heavier shadows instead of a hairline.
+        var offset = new Vector2(MathHelper.Max(1f, 2f * scale));
+        spriteBatch.DrawString(font, text, position + offset, Color.Black * 0.8f,
+            0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+        spriteBatch.DrawString(font, text, position, color,
             0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
     }
 }

@@ -37,6 +37,13 @@ public sealed class LifeLostState : GameState
     {
         DrawWorldAndHud(spriteBatch);
 
+        // Every banner state dims the world it interrupts (LevelCleared 0.35,
+        // Pause 0.55, GameOver 0.65) — this one used to skip it, and the
+        // flash got lost against a busy board. Lightest of the family: the
+        // world should still read as "right there", only marked.
+        spriteBatch.DrawRect(new Rectangle(0, 0, Screen.Width, Screen.Height),
+            Color.Black * 0.35f);
+
         // Hard on/off flash at 2 Hz — steps read more "arcade" than a smooth fade.
         if ((int)(_timer * 4f) % 2 == 0)
             spriteBatch.DrawCenteredText(Font, "LIFE LOST",

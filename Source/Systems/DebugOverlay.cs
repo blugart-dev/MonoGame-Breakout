@@ -41,7 +41,7 @@ public sealed class DebugOverlay
         // caches its strings (see GameSession.DrawHud).
         string text = $"FPS {_fps:0}   BALLS {session.Balls.Count} @ {topSpeed:0} px/s   " +
                       $"PARTICLES {session.Particles.Count}   POWERUPS {session.PowerUps.Count}";
-        spriteBatch.DrawString(font, text, new Vector2(12, Screen.Height - 26),
-            Color.Lime * 0.9f, 0f, Vector2.Zero, 0.6f, SpriteEffects.None, 0f);
+        spriteBatch.DrawShadowedText(font, text, new Vector2(12, Screen.Height - 26),
+            Color.Lime * 0.9f, 0.6f);
     }
 }

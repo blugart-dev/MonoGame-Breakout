@@ -36,6 +36,13 @@ public sealed class ReadyState : GameState
     public override void Draw(SpriteBatch spriteBatch)
     {
         DrawWorldAndHud(spriteBatch);
+
+        // A translucent strip behind the prompts. The shadow pass keeps text
+        // legible over a stray brick; the strip is for *composition* — it
+        // groups the prompt block and reads as UI, not as part of the board.
+        spriteBatch.DrawRect(new Rectangle(0, 282, Screen.Width, 66),
+            Color.Black * 0.45f);
+
         spriteBatch.DrawCenteredText(Font, "PRESS SPACE OR CLICK TO LAUNCH",
             new Vector2(Screen.Width / 2f, 300), Color.White);
         string hint = Session.Mode == GameMode.Coop
