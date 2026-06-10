@@ -17,7 +17,7 @@ comments explaining the MonoGame idioms it uses and the reasoning behind
 non-obvious choices. No prior game-engine experience assumed —
 the repo teaches MonoGame from first principles.*
 
-**[Run it](#run) · [Study guide](https://blugart-dev.github.io/MonoGame-Breakout/) · [The modes](#six-ways-to-play-one-engine) · [Features](#features) · [How to learn](#how-to-learn-from-this-repo)**
+**[Run it](#run) · [Download](#download) · [Study guide](https://blugart-dev.github.io/MonoGame-Breakout/) · [The modes](#six-ways-to-play-one-engine) · [Features](#features) · [How to learn](#how-to-learn-from-this-repo)**
 
 </div>
 
@@ -51,6 +51,32 @@ automatically and the content pipeline runs as part of the build.
 > [one-time setup script](https://docs.monogame.net/articles/getting_started/1_setting_up_your_os_for_development_ubuntu.html)
 > (`net9_mgfxc_wine_setup.sh`). See `.github/workflows/build.yml` for the
 > exact CI recipe.
+
+## Download
+
+Just want to play? Every release on the
+[Releases page](https://github.com/blugart-dev/MonoGame-Breakout/releases)
+carries self-contained builds — no .NET SDK or runtime needed. Download the
+archive for your OS, unpack it, and run the `Breakout` executable inside
+(it must stay next to its `Content` folder):
+
+| Platform | Archive |
+|---|---|
+| Windows x64 | `Breakout-v*-win-x64.zip` |
+| Linux x64 | `Breakout-v*-linux-x64.tar.gz` |
+| macOS (Intel) | `Breakout-v*-osx-x64.tar.gz` |
+| macOS (Apple Silicon) | `Breakout-v*-osx-arm64.tar.gz` |
+
+> **macOS note:** the builds are unsigned, so Gatekeeper quarantines the
+> download. After unpacking, clear it once with
+> `xattr -dr com.apple.quarantine Breakout-v1.0.0-osx-arm64` (or approve the
+> app under System Settings → Privacy & Security after the first launch
+> attempt).
+
+That said, this is a learning repo — running from source (above) is the
+intended path. Builds come out of
+[`.github/workflows/release.yml`](.github/workflows/release.yml), itself a
+worked example of shipping a MonoGame game.
 
 ## Six ways to play, one engine
 
@@ -165,6 +191,7 @@ the right half (arrows, or a gamepad's D-pad/stick).
 ## Project layout
 
 ```
+.github/workflows/     CI on every push (build.yml) · v* tag → Release with builds (release.yml)
 Program.cs             entry point — two lines
 BreakoutGame.cs        application shell: window, loop, two-pass draw
 Source/

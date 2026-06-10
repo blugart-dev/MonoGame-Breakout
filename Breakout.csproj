@@ -3,6 +3,9 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <RollForward>Major</RollForward>
+    <!-- Single source of truth for the release version: the release workflow
+         checks that a pushed v* tag matches this before publishing builds. -->
+    <Version>1.0.0</Version>
     <!-- The SDK's default glob compiles every .cs under this directory,
          which would pull the test project's files into the game. -->
     <DefaultItemExcludes>$(DefaultItemExcludes);Tests/**</DefaultItemExcludes>

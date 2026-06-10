@@ -1162,7 +1162,8 @@ public void SpeedLevel_FollowsTheManualThresholds(
   <div class="tree">Breakout/
 ├── Program.cs                  <i>entry point — two lines</i>
 ├── <b>BreakoutGame.cs</b>             <i>application shell: window, loop, two-pass draw</i>
-├── Breakout.csproj             <i>note the Levels CopyToOutputDirectory entry</i>
+├── Breakout.csproj             <i>note the Levels CopyToOutputDirectory entry; &lt;Version&gt; drives releases</i>
+├── .github/workflows/          <i>CI on every push (build.yml) · v* tag → Release with playable builds (release.yml)</i>
 ├── Content/
 │   ├── Content.mgcb            <i>pipeline manifest (plain text)</i>
 │   ├── Fonts/Hud.spritefont    <i>XML font description → glyph atlas</i>
