@@ -153,6 +153,12 @@ public class GameSession
     {
         Particles.Update(dt);
         Shake.Update(dt);
+
+        // The brick entrance is presentation, not simulation — it animates a
+        // draw offset while Bounds stay put — so it ticks with the effects
+        // (and therefore freezes correctly when PauseState freezes them).
+        foreach (Brick brick in Bricks)
+            brick.UpdateDropIn(dt);
     }
 
     public void DrawWorld(SpriteBatch spriteBatch)

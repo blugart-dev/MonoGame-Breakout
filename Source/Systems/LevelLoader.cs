@@ -60,6 +60,12 @@ public static class LevelLoader
             row++;
         }
 
+        // Entrance animation, staggered by column so the wall sweeps in
+        // left-to-right. The classic wall deliberately skips this: the 1976
+        // machine made bricks appear instantly, and faithful means faithful.
+        foreach (Brick brick in bricks)
+            brick.StartDropIn((brick.Bounds.X - GridOffsetX) / (float)CellWidth * 0.04f);
+
         return bricks;
     }
 }
