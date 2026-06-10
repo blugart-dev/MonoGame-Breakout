@@ -34,6 +34,7 @@ public sealed class ActionMap
         [GameAction.P1MoveRight] = new[] { Keys.D },
         [GameAction.P2MoveLeft] = new[] { Keys.Left },
         [GameAction.P2MoveRight] = new[] { Keys.Right },
+        [GameAction.WatchReplay] = new[] { Keys.R },
         [GameAction.ToggleFullscreen] = new[] { Keys.F11 },
         [GameAction.ToggleDebugOverlay] = new[] { Keys.F3 },
         [GameAction.ToggleIntegerScaling] = new[] { Keys.F10 },
@@ -55,6 +56,7 @@ public sealed class ActionMap
         [GameAction.MenuUp] = new[] { Buttons.DPadUp, Buttons.LeftThumbstickUp },
         [GameAction.MenuDown] = new[] { Buttons.DPadDown, Buttons.LeftThumbstickDown },
         [GameAction.TitleScreen] = new[] { Buttons.Y },
+        [GameAction.WatchReplay] = new[] { Buttons.X },
         [GameAction.Quit] = new[] { Buttons.Back },
         // In co-op the gamepad player drives paddle two.
         [GameAction.P2MoveLeft] = new[] { Buttons.DPadLeft, Buttons.LeftThumbstickLeft },

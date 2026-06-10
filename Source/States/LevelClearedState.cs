@@ -20,6 +20,8 @@ public sealed class LevelClearedState : GameState
 
     public LevelClearedState(GameStateManager manager) : base(manager) { }
 
+    public override bool IsSimulation => true; // timer ticks count, like LifeLostState
+
     public override void Enter()
     {
         _banner = $"LEVEL {Session.LevelIndex + 1} CLEARED";

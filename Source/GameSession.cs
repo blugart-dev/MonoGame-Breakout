@@ -29,7 +29,14 @@ public class GameSession
 
     public static int LevelCount => LevelPaths.Length; // the title screen's level select needs the range
 
-    public readonly Random Rng = new();
+    // Seeded, and the seed is kept. `new Random()` is time-seeded anyway —
+    // the run was always going to be "random from some seed"; *naming* that
+    // seed is the one-line change that turns random into reproducible, and
+    // it is what makes the replay system possible. Everything stochastic in
+    // a run (launch angles, drop rolls, SFX pitch, shake) draws from this
+    // single stream, so same seed + same inputs = the same run, bit for bit.
+    public readonly int Seed;
+    public readonly Random Rng;
 
     // A list, not a single Paddle — local co-op did to the paddle what
     // multiball did to the ball. Same ripple, second rehearsal: every
@@ -92,8 +99,13 @@ public class GameSession
     private string _levelText;
     private int _levelTextValue = -1;
 
-    public GameSession(GameMode mode, int startLevel = 0)
+    public GameSession(GameMode mode, int startLevel = 0, int? seed = null)
     {
+        // No seed given = a fresh run (seeded from the clock, like new
+        // Random() would have); a recorded seed = a replay reliving that run.
+        Seed = seed ?? Environment.TickCount;
+        Rng = new Random(Seed);
+
         Mode = mode;
         StartLevelIndex = startLevel;
         LevelIndex = startLevel;

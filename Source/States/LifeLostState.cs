@@ -16,6 +16,10 @@ public sealed class LifeLostState : GameState
 
     public LifeLostState(GameStateManager manager) : base(manager) { }
 
+    // Part of the run's timeline even though it reads no input: its ticks
+    // *count* (the timer), so record and playback must both spend them.
+    public override bool IsSimulation => true;
+
     public override void Enter()
     {
         Session.Shake.Add(0.6f);

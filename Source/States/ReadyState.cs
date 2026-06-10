@@ -10,6 +10,8 @@ public sealed class ReadyState : GameState
 {
     public ReadyState(GameStateManager manager) : base(manager) { }
 
+    public override bool IsSimulation => true;
+
     public override void Enter() => Session.ResetForServe();
 
     public override void Update(float dt, InputHelper input)

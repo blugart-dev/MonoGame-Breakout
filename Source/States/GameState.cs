@@ -37,6 +37,17 @@ public abstract class GameState
     /// </summary>
     public virtual bool CapturesAllInput => false;
 
+    /// <summary>
+    /// Whether this state's ticks are part of the run — the replay contract.
+    /// The recorder keeps one input frame per simulation tick and the player
+    /// feeds one back per simulation tick, so the two streams stay aligned
+    /// exactly when this flag agrees on both sides. Pause is the instructive
+    /// case: its ticks are NOT simulation (nothing recorded, nothing fed), so
+    /// the recorder's pauses vanish from the movie and the viewer can pause
+    /// the movie at will — both for free, from this one bit.
+    /// </summary>
+    public virtual bool IsSimulation => false;
+
     public abstract void Update(float dt, InputHelper input);
     public abstract void Draw(SpriteBatch spriteBatch);
 

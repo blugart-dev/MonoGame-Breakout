@@ -57,6 +57,8 @@ public abstract class SuperPlayingState : GameState
     protected SuperPlayingState(GameStateManager manager) : base(manager)
         => _serveBall = Session.Balls[0];
 
+    public override bool IsSimulation => true; // covers all three variants
+
     /// <summary>x2/x3 while bonus balls fly — the manual's score tables are
     /// just "base value times balls in the playfield".</summary>
     protected int Multiplier => Session.Balls.Count;

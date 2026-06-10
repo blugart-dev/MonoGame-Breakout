@@ -15,6 +15,8 @@ public sealed class ClassicReadyState : GameState
 {
     public ClassicReadyState(GameStateManager manager) : base(manager) { }
 
+    public override bool IsSimulation => true;
+
     public override void Enter() => Session.PrepareClassicServe();
 
     public override void Update(float dt, InputHelper input)

@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Breakout.Systems;
 
@@ -13,7 +14,16 @@ public sealed class GameStateManager
     public GameSession Session { get; private set; }
     public SpriteFont Font { get; }
 
+    /// <summary>The last *finished* run, watchable from the game-over screen.</summary>
+    public Replay LastReplay { get; private set; }
+
+    /// <summary>True while a replay drives the simulation instead of the player.</summary>
+    public bool IsPlayingBack { get; private set; }
+
     private GameState _current;
+    private Replay _recording; // the run in progress; promoted to LastReplay at game over
+    private int _playbackIndex;
+    private float _replayBannerTimer;
 
     public GameStateManager(SpriteFont font)
     {
@@ -29,6 +39,27 @@ public sealed class GameStateManager
     public void StartNewGame(GameMode mode, int startLevel = 0)
     {
         Session = new GameSession(mode, startLevel);
+        IsPlayingBack = false;
+        // Recording costs nothing the player can feel (a few bytes per tick),
+        // so every run records unconditionally — there is no "start recording"
+        // button anywhere, just as no arcade machine ever asked.
+        _recording = new Replay(mode, startLevel, Session.Seed);
+        ChangeState(CreateServeState());
+    }
+
+    /// <summary>
+    /// Re-run the last finished game from its recording: rebuild the session
+    /// from the same mode, level and seed, enter the same serve state, and
+    /// from here Update feeds the recorded frames instead of live input. No
+    /// rewind machinery exists — a replay IS a new run that happens to make
+    /// every choice the old one made.
+    /// </summary>
+    public void StartPlayback()
+    {
+        Session = new GameSession(LastReplay.Mode, LastReplay.StartLevel, LastReplay.Seed);
+        _recording = null;
+        _playbackIndex = 0;
+        IsPlayingBack = true;
         ChangeState(CreateServeState());
     }
 
@@ -52,6 +83,24 @@ public sealed class GameStateManager
     {
         _current = next;
         next.Enter();
+
+        // Game over ends both kinds of run. A live recording is promoted to
+        // "the last replay" only here — abandoning a run to the title screen
+        // discards it, because half a movie replays into a desync. Order
+        // matters: GameOverState.Enter just read IsPlayingBack (to skip the
+        // high-score submit), so the flag flips after Enter, not before.
+        if (next is GameOverState)
+        {
+            if (IsPlayingBack)
+            {
+                IsPlayingBack = false; // the movie ended where the run did
+            }
+            else if (_recording != null)
+            {
+                LastReplay = _recording;
+                _recording = null;
+            }
+        }
     }
 
     /// <summary>
@@ -78,10 +127,54 @@ public sealed class GameStateManager
 
     public void Update(float dt, InputHelper input)
     {
+        if (IsPlayingBack)
+        {
+            _replayBannerTimer += dt;
+
+            // T stops the movie. TitleScreen is not a recorded action, so
+            // this read is guaranteed to be live hardware, never the tape.
+            if (input.WasActionJustPressed(GameAction.TitleScreen))
+            {
+                IsPlayingBack = false;
+                GoToTitle();
+                return;
+            }
+
+            if (_current.IsSimulation)
+            {
+                if (_playbackIndex >= LastReplay.Frames.Count)
+                {
+                    // Safety net: a complete recording ends at game over and
+                    // never reaches here; a truncated one just stops politely.
+                    IsPlayingBack = false;
+                    GoToTitle();
+                    return;
+                }
+                input.SetPlaybackFrame(LastReplay.Frames[_playbackIndex++]);
+            }
+            // Not a simulation tick (the viewer paused the movie): no frame is
+            // armed, so the pause menu reads live input — and no frame is
+            // *consumed*, so the tape and the run stay tick-for-tick aligned.
+        }
+        else if (_recording != null && _current.IsSimulation)
+        {
+            _recording.Frames.Add(InputSnapshot.Capture(input));
+        }
+
         if (!_current.FreezesEffects)
             Session.UpdateEffects(dt); // effects run in (almost) every state
         _current.Update(dt, input);
     }
 
-    public void Draw(SpriteBatch spriteBatch) => _current.Draw(spriteBatch);
+    public void Draw(SpriteBatch spriteBatch)
+    {
+        _current.Draw(spriteBatch);
+
+        // The movie must announce itself — a perfect reproduction of play is,
+        // by definition, indistinguishable from play. 1 Hz arcade-style blink.
+        if (IsPlayingBack && (int)(_replayBannerTimer * 2f) % 2 == 0)
+            spriteBatch.DrawCenteredText(Font, "REPLAY - T TO STOP",
+                new Vector2(Screen.Width / 2f, Screen.Height - 20),
+                Color.Gold, 0.75f);
+    }
 }

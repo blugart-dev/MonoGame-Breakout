@@ -23,9 +23,23 @@ public sealed class InputHelper
     private GamePadState _gamePad, _previousGamePad;
     private Point _virtualMousePosition;
 
+    // Replay playback: when the state manager arms a recorded frame for this
+    // tick, the *recorded* gameplay actions and the mouse answer from it
+    // instead of the hardware. Everything unrecorded (pause, menus, shell
+    // shortcuts) still reads live — the viewer keeps control of the player
+    // while the recording controls the paddle.
+    private InputSnapshot? _playbackFrame;
+
+    /// <summary>Arm one recorded frame for this tick (playback only).</summary>
+    public void SetPlaybackFrame(InputSnapshot frame) => _playbackFrame = frame;
+
     /// <summary>Call exactly once per Update tick, before anything reads input.</summary>
     public void Update(VirtualScreen virtualScreen)
     {
+        // Every tick starts live; the manager re-arms a playback frame each
+        // simulation tick it feeds, so a frame can never leak across ticks.
+        _playbackFrame = null;
+
         _previousKeyboard = _keyboard;
         _previousMouse = _mouse;
         _previousGamePad = _gamePad;
@@ -56,6 +70,9 @@ public sealed class InputHelper
 
     public bool IsActionDown(GameAction action)
     {
+        if (_playbackFrame is { } frame && InputSnapshot.IsRecorded(action))
+            return frame.IsActionDown(action);
+
         IReadOnlyList<Keys> keys = Actions.KeysFor(action);
         for (int i = 0; i < keys.Count; i++)
             if (_keyboard.IsKeyDown(keys[i]))
@@ -71,6 +88,9 @@ public sealed class InputHelper
 
     public bool WasActionJustPressed(GameAction action)
     {
+        if (_playbackFrame is { } frame && InputSnapshot.IsRecorded(action))
+            return frame.WasActionJustPressed(action);
+
         IReadOnlyList<Keys> keys = Actions.KeysFor(action);
         for (int i = 0; i < keys.Count; i++)
             if (_keyboard.IsKeyDown(keys[i]) && _previousKeyboard.IsKeyUp(keys[i]))
@@ -99,15 +119,24 @@ public sealed class InputHelper
         return null;
     }
 
+    // The mouse queries defer to an armed playback frame wholesale: unlike
+    // actions there is no live/recorded split to honor — only the simulation
+    // reads the mouse, and during playback the simulation IS the recording.
+
     public bool WasLeftClickJustPressed
-        => _mouse.LeftButton == ButtonState.Pressed
-           && _previousMouse.LeftButton == ButtonState.Released;
+        => _playbackFrame is { } frame
+            ? frame.LeftClickJustPressed
+            : _mouse.LeftButton == ButtonState.Pressed
+              && _previousMouse.LeftButton == ButtonState.Released;
 
     /// <summary>Mouse X in virtual (800x480) coordinates.</summary>
-    public int MouseX => _virtualMousePosition.X;
+    public int MouseX
+        => _playbackFrame is { } frame ? frame.MouseX : _virtualMousePosition.X;
 
     // Movement detection compares *raw* positions: the virtual transform
     // rounds to ints, and that rounding could register phantom movement.
     public bool MouseMoved
-        => _mouse.X != _previousMouse.X || _mouse.Y != _previousMouse.Y;
+        => _playbackFrame is { } frame
+            ? frame.MouseMoved
+            : _mouse.X != _previousMouse.X || _mouse.Y != _previousMouse.Y;
 }

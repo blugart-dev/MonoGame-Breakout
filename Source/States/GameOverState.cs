@@ -18,7 +18,9 @@ public sealed class GameOverState : GameState
     {
         // Submit once, on entry — Enter() is the state machine's natural
         // "this just happened" hook, and Update would re-submit every tick.
-        _rank = HighScores.Record(Session.Mode, Session.Score);
+        // Unless this is a replay ending: the run already scored when it was
+        // played live, and a recording must never bank its points twice.
+        _rank = Manager.IsPlayingBack ? -1 : HighScores.Record(Session.Mode, Session.Score);
 
         // Duck the music so the verdict jingle owns the moment.
         MusicPlayer.SetDucked(true);
@@ -39,6 +41,12 @@ public sealed class GameOverState : GameState
         {
             MusicPlayer.SetDucked(false);
             Manager.GoToTitle();
+        }
+        else if (Manager.LastReplay != null
+            && input.WasActionJustPressed(GameAction.WatchReplay))
+        {
+            MusicPlayer.SetDucked(false);
+            Manager.StartPlayback();
         }
     }
 
@@ -69,7 +77,10 @@ public sealed class GameOverState : GameState
 
         spriteBatch.DrawCenteredText(Font, "PRESS ENTER OR CLICK TO PLAY AGAIN",
             center + new Vector2(0, 290), new Color(150, 150, 165), 0.75f);
-        spriteBatch.DrawCenteredText(Font, "T FOR TITLE SCREEN",
+        string exits = Manager.LastReplay != null
+            ? "T FOR TITLE SCREEN   R TO WATCH REPLAY"
+            : "T FOR TITLE SCREEN";
+        spriteBatch.DrawCenteredText(Font, exits,
             center + new Vector2(0, 318), new Color(150, 150, 165), 0.75f);
     }
 }

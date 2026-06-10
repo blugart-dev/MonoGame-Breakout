@@ -18,6 +18,8 @@ public sealed class SuperReadyState : GameState
 {
     public SuperReadyState(GameStateManager manager) : base(manager) { }
 
+    public override bool IsSimulation => true;
+
     public override void Enter()
     {
         Session.PrepareSuperServe();

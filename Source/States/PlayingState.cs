@@ -17,6 +17,8 @@ public sealed class PlayingState : GameState
 
     public PlayingState(GameStateManager manager) : base(manager) { }
 
+    public override bool IsSimulation => true;
+
     public override void Update(float dt, InputHelper input)
     {
         if (input.WasActionJustPressed(GameAction.Pause))

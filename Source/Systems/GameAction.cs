@@ -20,6 +20,7 @@ public enum GameAction
     P1MoveRight,
     P2MoveLeft,
     P2MoveRight,
+    WatchReplay,
     ToggleFullscreen,
     ToggleDebugOverlay,
     ToggleIntegerScaling,
