@@ -15,6 +15,7 @@ public enum GameAction
     MenuUp,
     MenuDown,
     TitleScreen,
+    OpenRebind,
     ToggleFullscreen,
     ToggleDebugOverlay,
     ToggleIntegerScaling,

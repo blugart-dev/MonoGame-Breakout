@@ -38,6 +38,11 @@ public sealed class PauseState : GameState
             MusicPlayer.SetDucked(false);
             Manager.ResumeState(_resumeTo);
         }
+        else if (input.WasActionJustPressed(GameAction.OpenRebind))
+        {
+            // Music stays ducked: the rebind screen is part of being paused.
+            Manager.ChangeState(new RebindState(Manager, this, input.Actions));
+        }
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -52,6 +57,9 @@ public sealed class PauseState : GameState
             new Vector2(Screen.Width / 2f, Screen.Height / 2f - 20), Color.White, 1.5f);
         spriteBatch.DrawCenteredText(Font, "PRESS P TO RESUME",
             new Vector2(Screen.Width / 2f, Screen.Height / 2f + 30),
+            new Color(150, 150, 165), 0.75f);
+        spriteBatch.DrawCenteredText(Font, "B REBIND KEYS",
+            new Vector2(Screen.Width / 2f, Screen.Height / 2f + 60),
             new Color(150, 150, 165), 0.75f);
     }
 }

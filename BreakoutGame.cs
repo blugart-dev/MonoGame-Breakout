@@ -93,16 +93,21 @@ public class BreakoutGame : Game
 
         _input.Update(_virtualScreen);
 
-        if (_input.IsActionDown(GameAction.Quit))
-            Exit();
-        if (_input.WasActionJustPressed(GameAction.ToggleFullscreen))
-            ToggleFullscreen();
-        if (_input.WasActionJustPressed(GameAction.ToggleDebugOverlay))
-            _showDebugOverlay = !_showDebugOverlay;
-        if (_input.WasActionJustPressed(GameAction.ToggleIntegerScaling))
-            _virtualScreen.IntegerScaling = !_virtualScreen.IntegerScaling;
-        if (_input.WasActionJustPressed(GameAction.ToggleMusic))
-            MusicPlayer.ToggleMuted();
+        // The rebind screen captures all input: while it is waiting for "any
+        // key", none of these shortcuts may steal the press.
+        if (!_states.CurrentCapturesAllInput)
+        {
+            if (_input.IsActionDown(GameAction.Quit))
+                Exit();
+            if (_input.WasActionJustPressed(GameAction.ToggleFullscreen))
+                ToggleFullscreen();
+            if (_input.WasActionJustPressed(GameAction.ToggleDebugOverlay))
+                _showDebugOverlay = !_showDebugOverlay;
+            if (_input.WasActionJustPressed(GameAction.ToggleIntegerScaling))
+                _virtualScreen.IntegerScaling = !_virtualScreen.IntegerScaling;
+            if (_input.WasActionJustPressed(GameAction.ToggleMusic))
+                MusicPlayer.ToggleMuted();
+        }
 
         float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
         _states.Update(dt, _input);

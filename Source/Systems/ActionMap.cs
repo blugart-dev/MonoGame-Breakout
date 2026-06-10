@@ -27,6 +27,7 @@ public sealed class ActionMap
         [GameAction.MenuUp] = new[] { Keys.Up, Keys.W },
         [GameAction.MenuDown] = new[] { Keys.Down, Keys.S },
         [GameAction.TitleScreen] = new[] { Keys.T },
+        [GameAction.OpenRebind] = new[] { Keys.B },
         [GameAction.ToggleFullscreen] = new[] { Keys.F11 },
         [GameAction.ToggleDebugOverlay] = new[] { Keys.F3 },
         [GameAction.ToggleIntegerScaling] = new[] { Keys.F10 },

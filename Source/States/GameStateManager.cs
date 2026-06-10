@@ -72,6 +72,8 @@ public sealed class GameStateManager
             ChangeState(new PauseState(this, _current));
     }
 
+    public bool CurrentCapturesAllInput => _current.CapturesAllInput;
+
     public void Update(float dt, InputHelper input)
     {
         if (!_current.FreezesEffects)

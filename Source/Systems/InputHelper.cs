@@ -84,6 +84,21 @@ public sealed class InputHelper
         return false;
     }
 
+    /// <summary>
+    /// The rebind poll: the first key that went down *this frame*, or null.
+    /// "Which key did the player just press?" has no direct API — you diff
+    /// the full pressed-key sets between frames. GetPressedKeys() allocates
+    /// an array per call, which is why this is a method the rebind screen
+    /// calls and not something Update computes every tick for everyone.
+    /// </summary>
+    public Keys? FirstNewKey()
+    {
+        foreach (Keys key in _keyboard.GetPressedKeys())
+            if (_previousKeyboard.IsKeyUp(key))
+                return key;
+        return null;
+    }
+
     public bool WasLeftClickJustPressed
         => _mouse.LeftButton == ButtonState.Pressed
            && _previousMouse.LeftButton == ButtonState.Released;

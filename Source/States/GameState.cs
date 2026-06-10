@@ -29,6 +29,14 @@ public abstract class GameState
     /// </summary>
     public virtual bool FreezesEffects => false;
 
+    /// <summary>
+    /// While true, the shell's global shortcuts (Esc quit, F11, M, …) stand
+    /// down. The rebind screen needs this: when the game asks "press any
+    /// key", *any* key must be claimable as a binding — not intercepted as
+    /// a shortcut on its way in.
+    /// </summary>
+    public virtual bool CapturesAllInput => false;
+
     public abstract void Update(float dt, InputHelper input);
     public abstract void Draw(SpriteBatch spriteBatch);
 
