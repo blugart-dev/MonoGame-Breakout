@@ -1,21 +1,37 @@
-# Breakout — Learn MonoGame by Reading One Small Game
+<div align="center">
+
+# BREAKOUT
+
+### Learn MonoGame by reading one small game
 
 [![Build](https://github.com/blugart-dev/MonoGame-Breakout/actions/workflows/build.yml/badge.svg)](https://github.com/blugart-dev/MonoGame-Breakout/actions/workflows/build.yml)
+[![.NET 9](https://img.shields.io/badge/.NET-9.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![MonoGame 3.8](https://img.shields.io/badge/MonoGame-3.8-E73C00)](https://monogame.net/)
+[![Study guide](https://img.shields.io/badge/study%20guide-15%20sections-ffcd42)](https://blugart-dev.github.io/MonoGame-Breakout/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-A complete Breakout clone built with **MonoGame 3.8 (DesktopGL)**, written to be
-*read*: every file carries pedagogical comments explaining the MonoGame idioms
-it uses and the reasoning behind non-obvious choices. No prior game-engine
-experience is assumed — the repo teaches MonoGame from first principles.
+<img src="docs/media/title.png" width="680" alt="The title screen: six modes and a level select, under the CRT shader">
 
-It is also entirely **asset-free**: every visual is a tinted 1×1 white texture,
-every sound — the SFX *and* the looping music track — is synthesized at
-startup, and the only content pipeline assets are the HUD font and the CRT
+*A complete Breakout clone written to be **read**: every file carries pedagogical
+comments explaining the MonoGame idioms it uses and the reasoning behind
+non-obvious choices. No prior game-engine experience assumed —
+the repo teaches MonoGame from first principles.*
+
+**[Run it](#run) · [Study guide](https://blugart-dev.github.io/MonoGame-Breakout/) · [The modes](#six-ways-to-play-one-engine) · [Features](#features) · [How to learn](#how-to-learn-from-this-repo)**
+
+</div>
+
+---
+
+The project is entirely **asset-free**: every visual is a tinted 1×1 white
+texture, every sound — the SFX *and* the looping music track — is synthesized
+at startup, and the only content pipeline assets are the HUD font and the CRT
 shader (which is source code, not art).
 
-> 📖 **[Read the study guide](https://blugart-dev.github.io/MonoGame-Breakout/)** —
-> fifteen concept sections, a project map, an engine-concepts glossary, and
-> exercises. (Source: [`docs/index.html`](docs/index.html), served by GitHub Pages.)
+> 📖 **[The study guide](https://blugart-dev.github.io/MonoGame-Breakout/)** —
+> fifteen concept sections in reading order, a project map, an engine-concepts
+> glossary, and exercises. (Source: [`docs/index.html`](docs/index.html),
+> served by GitHub Pages.)
 
 ## Run
 
@@ -35,6 +51,32 @@ automatically and the content pipeline runs as part of the build.
 > [one-time setup script](https://docs.monogame.net/articles/getting_started/1_setting_up_your_os_for_development_ubuntu.html)
 > (`net9_mgfxc_wine_setup.sh`). See `.github/workflows/build.yml` for the
 > exact CI recipe.
+
+## Six ways to play, one engine
+
+A mode is not a flag — it is *which state objects drive the shared entities*.
+The title screen picks the pair; `GameStateManager.CreateServeState` is the
+only switch point.
+
+| | | |
+|:---:|:---:|:---:|
+| ![Modern mode: the ball bores into a tiered wall, trail behind it](docs/media/modern.png) | ![Classic 1976: the original 8×14 cellophane-striped wall](docs/media/classic-1976.png) | ![Super Breakout Cavity: two captive balls sealed inside the wall](docs/media/super-cavity.png) |
+| **Modern** — house rules | **Classic** — the 1976 manual | **Super: Cavity** — the 1978 manual |
+
+| Mode | Rules from | The game |
+|---|---|---|
+| **Modern** | this repo's house rules | three tiered boards, power-ups *and* falling debris, multiball, continuous paddle aiming, per-brick speed ramp |
+| **Co-op 2P** | modern rules × 2 | two paddles, half a court each — P1 mouse/`A`/`D`, P2 arrows/gamepad; lives shared, catches personal |
+| **Classic** | Atari's 1976 operation manual | four discrete ball speeds, four fixed paddle exits, one brick per trip, half-width paddle after breaking out — exactly two walls, **896-point maximum** |
+| **Super: Double** | the 1978 manual (TM-118) | two stacked paddles on one set of controls, two balls per serve (only the first costs one), ×2 points while both fly |
+| **Super: Cavity** | the 1978 manual (TM-118) | two captive balls sealed in the wall escape through the holes you open and join play for ×2/×3 scoring |
+| **Super: Progressive** | the 1978 manual (TM-118) | an endless wall scrolls toward you; a brick is worth whatever screen zone it currently occupies |
+| **RANDOM** *(level select)* | `BoardGenerator` | endless procedural boards, emitted in the same text format the hand-made levels use — seeded, so replays re-roll identical boards |
+
+The arcade numbers are transcribed from the original operation manuals, the
+ambiguities the manuals leave open are flagged in the code, and the test suite
+pins the lot ([study guide §11](https://blugart-dev.github.io/MonoGame-Breakout/#history)
+puts the three rule sets side by side).
 
 ## Controls
 
@@ -80,64 +122,39 @@ the right half (arrows, or a gamepad's D-pad/stick).
 
 ## Features
 
-- **Six ways to play, one engine.** A title screen (with level select)
-  picks the mode; a mode is just which states drive the shared entities
-- **Modern mode:** three tiered boards, power-ups, multiball, continuous
-  paddle aiming, per-brick speed ramp, staggered brick drop-in entrance
-- **Co-op (2P):** modern rules with two paddles — P1 left half
-  (mouse/`A`/`D`), P2 right half (arrows/gamepad); wide-paddle catches are
-  personal, lives are shared
-- **Classic 1976 mode:** the original arcade rules, reconstructed from
-  Atari's operation manual — 8×14 one-hit wall scored 1/1/3/3/5/5/7/7 by row
-  (448/wall), four discrete ball speeds (4th hit, 12th hit, instant max on
-  orange/red), four fixed paddle rebound exits (never perpendicular), one
-  brick per trip, half-width paddle after breaking through, hostile
-  mid-screen serve, and exactly two walls: max score 896
-- **Super Breakout 1978 modes:** the sequel's three games, from its operation
-  manual (TM-118). Shared 1978 physics: five discrete speeds (4th/8th/12th
-  return, instant max on a 5/7-point brick), the pass-through rule (an
-  unreturned ball sails through bricks; after each kill the ball *bores* for
-  four rows), paddle halves on top-boundary contact until the next serve, and
-  scores multiply by balls in play. **Double:** two stacked paddles on one
-  set of controls, two balls per serve (only the first costs a serve), ×2
-  points while both fly. **Cavity:** two captive balls sealed in the wall
-  escape through the holes you open and join play for ×2/×3 scoring.
-  **Progressive:** an endless wall scrolls toward you, re-priced by screen
-  zone (blue 7 → orange 5 → green 3 → yellow 1) every step
-- Arcade loop: Title → Ready → Playing → LifeLost → GameOver (plus Pause and
-  LevelCleared), 3 lives/serves, score + level HUD
-- Three levels as plain-text grids (`Content/Levels/*.txt`);
-  tier digit = hit points = color, `X` = unbreakable; score and lives
-  carry across levels, ball speed resets per board
-- **Procedural boards:** the level select's `RANDOM` slot plays endless
-  generated boards — `BoardGenerator` emits the same text format
+- **Replays** — every run records itself (RNG seed + one input frame per
+  60 Hz tick); `R` on the game-over screen re-simulates it, `T` stops,
+  `P` pauses. Determinism as a feature, and the repo's flagship lesson
+- **Procedural boards** — the level select's `RANDOM` slot plays endless
+  generated boards: `BoardGenerator` emits the same text format
   `LevelLoader` parses, with difficulty knobs (rows, hit-point budget,
   unbreakable density, mirroring) scaling per board
-- Paddle-position-controlled bounce angle (the aiming mechanic)
-- Speed ramp per brick; power-up drops: wide paddle (pink), multiball
-  (cyan) — a life is lost only when the *last* ball drops — and **falling
-  debris**, the anti-power-up: a dark tumbling hazard that halves the
-  paddle for eight seconds if you catch it
-- **Replays:** every run records itself (RNG seed + one input frame per
-  60 Hz tick); `R` on the game-over screen re-simulates it, `T` stops,
-  `P` pauses — determinism as a feature
-- Juice: brick-break particles, trauma-based screen shake, ball trail,
-  synthesized SFX with random pitch variation
-- Music: a synthesized chiptune loop on a looping `SoundEffectInstance` —
+- **Action map** — gameplay reads named intents (`GameAction`), not keys;
+  bindings live in runtime-rebindable dictionaries (`ActionMap`), with full
+  gamepad support and an in-game key rebinding screen (`B` from pause)
+- **High scores** — top five per table (each mode, with endless random runs
+  scored separately) persisted as JSON under the per-user `ApplicationData`
+  folder; game over shows the table, the title shows the best
+- **CRT shader** (`F9`) — scanlines locked to virtual rows, barrel curvature
+  and vignette in one HLSL `Effect`, applied where the frame is presented
+- **Juice** — brick-break particles, trauma-based screen shake, ball trail,
+  synthesized SFX with random pitch variation; power-up drops: wide paddle
+  (pink), multiball (cyan) — a life is lost only when the *last* ball
+  drops — and **falling debris**, the anti-power-up that halves the paddle
+  for eight seconds if you catch it
+- **Music** — a synthesized chiptune loop on a looping `SoundEffectInstance`:
   ducks (drops low, doesn't stop) on pause and game over, `M` mutes
-- Action map: gameplay reads named intents (`GameAction`), not keys —
-  bindings live in runtime-rebindable dictionaries (`ActionMap`), with
-  full gamepad support and an in-game key rebinding screen (`B` from pause)
-- High scores: top five per table (each mode, with endless random runs
-  scored separately) persisted as JSON under the per-user
-  `ApplicationData` folder; game over shows the table, title shows the best
-- **CRT shader** (`F9`): scanlines locked to virtual rows, barrel
-  curvature and vignette in one HLSL `Effect`, applied where the frame is
-  presented — the content pipeline's other asset type
-- Production layer: virtual 800×480 resolution rendered to a `RenderTarget2D`
-  and letterboxed to any window size, optional integer ("pixel perfect")
-  scaling, resizable window, borderless fullscreen, pause state with
+- **Levels as plain text** — boards are `.txt` grids
+  (`Content/Levels/*.txt`); tier digit = hit points = color, `X` =
+  unbreakable; score and lives carry across levels, ball speed resets per
+  board
+- **The production layer** — virtual 800×480 resolution rendered to a
+  `RenderTarget2D` and letterboxed to any window size, optional integer
+  ("pixel perfect") scaling, resizable window, borderless fullscreen,
   auto-pause on focus loss, debug overlay
+- **The arcade loop** — Title → Ready → Playing → LifeLost → GameOver (plus
+  Pause and LevelCleared), 3 lives/serves, paddle-position-controlled bounce
+  angle: the aiming mechanic that defines the genre
 
 ## Project layout
 
@@ -164,8 +181,10 @@ Content/
   Shaders/Crt.fx       HLSL, compiled to a platform blob at build time
   Levels/level0*.txt   runtime-loaded, copied via csproj — not pipelined
 Tests/
-  Breakout.Tests/      xUnit suite for the pure logic (rules, generator, …)
-docs/index.html        the study guide — open in a browser (or via Pages)
+  Breakout.Tests/      xUnit suite for the pure logic (rules, walls, generator, …)
+docs/
+  index.html           the study guide — open in a browser (or via Pages)
+  media/               the screenshots above
 ```
 
 ## Commands
