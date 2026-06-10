@@ -49,6 +49,11 @@ jobs:
       - name: Build (content pipeline runs as part of the build)
         run: dotnet build --configuration Release
 
+      - name: Test (the pure game logic — rules, generator, collision, ranking)
+        run: dotnet test Tests/Breakout.Tests --configuration Release
+
       - name: Verify formatting
         if: runner.os == 'Linux'
-        run: dotnet format --verify-no-changes
+        run: |
+          dotnet format --verify-no-changes
+          dotnet format Tests/Breakout.Tests/Breakout.Tests.csproj --verify-no-changes

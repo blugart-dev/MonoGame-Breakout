@@ -161,16 +161,30 @@ Content/
   Fonts/Hud.spritefont rasterized at build time by the pipeline
   Shaders/Crt.fx       HLSL, compiled to a platform blob at build time
   Levels/level0*.txt   runtime-loaded, copied via csproj — not pipelined
+Tests/
+  Breakout.Tests/      xUnit suite for the pure logic (rules, generator, …)
 docs/index.html        the study guide — open in a browser (or via Pages)
 ```
 
 ## Commands
 
 ```bash
-dotnet build    # compile (content pipeline runs as part of the build)
-dotnet run      # play
-dotnet format   # code style
+dotnet build                      # compile (content pipeline runs as part of the build)
+dotnet run                        # play
+dotnet test Tests/Breakout.Tests  # unit tests (the pure game logic)
+dotnet format                     # code style
 ```
+
+## Tests
+
+`Tests/Breakout.Tests` (xUnit) covers everything in the game that is a pure
+function: the 1976/1978 rule tables (speed ladders, rebound angles, the
+never-vertical law), the board generator (determinism, format contract,
+mirroring, winnability), AABB collision response, the ball's aiming math,
+high-score ranking, and the replay system's recorded-vs-live action contract.
+The deliberate boundary is the lesson: game *rules* are unit-testable because
+they are pure; the frame loop, rendering and feel are play-tested. CI runs the
+suite on both OSes.
 
 ## License
 

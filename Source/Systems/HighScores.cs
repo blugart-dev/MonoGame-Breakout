@@ -60,19 +60,35 @@ public static class HighScores
         if (!_tables.TryGetValue(table, out List<int> list))
             _tables[table] = list = new List<int>();
 
-        int rank = list.FindIndex(existing => score > existing);
+        int rank = InsertScore(list, score);
+        if (rank >= 0)
+            Save();
+        return rank;
+    }
+
+    /// <summary>
+    /// The ranking core, separated from the file IO above so it is testable:
+    /// a function of (list, score) can be exercised a hundred ways in a unit
+    /// test, while anything touching ApplicationData cannot run safely on a
+    /// build machine. Splitting the decision from the disk is the standard
+    /// move that makes game logic testable at all.
+    /// </summary>
+    public static int InsertScore(List<int> scores, int score)
+    {
+        if (score <= 0)
+            return -1;
+
+        int rank = scores.FindIndex(existing => score > existing);
         if (rank < 0)
         {
-            if (list.Count >= Capacity)
+            if (scores.Count >= Capacity)
                 return -1;
-            rank = list.Count;
+            rank = scores.Count;
         }
 
-        list.Insert(rank, score);
-        if (list.Count > Capacity)
-            list.RemoveAt(Capacity);
-
-        Save();
+        scores.Insert(rank, score);
+        if (scores.Count > Capacity)
+            scores.RemoveAt(Capacity);
         return rank;
     }
 

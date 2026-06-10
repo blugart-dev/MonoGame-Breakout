@@ -837,7 +837,7 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
 │   ├── Fonts/Hud.spritefont    <i>XML font description → glyph atlas</i>
 │   ├── Shaders/Crt.fx          <i>HLSL → compiled Effect: scanlines, curvature, vignette</i>
 │   └── Levels/level0*.txt      <i>3 boards, 13-col grids: . empty · 1-5 tier · X unbreakable</i>
-└── Source/
+├── Source/
     ├── Screen.cs               <i>virtual resolution constants (800×480)</i>
     ├── GameMode.cs             <i>Modern / Co-op / Classic / 3× Super — which states drive the session</i>
     ├── GameSession.cs          <i>the world: entities, score, lives, level/wall index</i>
@@ -884,7 +884,8 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
         ├── RebindState.cs      <i>B from pause: poll any-key, ActionMap.Rebind</i>
         ├── LifeLostState.cs    <i>frozen beat + flash, then back to Ready</i>
         ├── LevelClearedState.cs <i>banner + beat, then the next board loads</i>
-        └── GameOverState.cs    <i>win/lose overlay, Enter restarts</i></div>
+        └── GameOverState.cs    <i>win/lose overlay, Enter restarts</i>
+└── Tests/Breakout.Tests/       <i>xUnit: the pure logic — rule tables, generator, collision, ranking</i></div>
 </section>
 
 <!-- ============================================================ B -->
