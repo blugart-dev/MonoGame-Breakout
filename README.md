@@ -14,7 +14,7 @@ startup, and the only content pipeline assets are the HUD font and the CRT
 shader (which is source code, not art).
 
 > 📖 **[Read the study guide](https://blugart-dev.github.io/MonoGame-Breakout/)** —
-> ten concept sections, a project map, an engine-concepts glossary, and
+> fifteen concept sections, a project map, an engine-concepts glossary, and
 > exercises. (Source: [`docs/index.html`](docs/index.html), served by GitHub Pages.)
 
 ## Run
@@ -64,10 +64,12 @@ the right half (arrows, or a gamepad's D-pad/stick).
 1. **Play it** (`dotnet run`) so you know what the code produces.
 2. **Open the [study guide](https://blugart-dev.github.io/MonoGame-Breakout/)**
    (or `docs/index.html` locally in a browser).
-   Ten concept sections in reading order (game loop, fixed timestep,
+   Fifteen concept sections in reading order (game loop, fixed timestep,
    SpriteBatch, content pipeline, input polling, AABB collision, state
-   machines, virtual resolution, juice, production habits), each naming the
-   files to open next to it, plus an engine-concepts glossary and exercises.
+   machines, virtual resolution, juice, production habits, the 1976/1978
+   reconstructions, procedural boards, replays & determinism, the CRT
+   post-process, the testing boundary), each naming the files to open next
+   to it, plus an engine-concepts glossary and exercises.
 3. **Read the code** — the comments are the textbook. A good order:
    `Program.cs` → `BreakoutGame.cs` → `Source/States/PlayingState.cs`,
    then outward to whatever it touches.

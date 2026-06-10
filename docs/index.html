@@ -262,6 +262,11 @@
     <li><a href="#virtual"><span class="num">08</span>The Virtual Screen</a></li>
     <li><a href="#juice"><span class="num">09</span>Juice: Shake, Sparks, Square Waves</a></li>
     <li><a href="#production"><span class="num">10</span>Production Habits</a></li>
+    <li><a href="#history"><span class="num">11</span>Two Manuals, Three Games</a></li>
+    <li><a href="#procgen"><span class="num">12</span>Boards from a Seed</a></li>
+    <li><a href="#replay"><span class="num">13</span>The Run Is a Pure Function</a></li>
+    <li><a href="#crt"><span class="num">14</span>Shading the Whole Frame</a></li>
+    <li><a href="#testing"><span class="num">15</span>The Testable Half of a Game</a></li>
     <li><a href="#map"><span class="num">A</span>Project Map</a></li>
     <li><a href="#glossary"><span class="num">B</span>Engine Concepts → MonoGame</a></li>
     <li><a href="#next"><span class="num">C</span>Where to Go Next</a></li>
@@ -289,6 +294,8 @@
       <span class="chip">800 × 480 virtual</span>
       <span class="chip">60 Hz fixed step</span>
       <span class="chip">zero asset files</span>
+      <span class="chip">6 ways to play</span>
+      <span class="chip">deterministic replays</span>
     </div>
   </div>
   <div class="demo-frame">
@@ -827,6 +834,324 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
   is finished.</p></div>
 </section>
 
+<div class="brickrow"><i style="background:var(--tier4)"></i><i style="background:var(--tier4)"></i><i style="background:var(--tier2)"></i><i style="background:var(--tier2)"></i><i style="background:var(--tier3)"></i></div>
+
+<!-- ============================================================ 11 -->
+<section id="history">
+  <div class="kicker" style="color:var(--tier4)">11 / DESIGN HISTORY</div>
+  <h2>Two Manuals, Three Games</h2>
+  <p class="files">open: <code>Source/Systems/ClassicRules.cs</code> · <code>SuperRules.cs</code> · <code>ClassicWall.cs</code> · <code>SuperWall.cs</code> · the three playing states</p>
+
+  <p>The arcade modes are not "retro flavored" — they are <strong>reconstructions</strong>.
+  Classic plays the rules in Atari's 1976 Breakout operation manual; Double, Cavity and
+  Progressive play the sequel's 1978 manual (TM-118). Each manual became one rules file
+  and one wall file, written so the code reads like the document it came from — and the
+  diff between the three playing states is two years of design history in a split view:</p>
+
+  <table>
+    <tr><th></th><th>Breakout 1976</th><th>Super Breakout 1978</th><th>Modern (house rules)</th></tr>
+    <tr><td><strong>Ball speeds</strong></td>
+      <td>4 discrete steps: 4th hit, 12th hit, instant max on orange/red</td>
+      <td>5 discrete steps: 4th/8th/12th paddle return, instant max on a 5/7 brick</td>
+      <td>continuous ramp, +8&nbsp;px/s per brick</td></tr>
+    <tr><td><strong>Paddle rebound</strong></td>
+      <td>4 fixed exits by struck quarter, tightening as speed rises</td>
+      <td>the same 4-exit law, one rung longer</td>
+      <td>continuous angle from hit position (§06)</td></tr>
+    <tr><td><strong>Brick law</strong></td>
+      <td>one brick per trip — a dis-armed ball rebounds, the brick survives</td>
+      <td>pass-through — an unreturned ball sails through; after a kill it <em>bores</em> for four rows</td>
+      <td>chew through everything; multi-hit tiers</td></tr>
+    <tr><td><strong>Half-paddle penalty</strong></td>
+      <td>on breaking out behind the wall, for the rest of the volley</td>
+      <td>on touching the top boundary, until the next serve</td>
+      <td>only as the debris hazard's timed shrink</td></tr>
+    <tr><td><strong>Serve</strong></td>
+      <td colspan="2">materializes mid-screen, already falling <em>at</em> you</td>
+      <td>launched off the paddle, aimed cone</td></tr>
+    <tr><td><strong>Scoring</strong></td>
+      <td>by row, 1/1/3/3/5/5/7/7 — exactly two walls, 896 maximum</td>
+      <td>row (or zone) value × balls in play; endless walls</td>
+      <td>tier × 10; power-ups, multiball</td></tr>
+  </table>
+
+  <div class="code"><div class="head"><span class="fn">Source/Systems/ClassicRules.cs</span><span class="note">four exits, and never a vertical ball</span></div>
+<pre><code>float degrees = MathF.Abs(offset) &lt; 0.5f
+    ? InnerAngles[speedLevel]   // inner quarters: steep
+    : OuterAngles[speedLevel];  // outer quarters: wide
+
+// A dead-center hit still exits at the inner angle — to the right, by
+// convention. Math.Sign would return 0 and make the ball vertical,
+// which the original hardware never allowed.
+float side = offset &gt;= 0f ? 1f : -1f;</code></pre></div>
+
+  <p>That second half is the 1976 manual's strangest law: <strong>the ball is never allowed
+  to travel exactly perpendicular</strong> to the paddle, the bricks, or any boundary. The
+  reason is mechanical, not aesthetic — a vertical ball over a gap bounces forever without
+  the player, and the game plays itself. Forty-nine years later the same law protects this
+  codebase from the same softlock.</p>
+
+  <div class="box engine"><span class="tag">METHOD</span>
+  <p>The manuals state <em>laws</em>, but rarely <em>numbers</em>: the rebound figure is a
+  diagram with no angles, and "hit" is never defined for the speed-up counters. Every
+  reconstructed value is flagged as such in the rules files, with the chosen reading
+  defended ("we count destroyed bricks"; the 1978 file counts paddle returns — both
+  defensible) and the price of certainty written down (cycle-exact values would need the
+  TTL schematic). That is the transferable habit: <strong>name your sources, flag your
+  guesses, record what a better answer would cost.</strong></p></div>
+
+  <div class="box why"><span class="tag">DESIGN NOTE</span>
+  <p>The sequel's premise is "more balls": Double serves two for one credit, Cavity frees
+  captives into play, and scores multiply by balls in the playfield — but only the
+  <em>served</em> ball costs a serve when lost. Watch <code>SuperPlayingState</code>
+  identify the life-bearer by reference (<code>ball == _serveBall</code>): no flag on the
+  Ball class, because "which ball matters" is 1978 law, not a property of balls.</p></div>
+
+  <div class="box try"><span class="tag">TRY IT</span>
+  <p>Play one serve of Classic, then one of Modern. The 1976 paddle <em>routes</em> (four
+  exits, pick a lane); the modern paddle <em>aims</em> (continuous angle). Then open
+  <code>ClassicPlayingState</code> and <code>PlayingState</code> side by side — every
+  feel difference you just noticed is a visible diff.</p></div>
+</section>
+
+<div class="brickrow"><i style="background:var(--tier2)"></i><i style="background:var(--tier1)"></i><i style="background:var(--tier2)"></i><i style="background:var(--tier1)"></i><i style="background:var(--tier2)"></i></div>
+
+<!-- ============================================================ 12 -->
+<section id="procgen">
+  <div class="kicker" style="color:var(--tier2)">12 / GENERATION</div>
+  <h2>Boards from a Seed</h2>
+  <p class="files">open: <code>Source/Systems/BoardGenerator.cs</code> · <code>LevelLoader.cs</code> · <code>GameSession.cs</code> (GenerateBoard)</p>
+
+  <p>The level select's <code>RANDOM</code> slot plays endless generated boards — and the
+  generator never touches a <code>Brick</code>. It emits the same plain-text grid the
+  <code>.txt</code> levels use, and <code>LevelLoader.Parse</code> cannot tell (and never
+  learns) whether its text came from a file or from code. <strong>The format is the
+  contract</strong>; a generator is just another producer of it. The output is even legal
+  to paste into a level file if a generated board turns out to be a keeper.</p>
+
+  <div class="code"><div class="head"><span class="fn">Source/Systems/BoardGenerator.cs</span><span class="note">difficulty as four small curves</span></div>
+<pre><code>int rows = Math.Min(5 + boardNumber / 2, 8);
+int tierCap = Math.Min(2 + boardNumber / 2, 5);
+int tierBudget = 35 + boardNumber * 10;
+float unbreakableDensity = Math.Min(0.012f * boardNumber, 0.10f);</code></pre></div>
+
+  <p>Three decisions carry the design. <strong>A budget, not a fill chance:</strong> the
+  generator spends hit-points brick by brick, which bounds the board's total work — "how
+  long does a board take" scales predictably even though every layout differs.
+  <strong>Mirroring:</strong> only the left half plus the center column is generated; the
+  right half is a reflection. Humans forgive randomness far more readily when it has
+  structure — and symmetry halves the space the generator can get wrong.
+  <strong>Unbreakables last:</strong> they fill leftover holes <em>after</em> the budget
+  is spent, so they are obstacles to route around, never a substitute for bricks to clear —
+  no board can generate unwinnable.</p>
+
+  <div class="box gotcha"><span class="tag">GOTCHA</span>
+  <p>Random placement stalls once the grid fills: the spend loop pairs its budget with a
+  stall counter instead of trusting luck. Every loop fed by randomness needs an exit that
+  does not depend on the dice — <code>while (tierBudget &gt; 0)</code> alone is a hang
+  waiting for the right seed.</p></div>
+
+  <div class="box why"><span class="tag">DESIGN NOTE</span>
+  <p>All randomness comes from the <em>caller's</em> <code>Random</code> — in play, the
+  session's seeded stream (§13). That one parameter is what makes generated runs
+  replayable: the replay re-seeds the same stream, so it re-rolls the same boards. The
+  tests pin exactly the properties everything else relies on: determinism, the format
+  contract, mirroring, and winnability, swept across 50 seeds × 15 boards.</p></div>
+
+  <div class="box try"><span class="tag">TRY IT</span>
+  <p>Set <code>unbreakableDensity</code>'s cap to <code>0.5f</code> and play a few RANDOM
+  boards — feel how obstacles stop being seasoning and start being the dish. Then run
+  <code>dotnet test</code>: the winnability sweep still passes, and knowing <em>why</em>
+  (unbreakables only fill leftover holes) is the lesson.</p></div>
+</section>
+
+<div class="brickrow"><i style="background:var(--tier3)"></i><i style="background:var(--tier3)"></i><i style="background:var(--tier1)"></i><i style="background:var(--tier3)"></i><i style="background:var(--tier3)"></i></div>
+
+<!-- ============================================================ 13 -->
+<section id="replay">
+  <div class="kicker" style="color:var(--tier3)">13 / DETERMINISM</div>
+  <h2>The Run Is a Pure Function</h2>
+  <p class="files">open: <code>Source/Systems/Replay.cs</code> · <code>InputSnapshot.cs</code> · <code>Source/States/GameStateManager.cs</code> · <code>GameSession.cs</code> (Seed, Rng)</p>
+
+  <p><code>Replay.cs</code> is twenty-odd lines, and stores <em>nothing about the world</em>:
+  no ball positions, no scores, no events. A replay is a mode, a start level, an RNG seed,
+  and one input frame per simulation tick — because given those, the run is a pure
+  function. Press <code>R</code> on the game-over screen and the game does not rewind;
+  it <strong>re-simulates</strong>, feeding the recorded frames through the very states
+  that consumed them live.</p>
+
+  <p>Three habits make that possible, each cheap on its own: the fixed timestep (§02), so
+  tick N means the same amount of time in every run; <strong>one named Random</strong> —
+  <code>new Random()</code> was always going to be "random from some seed", and
+  <em>naming</em> that seed is the one-line change that turns random into reproducible;
+  and all per-tick gameplay input behind one snapshot type:</p>
+
+  <div class="code"><div class="head"><span class="fn">Source/Systems/InputSnapshot.cs</span><span class="note">the whole replay format is "keep these in a list"</span></div>
+<pre><code>// Only the actions the simulation reads are recorded. Everything else —
+// Pause, the menus, the shell shortcuts — deliberately stays live during
+// playback: the viewer can still pause, rebind, or quit the *movie*
+// without those presses ever having been part of the *run*.
+private static readonly GameAction[] RecordedActions =
+{
+    GameAction.MoveLeft, GameAction.MoveRight, GameAction.Launch,
+    GameAction.P1MoveLeft, GameAction.P1MoveRight,
+    GameAction.P2MoveLeft, GameAction.P2MoveRight,
+};</code></pre></div>
+
+  <p>The alignment rule is one flag: <code>GameState.IsSimulation</code>. The recorder
+  keeps one frame per simulation tick; the player feeds one back per simulation tick; the
+  two streams stay aligned exactly because both sides agree on which ticks <em>count</em>.
+  Pause is the instructive case — its ticks are not simulation, so the recorder's pauses
+  vanish from the movie and the viewer can pause the movie at will, both for free, from
+  one bit.</p>
+
+  <div class="box gotcha"><span class="tag">GOTCHA</span>
+  <p>Almost for free. The pause-<em>entry</em> tick is the trap: the state transitions
+  and returns <em>without simulating</em>, but the manager has already spent that tick on
+  the tape — recorded a frame the run never simulated, or consumed one that never ran.
+  One tick of drift, compounding forever after. <code>GameStateManager.Update</code> ends
+  by <strong>un-spending</strong> such a tick (pop the frame / rewind the index); the
+  commit that added it tells the debugging story. Off-by-one is the native bug class of
+  every tape format.</p></div>
+
+  <div class="box why"><span class="tag">THE INVARIANT</span>
+  <p>Everything stochastic in a run draws from <code>Session.Rng</code> — launch angles,
+  drop rolls, SFX pitch, screen shake, generated boards — so the seed reproduces all of
+  it. The corollary with teeth: <strong>RNG consumption must never depend on output
+  devices.</strong> <code>AudioBank.PlayVaried</code> rolls its pitch <em>before</em> its
+  null check, so a machine with no sound card consumes the identical stream. Determinism
+  is less a feature than a discipline about who may roll dice, and when.</p></div>
+
+  <div class="box engine"><span class="tag">WORTH KNOWING</span>
+  <p>This same machinery — seed + inputs, re-simulate — is how arcade attract modes,
+  fighting-game replays, RTS lockstep netcode and desync bug reports all work. "Record
+  causes, re-derive effects" scales from these 26 lines to shipped engines unchanged.</p></div>
+
+  <div class="box try"><span class="tag">TRY IT</span>
+  <p>Move <code>GameAction.Launch</code> out of <code>RecordedActions</code> and run the
+  tests: <code>InputSnapshotTests</code> fails naming Launch. Ignore it and watch a
+  replay anyway — the movie stalls at the serve while the tape drains, and nothing lines
+  up after. A contract test failing <em>by name</em> beats a desync you notice minutes
+  later.</p></div>
+</section>
+
+<div class="brickrow"><i style="background:var(--tier5)"></i><i style="background:var(--tier4)"></i><i style="background:var(--tier5)"></i><i style="background:var(--tier4)"></i><i style="background:var(--tier5)"></i></div>
+
+<!-- ============================================================ 14 -->
+<section id="crt">
+  <div class="kicker" style="color:var(--tier5)">14 / POST-PROCESS</div>
+  <h2>Shading the Whole Frame</h2>
+  <p class="files">open: <code>Content/Shaders/Crt.fx</code> · <code>Source/Systems/VirtualScreen.cs</code> (SetCrtEffect, Present)</p>
+
+  <p>A post-process wants exactly one thing: a moment when the whole frame is a single
+  texture. The virtual screen (§08) created that moment — the present draw — so the CRT
+  pass costs <em>one</em> <code>Effect</code> on <em>one</em> draw call, shading every
+  pixel of the frame. <code>F9</code> toggles it, because any effect that changes the
+  entire image must be the player's choice.</p>
+
+  <p><code>Crt.fx</code> is the Content Pipeline's other major asset type: HLSL source in,
+  compiled platform blob out, at <em>build</em> time. For DesktopGL the source is
+  translated to GLSL by MojoShader — but the first step runs Direct3D's shader compiler,
+  which is Windows-only, which is why effect builds on Linux run it under Wine (the CI
+  workflow shows the exact recipe). At runtime, <code>Content.Load&lt;Effect&gt;</code>
+  just uploads the blob.</p>
+
+  <div class="code"><div class="head"><span class="fn">Content/Shaders/Crt.fx</span><span class="note">mask and scanlines, branchless</span></div>
+<pre><code>// Past the curved edge there is no image — mask to black. step() instead
+// of an if/discard: branchless is the native dialect of pixel shaders.
+float inside = step(abs(centered.x), 1.0) * step(abs(centered.y), 1.0);
+
+// Scanlines: cos(pi * row) alternates sign every virtual row. Using
+// VIRTUAL rows keeps the lines locked to game pixels at any window size.
+float wave = 0.5 + 0.5 * cos(uv.y * VirtualSize.y * 3.14159265);
+color.rgb *= 1.0 - ScanlineStrength * (1.0 - wave);</code></pre></div>
+
+  <p>The curvature is the classic cheap barrel: push each sample point <em>outward</em> in
+  proportion to its squared distance from center, and the image bows <em>inward</em> at
+  the edges — curved glass. The vignette rides the same <code>r²</code>: corners sit
+  furthest from the electron gun, so they get both the bend and the dimming.</p>
+
+  <div class="box why"><span class="tag">DESIGN NOTE</span>
+  <p>The technique compiles a <em>pixel shader only</em> — SpriteBatch's own vertex shader
+  stays bound, which is exactly what a SpriteBatch post-process wants. And the tuning
+  parameters are set once in <code>SetCrtEffect</code>, not per frame: Effect parameters
+  persist on the object, so you never re-send what never changes.</p></div>
+
+  <div class="box gotcha"><span class="tag">GOTCHA</span>
+  <p>Post-process strength is resolution-relative. At the default window size the game
+  presents at exactly 1×, where the scanline period is a single physical pixel — a value
+  that looks like gentle phosphor at 2× reads as a dark comb at 1×. This repo's strength
+  was halved for exactly that reason; tune yours at the size players actually use.</p></div>
+
+  <div class="box try"><span class="tag">TRY IT</span>
+  <p>Set <code>Curvature</code> to <code>0.4f</code> in <code>SetCrtEffect</code> for a
+  fishbowl, then <code>0f</code> for flat glass with scanlines only. One uniform each —
+  that immediacy is why post-processing is the highest juice-per-line system in the
+  repo.</p></div>
+</section>
+
+<div class="brickrow"><i style="background:var(--engine)"></i><i style="background:var(--tier1)"></i><i style="background:var(--engine)"></i><i style="background:var(--tier1)"></i><i style="background:var(--engine)"></i></div>
+
+<!-- ============================================================ 15 -->
+<section id="testing">
+  <div class="kicker" style="color:var(--engine)">15 / TESTING</div>
+  <h2>The Testable Half of a Game</h2>
+  <p class="files">open: <code>Tests/Breakout.Tests/</code> · <code>Source/Systems/HighScores.cs</code> (InsertScore)</p>
+
+  <p>88 tests, zero graphics. The suite never boots the game loop, never draws a frame —
+  and that is the strategy, not a limitation: <strong>the line between unit-testable and
+  play-testable runs exactly along the pure/impure divide.</strong> Rules, walls, the
+  generator, the parser, collision response, ranking, the replay contract: pure functions,
+  tested hard. States, rendering, game feel: play-tested, on purpose.</p>
+
+  <table>
+    <tr><th>What</th><th>Pinned by</th><th>The failure it catches</th></tr>
+    <tr><td>the 1976/1978 rule tables</td><td><code>ClassicRulesTests</code> · <code>SuperRulesTests</code></td><td>a typo'd manual threshold shipping silently; a ball allowed to fly vertical</td></tr>
+    <tr><td>the manual-sourced walls</td><td><code>ClassicWallTests</code> · <code>SuperWallTests</code></td><td>448 not being 448; a brick standing inside a cavity; Progressive mispricing a zone</td></tr>
+    <tr><td>the board generator</td><td><code>BoardGeneratorTests</code></td><td>a seed that desyncs replays; an unwinnable board</td></tr>
+    <tr><td>the shipped levels</td><td><code>LevelFilesTests</code></td><td>a stray character in <code>level03.txt</code> nobody plays far enough to meet</td></tr>
+    <tr><td>collision response</td><td><code>CollisionHelperTests</code></td><td>the sign error you'd otherwise meet once an hour in play</td></tr>
+    <tr><td>aiming &amp; speed math</td><td><code>BallTests</code></td><td>the game-feel knobs drifting</td></tr>
+    <tr><td>the replay contract</td><td><code>InputSnapshotTests</code></td><td>a new action landing on the wrong side of recorded-vs-live (§13)</td></tr>
+    <tr><td>high-score ranking</td><td><code>HighScoresTests</code></td><td>an equal score outranking the incumbent</td></tr>
+  </table>
+
+  <div class="code"><div class="head"><span class="fn">Tests/Breakout.Tests/ClassicRulesTests.cs</span><span class="note">table-driven: the manual's thresholds as data (abridged)</span></div>
+<pre><code>[Theory]
+[InlineData(0, false, 0, 0)]   // fresh serve: slowest speed
+[InlineData(4, false, 0, 1)]   // the manual's 4th-hit speed-up
+[InlineData(12, false, 1, 2)]  // the 12th-hit speed-up
+[InlineData(0, true, 0, 3)]    // orange/red brick: instant top speed
+public void SpeedLevel_FollowsTheManualThresholds(
+    int bricks, bool highRow, int current, int expected)
+    =&gt; Assert.Equal(expected, ClassicRules.SpeedLevel(bricks, highRow, current));</code></pre></div>
+
+  <div class="box why"><span class="tag">THE SEAM LESSON</span>
+  <p><code>HighScores.Record</code> touches a real file under ApplicationData — a test
+  must never do that (it would corrupt your actual scores, and CI machines shouldn't
+  write profile data at all). So the pure ranking core exists as its own method,
+  <code>InsertScore</code>, and the tests exercise that. When code is hard to test, the
+  professional move is usually a <em>seam</em> — split the decision from the disk — not
+  a mocking framework.</p></div>
+
+  <div class="box gotcha"><span class="tag">WHAT'S DELIBERATELY UNTESTED</span>
+  <p>States, draw code, feel. They change for <em>design</em> reasons, and a test that
+  breaks on every design change teaches a team to delete tests. Play-testing is testing
+  too — with the right oracle for the job: a human who can feel that the paddle went
+  mushy. The skill is knowing which oracle each behavior needs.</p></div>
+
+  <div class="box engine"><span class="tag">WORTH KNOWING</span>
+  <p>CI runs the suite on Windows <em>and</em> Ubuntu, plus a <code>dotnet format</code>
+  gate — the README badge is green because checks run, not because someone says so. A
+  learning repo earns trust the same way a shipping one does.</p></div>
+
+  <div class="box try"><span class="tag">TRY IT</span>
+  <p>Change a 7 to an 8 in <code>ClassicWall.RowScores</code> and run
+  <code>dotnet test</code>. Two tests fail, naming the wall and the law (448 and the row
+  pricing) — that's a transcription error caught at the cost of a keystroke, which is
+  the entire argument for pinning manual-sourced numbers.</p></div>
+</section>
+
 <div class="brickrow"><i style="background:var(--tier2)"></i><i style="background:var(--tier5)"></i><i style="background:var(--tier3)"></i><i style="background:var(--tier1)"></i><i style="background:var(--tier4)"></i></div>
 
 <!-- ============================================================ A -->
@@ -919,6 +1244,8 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
     <tr><td>one audio player for everything</td><td><code>SoundEffect</code> (SFX) vs <code>Song</code>+<code>MediaPlayer</code> (music) vs <code>SoundEffectInstance</code> (the controllable handle)</td><td><code>AudioBank</code> · <code>MusicPlayer</code></td></tr>
     <tr><td>project display settings</td><td><code>GraphicsDeviceManager</code> preferences + <code>ApplyChanges()</code></td><td><code>BreakoutGame</code> ctor</td></tr>
     <tr><td>built-in particle system</td><td>a list of structs and forty lines</td><td><code>ParticleSystem</code></td></tr>
+    <tr><td>built-in tween / animation player</td><td>a timer, an easing function, an offset applied at draw time</td><td><code>Brick.UpdateDropIn</code> (cubic ease-out) · <code>Paddle</code>'s width lerp</td></tr>
+    <tr><td>procedural generation helpers</td><td>a seeded <code>Random</code> plus a data format both sides agree on</td><td><code>BoardGenerator</code> → <code>LevelLoader.Parse</code></td></tr>
     <tr><td>built-in pause / time scale</td><td>a state that updates nothing</td><td><code>PauseState</code></td></tr>
     <tr><td>engine pauses the unfocused game</td><td>check <code>IsActive</code> yourself, auto-enter pause</td><td><code>GameStateManager.NotifyFocusLost</code></td></tr>
     <tr><td>post-processing stack</td><td>one <code>Effect</code> on the draw that presents the render target</td><td><code>Content/Shaders/Crt.fx</code> · <code>VirtualScreen.Present</code></td></tr>
@@ -963,7 +1290,7 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
   "bricks never move" (Progressive scrolls the wall and re-prices it by screen zone),
   and <code>Paddle</code>'s row became constructor data (Double stacks two on one
   set of controls, one of them one-sided — an effect of the plain rule "a rising
-  ball never meets a paddle").</p>
+  ball never meets a paddle"). §11 lays the three rule sets side by side.</p>
 
   <p>The rest of the round is now implemented too, one commit each (2026-06-10),
   closing the appendix. <strong>Falling debris</strong> rode the PowerUp pipeline with
@@ -974,15 +1301,17 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
   <code>InputSnapshot</code> per fixed 60&nbsp;Hz tick, and a whole run becomes a pure
   function you can re-run from the game-over screen (<code>R</code>) — note in
   <code>GameStateManager</code> how little machinery "playback" really is, and how
-  pause stays live on both sides because its ticks were never part of the run.
+  pause stays live on both sides because its ticks were never part of the run
+  (§13 walks the whole contract, off-by-one trap included).
   <strong>Procedural boards</strong> (the <code>RANDOM</code> slot in level select)
   cash in the level format a second time: <code>LevelLoader</code> split into
   Load/Parse, and <code>BoardGenerator</code> is just another producer of the text the
   parser already reads — drawing from the seeded session stream, so replays re-roll
-  identical boards. And the <strong>CRT shader</strong> opens the pipeline's other
-  asset type: <code>Crt.fx</code> compiles at build time (on Linux, via Wine — see the
-  CI workflow) and applies at the single draw where the whole frame is one texture,
-  <code>VirtualScreen.Present</code>. <code>F9</code> toggles it.</p>
+  identical boards (§12 has the design). And the <strong>CRT shader</strong> opens the
+  pipeline's other asset type: <code>Crt.fx</code> compiles at build time (on Linux, via
+  Wine — see the CI workflow) and applies at the single draw where the whole frame is
+  one texture, <code>VirtualScreen.Present</code>. <code>F9</code> toggles it; §14 reads
+  the shader line by line.</p>
 
   <p style="margin-top:34px">When you've read everything: delete a system —
   the shake, the particles, the speed ramp — run the game, and feel what's missing.
