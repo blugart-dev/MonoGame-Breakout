@@ -37,6 +37,7 @@ automatically and the content pipeline runs as part of the build.
 | Mouse / `←` `→` / `A` `D` | Move paddle |
 | `Space` / Left click | Launch ball |
 | `Enter` / Click (on game over) | Play again |
+| `P` | Pause / resume (also auto-pauses when the window loses focus) |
 | `F11` | Borderless fullscreen |
 | `F10` | Integer ("pixel perfect") scaling toggle |
 | `F3` | Debug overlay (FPS, ball speed, entity counts) |

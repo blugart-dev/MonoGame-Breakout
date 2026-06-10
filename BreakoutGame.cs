@@ -81,6 +81,7 @@ public class BreakoutGame : Game
         // alt-tabbed. base.Update still runs for framework housekeeping.
         if (!IsActive)
         {
+            _states.NotifyFocusLost(); // a live game auto-pauses, see PauseState
             base.Update(gameTime);
             return;
         }

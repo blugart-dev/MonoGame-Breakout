@@ -33,9 +33,28 @@ public sealed class GameStateManager
         next.Enter();
     }
 
+    /// <summary>
+    /// Make a previously interrupted state current again *without* calling
+    /// Enter() — it never conceptually exited, so its one-shot setup (sounds,
+    /// re-attaching the ball) must not run a second time.
+    /// </summary>
+    public void ResumeState(GameState state) => _current = state;
+
+    /// <summary>
+    /// Called by the shell when the window loses focus. Auto-pausing the live
+    /// game is the professional default — nobody wants to lose a ball while
+    /// alt-tabbed. Only Playing needs it: every other state is already static.
+    /// </summary>
+    public void NotifyFocusLost()
+    {
+        if (_current is PlayingState)
+            ChangeState(new PauseState(this, _current));
+    }
+
     public void Update(float dt, InputHelper input)
     {
-        Session.UpdateEffects(dt); // effects run in every state
+        if (!_current.FreezesEffects)
+            Session.UpdateEffects(dt); // effects run in (almost) every state
         _current.Update(dt, input);
     }
 

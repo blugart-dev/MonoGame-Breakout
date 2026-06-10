@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Breakout.Entities;
 using Breakout.Systems;
 
@@ -18,6 +19,12 @@ public sealed class PlayingState : GameState
 
     public override void Update(float dt, InputHelper input)
     {
+        if (input.WasKeyJustPressed(Keys.P))
+        {
+            Manager.ChangeState(new PauseState(Manager, this));
+            return; // don't simulate the tick the player paused on
+        }
+
         Session.Paddle.Update(dt, input);
         Session.Ball.Update(dt);
 

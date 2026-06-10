@@ -14,6 +14,12 @@ public sealed class ReadyState : GameState
 
     public override void Update(float dt, InputHelper input)
     {
+        if (input.WasKeyJustPressed(Keys.P))
+        {
+            Manager.ChangeState(new PauseState(Manager, this));
+            return;
+        }
+
         Session.Paddle.Update(dt, input);
         Session.Ball.Update(dt); // follows the paddle while attached
 

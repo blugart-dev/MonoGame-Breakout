@@ -22,6 +22,13 @@ public abstract class GameState
     /// <summary>One-shot setup when the state becomes current.</summary>
     public virtual void Enter() { }
 
+    /// <summary>
+    /// Whether effects (particles, shake) freeze while this state is current.
+    /// They normally animate everywhere — even on the game-over screen — but a
+    /// pause that leaves particles falling doesn't look paused.
+    /// </summary>
+    public virtual bool FreezesEffects => false;
+
     public abstract void Update(float dt, InputHelper input);
     public abstract void Draw(SpriteBatch spriteBatch);
 
