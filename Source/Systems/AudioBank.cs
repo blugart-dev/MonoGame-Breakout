@@ -21,6 +21,20 @@ public static class AudioBank
     public static SoundEffect LifeLost { get; private set; }
     public static SoundEffect Win { get; private set; }
 
+    /// <summary>
+    /// Play with a small random pitch offset. MonoGame's pitch parameter is in
+    /// octaves: -1 = one octave down, +1 = one octave up, so ±0.08 is under a
+    /// semitone — too small to hear as a "different note", just enough that
+    /// rapid identical hits stop sounding like a stuck sample. The cheapest
+    /// audio juice there is: one parameter on a call you already make.
+    /// </summary>
+    public static void PlayVaried(this SoundEffect effect, Random rng,
+        float maxPitchOffset = 0.08f)
+    {
+        float pitch = ((float)rng.NextDouble() * 2f - 1f) * maxPitchOffset;
+        effect.Play(volume: 1f, pitch: pitch, pan: 0f);
+    }
+
     public static void Initialize()
     {
         try

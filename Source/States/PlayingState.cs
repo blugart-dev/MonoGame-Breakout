@@ -61,7 +61,7 @@ public sealed class PlayingState : GameState
         }
 
         if (bounced)
-            AudioBank.WallHit?.Play();
+            AudioBank.WallHit?.PlayVaried(Session.Rng);
     }
 
     private void BounceOffPaddle()
@@ -76,7 +76,7 @@ public sealed class PlayingState : GameState
             return;
 
         ball.BounceOffPaddle(Session.Paddle);
-        AudioBank.PaddleHit?.Play();
+        AudioBank.PaddleHit?.PlayVaried(Session.Rng);
     }
 
     private void HandleBrickCollision()
@@ -97,13 +97,13 @@ public sealed class PlayingState : GameState
                 Session.Particles.Emit(brick.Bounds.Center.ToVector2(), brick.BaseColor, 18, Session.Rng);
                 Session.Shake.Add(0.3f);
                 Session.Ball.RampSpeed(); // difficulty ramps with progress
-                AudioBank.BrickBreak?.Play();
+                AudioBank.BrickBreak?.PlayVaried(Session.Rng);
                 MaybeDropPowerUp(brick.Bounds.Center.ToVector2());
             }
             else
             {
                 Session.Shake.Add(0.1f);
-                AudioBank.BrickHit?.Play();
+                AudioBank.BrickHit?.PlayVaried(Session.Rng);
             }
 
             // One brick per tick: after reflecting, a second simultaneous
