@@ -5,12 +5,15 @@ namespace Breakout.Systems;
 
 /// <summary>
 /// The input-mapping layer big engines ship built in, rebuilt as one
-/// dictionary: action → the keys currently bound to it. Two things fall out
-/// for free. Alternate bindings are just more entries in the array (arrows
-/// AND A/D both mean "move"), and rebinding at runtime is a dictionary
-/// write — no gameplay code changes, because no gameplay code names a key.
-/// Mouse input deliberately stays outside the map: it is positional, not a
-/// binary "pressed" thing a Keys value could stand in for.
+/// dictionary per device: action → the keys (or gamepad buttons) currently
+/// bound to it. Two things fall out for free. Alternate bindings are just
+/// more entries in the array (arrows AND A/D both mean "move"), and rebinding
+/// at runtime is a dictionary write — no gameplay code changes, because no
+/// gameplay code names a key. Adding the gamepad proved the layer's worth:
+/// it is one more dictionary here and two loops in InputHelper, and not a
+/// single gameplay file changed. Mouse input deliberately stays outside the
+/// map: it is positional, not a binary "pressed" thing a Keys value could
+/// stand in for.
 /// </summary>
 public sealed class ActionMap
 {
@@ -31,7 +34,29 @@ public sealed class ActionMap
         [GameAction.Quit] = new[] { Keys.Escape },
     };
 
+    // The gamepad half of the map. MonoGame exposes thumbstick directions as
+    // pseudo-buttons (LeftThumbstickLeft etc., with a built-in dead zone), so
+    // analog movement joins the same binary action model for free. Not every
+    // action needs a pad binding — F-key toggles stay keyboard-only.
+    private readonly Dictionary<GameAction, Buttons[]> _buttonBindings = new()
+    {
+        [GameAction.MoveLeft] = new[] { Buttons.DPadLeft, Buttons.LeftThumbstickLeft },
+        [GameAction.MoveRight] = new[] { Buttons.DPadRight, Buttons.LeftThumbstickRight },
+        [GameAction.Launch] = new[] { Buttons.A },
+        [GameAction.Pause] = new[] { Buttons.Start },
+        [GameAction.Restart] = new[] { Buttons.A, Buttons.Start },
+        [GameAction.MenuUp] = new[] { Buttons.DPadUp, Buttons.LeftThumbstickUp },
+        [GameAction.MenuDown] = new[] { Buttons.DPadDown, Buttons.LeftThumbstickDown },
+        [GameAction.TitleScreen] = new[] { Buttons.Y },
+        [GameAction.Quit] = new[] { Buttons.Back },
+    };
+
+    private static readonly Buttons[] NoButtons = System.Array.Empty<Buttons>();
+
     public IReadOnlyList<Keys> KeysFor(GameAction action) => _bindings[action];
+
+    public IReadOnlyList<Buttons> ButtonsFor(GameAction action)
+        => _buttonBindings.TryGetValue(action, out Buttons[] buttons) ? buttons : NoButtons;
 
     /// <summary>
     /// Replace an action's bindings at runtime. This dictionary write is the

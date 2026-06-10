@@ -20,6 +20,7 @@ public sealed class InputHelper
 
     private KeyboardState _keyboard, _previousKeyboard;
     private MouseState _mouse, _previousMouse;
+    private GamePadState _gamePad, _previousGamePad;
     private Point _virtualMousePosition;
 
     /// <summary>Call exactly once per Update tick, before anything reads input.</summary>
@@ -27,8 +28,14 @@ public sealed class InputHelper
     {
         _previousKeyboard = _keyboard;
         _previousMouse = _mouse;
+        _previousGamePad = _gamePad;
         _keyboard = Keyboard.GetState();
         _mouse = Mouse.GetState();
+
+        // Same polling model as the keyboard. With no pad plugged in this
+        // returns a disconnected state whose buttons all read "up" — cheap
+        // and safe, so we don't bother checking IsConnected every frame.
+        _gamePad = GamePad.GetState(PlayerIndex.One);
 
         // The OS reports the mouse in window-client pixels; the game thinks in
         // virtual pixels. Convert once here so no gameplay code ever knows the
@@ -41,9 +48,11 @@ public sealed class InputHelper
     public bool WasKeyJustPressed(Keys key)
         => _keyboard.IsKeyDown(key) && _previousKeyboard.IsKeyUp(key);
 
-    // The action-level queries: any bound key satisfies the action. These
-    // loop over an array instead of allocating LINQ enumerators because they
-    // run every tick on the hot path.
+    // The action-level queries: any bound key OR gamepad button satisfies the
+    // action. These loop over arrays instead of allocating LINQ enumerators
+    // because they run every tick on the hot path. Note that gameplay code
+    // calling these never learned a gamepad exists — that is the action
+    // layer's whole promise.
 
     public bool IsActionDown(GameAction action)
     {
@@ -51,6 +60,12 @@ public sealed class InputHelper
         for (int i = 0; i < keys.Count; i++)
             if (_keyboard.IsKeyDown(keys[i]))
                 return true;
+
+        IReadOnlyList<Buttons> buttons = Actions.ButtonsFor(action);
+        for (int i = 0; i < buttons.Count; i++)
+            if (_gamePad.IsButtonDown(buttons[i]))
+                return true;
+
         return false;
     }
 
@@ -60,6 +75,12 @@ public sealed class InputHelper
         for (int i = 0; i < keys.Count; i++)
             if (_keyboard.IsKeyDown(keys[i]) && _previousKeyboard.IsKeyUp(keys[i]))
                 return true;
+
+        IReadOnlyList<Buttons> buttons = Actions.ButtonsFor(action);
+        for (int i = 0; i < buttons.Count; i++)
+            if (_gamePad.IsButtonDown(buttons[i]) && _previousGamePad.IsButtonUp(buttons[i]))
+                return true;
+
         return false;
     }
 
