@@ -33,6 +33,15 @@ public class Ball
     private Paddle _attachedTo;
     public bool IsAttached => _attachedTo != null;
 
+    // Trail: the last N center positions in a ring buffer. Same GC-free shape
+    // as the particle pool — a fixed array plus a write index that wraps with
+    // modulo. Nothing is ever allocated or shifted; "oldest entry" is simply
+    // "the slot the head will overwrite next".
+    private const int TrailLength = 12;
+    private readonly Vector2[] _trail = new Vector2[TrailLength];
+    private int _trailHead;  // next slot to write
+    private int _trailCount; // how many slots hold real data (< Length at start)
+
     public Rectangle Bounds => new(
         (int)(Position.X - Size / 2f), (int)(Position.Y - Size / 2f), Size, Size);
 
@@ -41,6 +50,7 @@ public class Ball
         _attachedTo = paddle;
         Velocity = Vector2.Zero;
         Speed = InitialSpeed; // losing a life also resets the speed ramp
+        _trailCount = 0;      // no ghost trail on the freshly served ball
     }
 
     public void Launch(Random rng)
@@ -59,6 +69,13 @@ public class Ball
                 _attachedTo.Bounds.Top - Size / 2f - 1);
             return;
         }
+
+        // One trail sample per fixed 60 Hz tick gives evenly spaced ghosts
+        // without any timestamp bookkeeping.
+        _trail[_trailHead] = Position;
+        _trailHead = (_trailHead + 1) % TrailLength;
+        if (_trailCount < TrailLength)
+            _trailCount++;
 
         Position += Velocity * dt;
     }
@@ -88,5 +105,26 @@ public class Ball
             Velocity = Vector2.Normalize(Velocity) * Speed;
     }
 
-    public void Draw(SpriteBatch spriteBatch) => spriteBatch.DrawRect(Bounds, Color.White);
+    public void Draw(SpriteBatch spriteBatch)
+    {
+        // Trail first so the ball draws on top of it. Walk from oldest to
+        // newest: index back from the head, oldest sample = furthest back.
+        for (int i = 0; i < _trailCount; i++)
+        {
+            int index = (_trailHead - _trailCount + i + TrailLength) % TrailLength;
+
+            // t runs 0 (oldest) -> 1 (newest); both size and alpha follow it.
+            float t = (i + 1f) / (_trailCount + 1f);
+            int size = Math.Max(2, (int)(Size * t * 0.8f));
+            var rect = new Rectangle(
+                (int)(_trail[index].X - size / 2f),
+                (int)(_trail[index].Y - size / 2f), size, size);
+
+            // `Color * float` premultiplies — fades cleanly under SpriteBatch's
+            // default blend, same trick as the particles.
+            spriteBatch.DrawRect(rect, Color.White * (t * t * 0.30f));
+        }
+
+        spriteBatch.DrawRect(Bounds, Color.White);
+    }
 }
