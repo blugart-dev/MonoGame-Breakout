@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Breakout.Entities;
 using Breakout.Systems;
 
 namespace Breakout.States;
@@ -19,7 +20,8 @@ public sealed class ReadyState : GameState
             return;
         }
 
-        Session.Paddle.Update(dt, input);
+        foreach (Paddle paddle in Session.Paddles)
+            paddle.Update(dt, input);
         Session.Balls[0].Update(dt); // ResetForServe guarantees exactly one
 
         if (input.WasActionJustPressed(GameAction.Launch) || input.WasLeftClickJustPressed)
@@ -34,7 +36,10 @@ public sealed class ReadyState : GameState
         DrawWorldAndHud(spriteBatch);
         spriteBatch.DrawCenteredText(Font, "PRESS SPACE OR CLICK TO LAUNCH",
             new Vector2(Screen.Width / 2f, 300), Color.White);
-        spriteBatch.DrawCenteredText(Font, "MOVE: MOUSE / ARROWS / A-D",
+        string hint = Session.Mode == GameMode.Coop
+            ? "P1 LEFT HALF: MOUSE / A-D    P2 RIGHT HALF: ARROWS / GAMEPAD"
+            : "MOVE: MOUSE / ARROWS / A-D / GAMEPAD";
+        spriteBatch.DrawCenteredText(Font, hint,
             new Vector2(Screen.Width / 2f, 332), new Color(150, 150, 165), 0.75f);
     }
 }

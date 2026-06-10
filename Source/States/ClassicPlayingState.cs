@@ -46,7 +46,7 @@ public sealed class ClassicPlayingState : GameState
             return;
         }
 
-        Session.Paddle.Update(dt, input);
+        Session.Paddles[0].Update(dt, input); // classic is one-player by definition
 
         Ball ball = Session.Balls[0]; // classic is strictly one ball
         ball.Update(dt);
@@ -113,13 +113,13 @@ public sealed class ClassicPlayingState : GameState
     {
         if (ball.Velocity.Y <= 0f)
             return;
-        if (!ball.Bounds.Intersects(Session.Paddle.Bounds))
+        if (!ball.Bounds.Intersects(Session.Paddles[0].Bounds))
             return;
 
         // Where the modern game maps the hit position to a continuous angle,
         // 1976 hardware had four fixed exits. Same offset computation, then a
         // table lookup instead of multiplication — feel the difference in play.
-        Rectangle p = Session.Paddle.Bounds;
+        Rectangle p = Session.Paddles[0].Bounds;
         float offset = MathHelper.Clamp(
             (ball.Position.X - p.Center.X) / (p.Width / 2f), -1f, 1f);
 
@@ -195,7 +195,7 @@ public sealed class ClassicPlayingState : GameState
         // that's the game's namesake event, and it costs half the paddle for
         // the rest of this volley.
         _brokeOut = true;
-        Session.Paddle.ApplyClassicShrink();
+        Session.Paddles[0].ApplyClassicShrink();
         Session.Shake.Add(0.25f);
         AudioBank.PowerUpCatch?.Play(); // the rising sweep doubles as a fanfare
     }

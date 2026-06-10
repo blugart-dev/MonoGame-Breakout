@@ -25,7 +25,7 @@ public sealed class ClassicReadyState : GameState
             return;
         }
 
-        Session.Paddle.Update(dt, input);
+        Session.Paddles[0].Update(dt, input);
 
         if (input.WasActionJustPressed(GameAction.Launch) || input.WasLeftClickJustPressed)
             Serve();

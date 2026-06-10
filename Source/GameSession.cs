@@ -30,7 +30,12 @@ public class GameSession
     public static int LevelCount => LevelPaths.Length; // the title screen's level select needs the range
 
     public readonly Random Rng = new();
-    public readonly Paddle Paddle = new();
+
+    // A list, not a single Paddle — local co-op did to the paddle what
+    // multiball did to the ball. Same ripple, second rehearsal: every
+    // consumer that said "the paddle" (movement, ball bounce, power-up
+    // catch, serve attach) had to decide what it means when there are two.
+    public readonly List<Paddle> Paddles = new();
 
     // A list, not a single Ball — the multiball power-up was the feature that
     // forced this. Worth noticing how far the one-to-many change rippled:
@@ -79,6 +84,20 @@ public class GameSession
             ? ClassicWall.Build()
             : LevelLoader.Load(LevelPaths[startLevel]);
 
+        if (mode == GameMode.Coop)
+        {
+            // Two paddles, two action sets, half a court each. P1 keeps the
+            // mouse; P2 gets the arrows and the gamepad.
+            Paddles.Add(new Paddle(GameAction.P1MoveLeft, GameAction.P1MoveRight,
+                useMouse: true, 0f, Screen.Width / 2f));
+            Paddles.Add(new Paddle(GameAction.P2MoveLeft, GameAction.P2MoveRight,
+                useMouse: false, Screen.Width / 2f, Screen.Width, new Color(170, 190, 255)));
+        }
+        else
+        {
+            Paddles.Add(new Paddle());
+        }
+
         if (mode == GameMode.Classic)
             PrepareClassicServe();
         else
@@ -94,7 +113,7 @@ public class GameSession
     public void ResetForServe()
     {
         EnsureSingleBall();
-        Balls[0].AttachTo(Paddle);
+        Balls[0].AttachTo(Paddles[0]); // in co-op, player one carries the serve
     }
 
     /// <summary>
@@ -107,7 +126,7 @@ public class GameSession
     {
         EnsureSingleBall();
         Balls[0].Park();
-        Paddle.ResetWidth();
+        Paddles[0].ResetWidth(); // classic is one-player by definition
     }
 
     private void EnsureSingleBall()
@@ -167,7 +186,8 @@ public class GameSession
             brick.Draw(spriteBatch);
         foreach (PowerUp powerUp in PowerUps)
             powerUp.Draw(spriteBatch);
-        Paddle.Draw(spriteBatch);
+        foreach (Paddle paddle in Paddles)
+            paddle.Draw(spriteBatch);
         foreach (Ball ball in Balls)
             ball.Draw(spriteBatch);
         Particles.Draw(spriteBatch);

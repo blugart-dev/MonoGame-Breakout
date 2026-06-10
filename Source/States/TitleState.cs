@@ -16,8 +16,9 @@ namespace Breakout.States;
 public sealed class TitleState : GameState
 {
     private const int ModernEntry = 0;
-    private const int ClassicEntry = 1;
-    private const int EntryCount = 2;
+    private const int CoopEntry = 1;
+    private const int ClassicEntry = 2;
+    private const int EntryCount = 3;
 
     private static readonly Color DimColor = new(150, 150, 165);
 
@@ -36,7 +37,8 @@ public sealed class TitleState : GameState
             _selected = (_selected + 1) % EntryCount;
 
         // Left/right reuse the move actions — on a menu they read as "adjust".
-        if (_selected == ModernEntry)
+        // Modern and co-op share the level boards, so both get level select.
+        if (_selected != ClassicEntry)
         {
             if (input.WasActionJustPressed(GameAction.MoveLeft))
                 _startLevel = MathHelper.Clamp(_startLevel - 1, 0, GameSession.LevelCount - 1);
@@ -48,10 +50,9 @@ public sealed class TitleState : GameState
             || input.WasActionJustPressed(GameAction.Restart)
             || input.WasLeftClickJustPressed)
         {
-            if (_selected == ClassicEntry)
-                Manager.StartNewGame(GameMode.Classic);
-            else
-                Manager.StartNewGame(GameMode.Modern, _startLevel);
+            // Classic has no level select — its wall is the wall.
+            Manager.StartNewGame(SelectedMode,
+                SelectedMode == GameMode.Classic ? 0 : _startLevel);
         }
     }
 
@@ -66,15 +67,16 @@ public sealed class TitleState : GameState
         // black-and-white monitor, so the title wears the same four bands.
         DrawColorBands(spriteBatch);
 
-        string modernLabel = $"MODERN GAME    < LEVEL {_startLevel + 1} >";
-        DrawEntry(spriteBatch, modernLabel, 280, _selected == ModernEntry);
-        DrawEntry(spriteBatch, "CLASSIC 1976", 320, _selected == ClassicEntry);
+        string level = $"< LEVEL {_startLevel + 1} >";
+        DrawEntry(spriteBatch, $"MODERN GAME    {level}", 272, _selected == ModernEntry);
+        DrawEntry(spriteBatch, $"CO-OP  2P      {level}", 308, _selected == CoopEntry);
+        DrawEntry(spriteBatch, "CLASSIC 1976", 344, _selected == ClassicEntry);
 
         // The highlighted mode's record, straight from the JSON save file.
-        int best = HighScores.Best(_selected == ClassicEntry ? GameMode.Classic : GameMode.Modern);
+        int best = HighScores.Best(SelectedMode);
         if (best > 0)
             spriteBatch.DrawCenteredText(Font, $"BEST  {best}",
-                center + new Vector2(0, 360), Color.Gold, 0.75f);
+                center + new Vector2(0, 374), Color.Gold, 0.75f);
 
         spriteBatch.DrawCenteredText(Font,
             "UP/DOWN SELECT   LEFT/RIGHT START LEVEL   SPACE PLAY",
@@ -83,6 +85,13 @@ public sealed class TitleState : GameState
             "P PAUSE   M MUSIC   F11 FULLSCREEN   ESC QUIT",
             center + new Vector2(0, 430), DimColor, 0.75f);
     }
+
+    private GameMode SelectedMode => _selected switch
+    {
+        CoopEntry => GameMode.Coop,
+        ClassicEntry => GameMode.Classic,
+        _ => GameMode.Modern,
+    };
 
     private void DrawEntry(SpriteBatch spriteBatch, string text, int y, bool selected)
     {

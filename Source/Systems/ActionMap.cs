@@ -28,6 +28,12 @@ public sealed class ActionMap
         [GameAction.MenuDown] = new[] { Keys.Down, Keys.S },
         [GameAction.TitleScreen] = new[] { Keys.T },
         [GameAction.OpenRebind] = new[] { Keys.B },
+        // Co-op splits what single-player merges: MoveLeft means "arrows OR
+        // A/D", but with two players those have to be two different intents.
+        [GameAction.P1MoveLeft] = new[] { Keys.A },
+        [GameAction.P1MoveRight] = new[] { Keys.D },
+        [GameAction.P2MoveLeft] = new[] { Keys.Left },
+        [GameAction.P2MoveRight] = new[] { Keys.Right },
         [GameAction.ToggleFullscreen] = new[] { Keys.F11 },
         [GameAction.ToggleDebugOverlay] = new[] { Keys.F3 },
         [GameAction.ToggleIntegerScaling] = new[] { Keys.F10 },
@@ -50,6 +56,9 @@ public sealed class ActionMap
         [GameAction.MenuDown] = new[] { Buttons.DPadDown, Buttons.LeftThumbstickDown },
         [GameAction.TitleScreen] = new[] { Buttons.Y },
         [GameAction.Quit] = new[] { Buttons.Back },
+        // In co-op the gamepad player drives paddle two.
+        [GameAction.P2MoveLeft] = new[] { Buttons.DPadLeft, Buttons.LeftThumbstickLeft },
+        [GameAction.P2MoveRight] = new[] { Buttons.DPadRight, Buttons.LeftThumbstickRight },
     };
 
     private static readonly Buttons[] NoButtons = System.Array.Empty<Buttons>();

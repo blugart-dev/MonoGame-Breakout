@@ -24,7 +24,8 @@ public sealed class PlayingState : GameState
             return; // don't simulate the tick the player paused on
         }
 
-        Session.Paddle.Update(dt, input);
+        foreach (Paddle paddle in Session.Paddles)
+            paddle.Update(dt, input);
 
         // Backwards so RemoveAt never shifts a ball we haven't visited yet.
         for (int i = Session.Balls.Count - 1; i >= 0; i--)
@@ -99,11 +100,18 @@ public sealed class PlayingState : GameState
         // for a few frames, and re-bouncing every one of them would glue it down.
         if (ball.Velocity.Y <= 0f)
             return;
-        if (!ball.Bounds.Intersects(Session.Paddle.Bounds))
-            return;
 
-        ball.BounceOffPaddle(Session.Paddle);
-        AudioBank.PaddleHit?.PlayVaried(Session.Rng);
+        // Whichever paddle the ball meets first owns the bounce; they guard
+        // disjoint court halves, so at most one can intersect.
+        foreach (Paddle paddle in Session.Paddles)
+        {
+            if (!ball.Bounds.Intersects(paddle.Bounds))
+                continue;
+
+            ball.BounceOffPaddle(paddle);
+            AudioBank.PaddleHit?.PlayVaried(Session.Rng);
+            return;
+        }
     }
 
     private void HandleBrickCollision(Ball ball)
@@ -164,9 +172,10 @@ public sealed class PlayingState : GameState
             PowerUp powerUp = Session.PowerUps[i];
             powerUp.Update(dt);
 
-            if (powerUp.Bounds.Intersects(Session.Paddle.Bounds))
+            Paddle catcher = CatchingPaddle(powerUp);
+            if (catcher != null)
             {
-                ApplyPowerUp(powerUp);
+                ApplyPowerUp(powerUp, catcher);
                 AudioBank.PowerUpCatch?.Play();
                 Session.PowerUps.RemoveAt(i);
             }
@@ -177,12 +186,20 @@ public sealed class PlayingState : GameState
         }
     }
 
-    private void ApplyPowerUp(PowerUp powerUp)
+    private Paddle CatchingPaddle(PowerUp powerUp)
+    {
+        foreach (Paddle paddle in Session.Paddles)
+            if (powerUp.Bounds.Intersects(paddle.Bounds))
+                return paddle;
+        return null;
+    }
+
+    private void ApplyPowerUp(PowerUp powerUp, Paddle catcher)
     {
         switch (powerUp.Type)
         {
             case PowerUpType.WidePaddle:
-                Session.Paddle.ApplyWide(PowerUp.WidePaddleDuration);
+                catcher.ApplyWide(PowerUp.WidePaddleDuration); // the catch is personal in co-op
                 break;
             case PowerUpType.Multiball:
                 SpawnMultiball();
