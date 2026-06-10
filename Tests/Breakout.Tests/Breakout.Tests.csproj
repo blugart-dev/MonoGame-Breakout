@@ -17,4 +17,11 @@
          restructuring of the game project. -->
     <ProjectReference Include="..\..\Breakout.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- The shipped level files, linked in so LevelFilesTests parses the
+         real boards — the same CopyToOutputDirectory trick the game csproj
+         uses to get them next to its binary. -->
+    <None Include="..\..\Content\Levels\*.txt" Link="Levels\%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

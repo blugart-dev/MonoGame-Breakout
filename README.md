@@ -179,9 +179,12 @@ dotnet format                     # code style
 
 `Tests/Breakout.Tests` (xUnit) covers everything in the game that is a pure
 function: the 1976/1978 rule tables (speed ladders, rebound angles, the
-never-vertical law), the board generator (determinism, format contract,
-mirroring, winnability), AABB collision response, the ball's aiming math,
-high-score ranking, and the replay system's recorded-vs-live action contract.
+never-vertical law), the manual-sourced walls (the 448-point 1976 wall, the
+Super walls and cavity holes, Progressive's scroll/re-pricing/feed pattern),
+the board generator (determinism, format contract, mirroring, winnability),
+the shipped level files (parsed exactly as the game parses them), AABB
+collision response, the ball's aiming math, high-score ranking, and the
+replay system's recorded-vs-live action contract.
 The deliberate boundary is the lesson: game *rules* are unit-testable because
 they are pure; the frame loop, rendering and feel are play-tested. CI runs the
 suite on both OSes.
