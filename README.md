@@ -61,9 +61,11 @@ automatically and the content pipeline runs as part of the build.
 
 ## Features
 
-- Classic loop: Ready → Playing → LifeLost → GameOver, 3 lives, score HUD
-- Bricks loaded from a plain-text grid (`Content/Levels/level01.txt`);
-  tier digit = hit points = color, `X` = unbreakable
+- Classic loop: Ready → Playing → LifeLost → GameOver (plus Pause and
+  LevelCleared), 3 lives, score + level HUD
+- Three levels as plain-text grids (`Content/Levels/*.txt`);
+  tier digit = hit points = color, `X` = unbreakable; score and lives
+  carry across levels, ball speed resets per board
 - Paddle-position-controlled bounce angle (the aiming mechanic)
 - Speed ramp per brick, wide-paddle power-up drops
 - Juice: brick-break particles, trauma-based screen shake, synthesized SFX

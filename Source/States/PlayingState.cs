@@ -34,9 +34,18 @@ public sealed class PlayingState : GameState
         UpdatePowerUps(dt);
 
         if (Session.Ball.Position.Y - Ball.Size > Screen.Height)
+        {
             OnBallLost();
+        }
         else if (Session.LevelCleared)
-            Manager.ChangeState(new GameOverState(Manager, won: true));
+        {
+            // "You win" only exists after the last board; everything before
+            // that is just another level transition.
+            if (Session.HasNextLevel)
+                Manager.ChangeState(new LevelClearedState(Manager));
+            else
+                Manager.ChangeState(new GameOverState(Manager, won: true));
+        }
     }
 
     public override void Draw(SpriteBatch spriteBatch) => DrawWorldAndHud(spriteBatch);
