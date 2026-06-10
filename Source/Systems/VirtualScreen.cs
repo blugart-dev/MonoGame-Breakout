@@ -38,6 +38,28 @@ public sealed class VirtualScreen
     /// </summary>
     public bool IntegerScaling { get; set; }
 
+    /// <summary>CRT look on the final present (scanlines, curvature). On by
+    /// default — it sells the arcade fantasy — and toggleable, because every
+    /// post-process that changes the whole image must be the player's choice.</summary>
+    public bool CrtEnabled { get; set; } = true;
+
+    private Effect _crtEffect;
+
+    /// <summary>
+    /// Hand over the compiled CRT shader (loaded by the shell — only it has
+    /// the ContentManager). The tuning constants are set once here: Effect
+    /// parameters persist on the object, so per-frame Present calls don't
+    /// re-send what never changes.
+    /// </summary>
+    public void SetCrtEffect(Effect effect)
+    {
+        _crtEffect = effect;
+        effect.Parameters["VirtualSize"].SetValue(new Vector2(VirtualWidth, VirtualHeight));
+        effect.Parameters["Curvature"].SetValue(0.08f);
+        effect.Parameters["ScanlineStrength"].SetValue(0.18f);
+        effect.Parameters["VignetteStrength"].SetValue(0.16f);
+    }
+
     public VirtualScreen(GraphicsDevice device, int virtualWidth, int virtualHeight)
     {
         _device = device;
@@ -81,13 +103,17 @@ public sealed class VirtualScreen
     /// <summary>
     /// Switch back to the real back buffer and draw the virtual image onto it,
     /// scaled. PointClamp keeps the scale-up crisp instead of bilinear-smeared.
+    /// This single Draw is where a post-process slots in: the whole game is
+    /// one texture by now, so one Effect on this call shades every pixel of
+    /// the frame — the cheapest full-screen pass there is.
     /// </summary>
     public void Present(SpriteBatch spriteBatch)
     {
         _device.SetRenderTarget(null); // null = the actual back buffer
         _device.Clear(Color.Black);    // letterbox bar color
 
-        spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        spriteBatch.Begin(samplerState: SamplerState.PointClamp,
+            effect: CrtEnabled ? _crtEffect : null); // null = SpriteBatch default
         spriteBatch.Draw(_target, DestinationBounds, Color.White);
         spriteBatch.End();
     }

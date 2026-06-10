@@ -76,6 +76,11 @@ public class BreakoutGame : Game
 
         // Pipeline asset names are path-without-extension relative to Content/.
         _font = Content.Load<SpriteFont>("Fonts/Hud");
+
+        // The CRT shader is the pipeline's other asset type: .fx source went
+        // in, a compiled Effect comes out — same path-without-extension rule.
+        _virtualScreen.SetCrtEffect(Content.Load<Effect>("Shaders/Crt"));
+
         _states = new GameStateManager(_font);
     }
 
@@ -105,6 +110,8 @@ public class BreakoutGame : Game
                 _showDebugOverlay = !_showDebugOverlay;
             if (_input.WasActionJustPressed(GameAction.ToggleIntegerScaling))
                 _virtualScreen.IntegerScaling = !_virtualScreen.IntegerScaling;
+            if (_input.WasActionJustPressed(GameAction.ToggleCrt))
+                _virtualScreen.CrtEnabled = !_virtualScreen.CrtEnabled;
             if (_input.WasActionJustPressed(GameAction.ToggleMusic))
                 MusicPlayer.ToggleMuted();
         }
