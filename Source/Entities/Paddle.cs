@@ -38,9 +38,15 @@ public class Paddle
     private float _centerX;
     private float _width = BaseWidth;
     private float _wideTimer;
+    private float _shrinkTimer;
     private bool _shrunk;
 
     public bool IsWide => _wideTimer > 0f;
+
+    // Narrow for any reason — the classic rule's permanent penalty or the
+    // debris hazard's timed one. Width and color treat them identically;
+    // only how they end differs (serve reset vs. timer).
+    private bool IsNarrow => _shrunk || _shrinkTimer > 0f;
 
     /// <summary>The single-player paddle: default actions, mouse, full court.</summary>
     public Paddle()
@@ -76,18 +82,34 @@ public class Paddle
 
         if (_wideTimer > 0f)
             _wideTimer -= dt;
+        if (_shrinkTimer > 0f)
+            _shrinkTimer -= dt;
 
         // Animate toward the target width instead of snapping — exponential
         // ease via lerp-with-dt, the cheapest smoothing there is. Shrunk wins
         // over wide: the classic penalty is a rule, not a power-up to outbid.
-        float targetWidth = _shrunk ? BaseWidth / 2f : IsWide ? WideWidth : BaseWidth;
+        float targetWidth = IsNarrow ? BaseWidth / 2f : IsWide ? WideWidth : BaseWidth;
         _width = MathHelper.Lerp(_width, targetWidth, MathF.Min(1f, WidthLerpSpeed * dt));
 
         float half = _width / 2f;
         _centerX = MathHelper.Clamp(_centerX, _minX + half, _maxX - half);
     }
 
-    public void ApplyWide(float duration) => _wideTimer = duration;
+    // Wide and the debris shrink cancel each other — last catch wins. The
+    // alternative (both timers running, shrink outranking wide) makes a
+    // caught prize do *nothing visible*, which players read as a bug.
+    public void ApplyWide(float duration)
+    {
+        _wideTimer = duration;
+        _shrinkTimer = 0f;
+    }
+
+    /// <summary>The debris penalty: half width until the timer runs out.</summary>
+    public void ApplyShrink(float duration)
+    {
+        _shrinkTimer = duration;
+        _wideTimer = 0f;
+    }
 
     /// <summary>
     /// The 1976 penalty: once the ball breaks through to the zone behind the
@@ -100,11 +122,12 @@ public class Paddle
     {
         _shrunk = false;
         _wideTimer = 0f;
+        _shrinkTimer = 0f;
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        Color body = _shrunk ? new Color(255, 170, 90)
+        Color body = IsNarrow ? new Color(255, 170, 90)
             : IsWide ? new Color(120, 220, 255) : _bodyColor;
         Rectangle b = Bounds;
         spriteBatch.DrawRect(b, body);

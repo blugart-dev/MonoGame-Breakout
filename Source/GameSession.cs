@@ -51,6 +51,8 @@ public class GameSession
     // Freeing one means moving it from this list to Balls.
     public readonly List<Ball> CaptiveBalls = new();
 
+    // Holds prizes AND debris hazards: the fall/catch pipeline is identical,
+    // only the catch's *meaning* differs (PowerUpType decides at apply time).
     public readonly List<PowerUp> PowerUps = new();
     public readonly ParticleSystem Particles = new();
     public readonly ScreenShake Shake;

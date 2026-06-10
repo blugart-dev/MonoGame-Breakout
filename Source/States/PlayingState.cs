@@ -13,6 +13,7 @@ namespace Breakout.States;
 public sealed class PlayingState : GameState
 {
     private const float PowerUpDropChance = 0.15f;
+    private const float DebrisDropChance = 0.10f;
 
     public PlayingState(GameStateManager manager) : base(manager) { }
 
@@ -154,14 +155,23 @@ public sealed class PlayingState : GameState
 
     private void MaybeDropPowerUp(Vector2 origin)
     {
-        if (Session.Rng.NextDouble() > PowerUpDropChance)
-            return;
-
-        // Wide is the safer prize, so it's the more common one.
-        PowerUpType type = Session.Rng.NextDouble() < 0.6
-            ? PowerUpType.WidePaddle
-            : PowerUpType.Multiball;
-        Session.PowerUps.Add(new PowerUp(type, origin));
+        // One roll, partitioned: [0, .15) drops a prize, [.15, .25) drops
+        // debris, the rest drops nothing. Mutually exclusive outcomes from a
+        // single random number — two independent rolls could drop both from
+        // one brick, stacked on the same spot.
+        double roll = Session.Rng.NextDouble();
+        if (roll < PowerUpDropChance)
+        {
+            // Wide is the safer prize, so it's the more common one.
+            PowerUpType type = Session.Rng.NextDouble() < 0.6
+                ? PowerUpType.WidePaddle
+                : PowerUpType.Multiball;
+            Session.PowerUps.Add(new PowerUp(type, origin));
+        }
+        else if (roll < PowerUpDropChance + DebrisDropChance)
+        {
+            Session.PowerUps.Add(new PowerUp(PowerUpType.Debris, origin));
+        }
     }
 
     private void UpdatePowerUps(float dt)
@@ -176,7 +186,10 @@ public sealed class PlayingState : GameState
             if (catcher != null)
             {
                 ApplyPowerUp(powerUp, catcher);
-                AudioBank.PowerUpCatch?.Play();
+                if (powerUp.IsHazard)
+                    AudioBank.DebrisHit?.PlayVaried(Session.Rng);
+                else
+                    AudioBank.PowerUpCatch?.Play();
                 Session.PowerUps.RemoveAt(i);
             }
             else if (powerUp.IsBelowScreen)
@@ -203,6 +216,15 @@ public sealed class PlayingState : GameState
                 break;
             case PowerUpType.Multiball:
                 SpawnMultiball();
+                break;
+            case PowerUpType.Debris:
+                catcher.ApplyShrink(PowerUp.DebrisShrinkDuration);
+                // Negative feedback mirrors positive: the prize-catch plays a
+                // rising tone, this shakes the screen and sprays dark chips —
+                // the player must *feel* the difference before reading any text.
+                Session.Shake.Add(0.25f);
+                Session.Particles.Emit(
+                    powerUp.Position, new Color(200, 70, 40), 12, Session.Rng);
                 break;
         }
     }

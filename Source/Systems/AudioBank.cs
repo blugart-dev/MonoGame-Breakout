@@ -20,6 +20,7 @@ public static class AudioBank
     public static SoundEffect BrickHit { get; private set; }
     public static SoundEffect BrickBreak { get; private set; }
     public static SoundEffect PowerUpCatch { get; private set; }
+    public static SoundEffect DebrisHit { get; private set; }
     public static SoundEffect LifeLost { get; private set; }
     public static SoundEffect LevelClear { get; private set; }
     public static SoundEffect Win { get; private set; }
@@ -47,6 +48,7 @@ public static class AudioBank
             BrickHit = CreateTone(520, 480, 0.045, 0.40f);
             BrickBreak = CreateTone(620, 920, 0.07, 0.45f);
             PowerUpCatch = CreateTone(300, 900, 0.25, 0.40f);
+            DebrisHit = CreateTone(280, 70, 0.22, 0.50f); // PowerUpCatch's mirror: falling, not rising
             LifeLost = CreateTone(400, 110, 0.45, 0.50f);
             LevelClear = CreateTone(392, 784, 0.30, 0.45f); // shorter sibling of Win
             Win = CreateTone(523, 1046, 0.40, 0.45f);
