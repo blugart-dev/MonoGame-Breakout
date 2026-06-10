@@ -38,6 +38,7 @@ automatically and the content pipeline runs as part of the build.
 | `Space` / Left click | Launch ball |
 | `Enter` / Click (on game over) | Play again |
 | `F11` | Borderless fullscreen |
+| `F10` | Integer ("pixel perfect") scaling toggle |
 | `F3` | Debug overlay (FPS, ball speed, entity counts) |
 | `Esc` | Quit |
 

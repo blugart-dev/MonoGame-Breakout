@@ -93,6 +93,8 @@ public class BreakoutGame : Game
             ToggleFullscreen();
         if (_input.WasKeyJustPressed(Keys.F3))
             _showDebugOverlay = !_showDebugOverlay;
+        if (_input.WasKeyJustPressed(Keys.F10))
+            _virtualScreen.IntegerScaling = !_virtualScreen.IntegerScaling;
 
         float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
         _states.Update(dt, _input);

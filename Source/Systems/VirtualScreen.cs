@@ -25,6 +25,19 @@ public sealed class VirtualScreen
     public int VirtualWidth { get; }
     public int VirtualHeight { get; }
 
+    /// <summary>
+    /// "Pixel perfect" mode. At a fractional scale (say 1.4x) some virtual
+    /// pixels come out 1 window pixel wide and some 2 — and as things move,
+    /// *which* pixels get the extra column changes every frame. That crawling
+    /// is the "shimmer" pixel-art games suffer. Flooring the scale to a whole
+    /// number makes every virtual pixel exactly the same size, trading bigger
+    /// letterbox bars for perfectly stable pixels. This is why pixel-art games
+    /// ship an integer-scaling toggle instead of just always doing it: at
+    /// 1080p an 800x480 game floors to 2x = 1600x960, leaving thick bars some
+    /// players hate more than shimmer. Let the player pick.
+    /// </summary>
+    public bool IntegerScaling { get; set; }
+
     public VirtualScreen(GraphicsDevice device, int virtualWidth, int virtualHeight)
     {
         _device = device;
@@ -48,6 +61,12 @@ public sealed class VirtualScreen
             float scale = MathF.Min(
                 (float)windowWidth / VirtualWidth,
                 (float)windowHeight / VirtualHeight);
+
+            // Only floor when the result stays >= 1x — in a window smaller
+            // than the virtual resolution there is no integer scale to snap
+            // to, so fall back to plain fit-and-letterbox.
+            if (IntegerScaling && scale >= 1f)
+                scale = MathF.Floor(scale);
 
             int width = (int)(VirtualWidth * scale);
             int height = (int)(VirtualHeight * scale);
