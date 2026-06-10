@@ -1,5 +1,0 @@
-[     733ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.manualslib.com/manual/1914666/Atari-Breakout.html?page=10:0
-[     955ms] [LOG] %c【AdEngine】(adaptive_v2-161) queued at 907ms and loaded in 4ms. (manualslib1.com:19069-1781012519117-default) color:#2dc9ac; @ https://adengine.snigelweb.com/manualslib1.com/19069-1781012519117/adngin.js:0
-[    1120ms] [WARNING] [GPT] PubAdsService.disableInitialLoad is deprecated, use googletag.setConfig({disableInitialLoad: ...}) instead.
-https://goo.gle/gpt-message#170 @ https://securepubads.g.doubleclick.net/pagead/managed/js/gpt/m202606040101/pubads_impl.js:18
-[    1134ms] [WARNING] Anonymised tag: Tag will not start. Domain is not verified! @ https://static.anonymised.io/light/loader.js:0
