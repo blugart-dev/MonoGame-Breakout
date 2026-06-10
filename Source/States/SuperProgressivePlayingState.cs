@@ -30,7 +30,8 @@ public sealed class SuperProgressivePlayingState : SuperPlayingState
     {
         _returns++;
         if (_returns >= FastAfterReturns || _returns % RowEveryNthReturn == 0)
-            SuperWall.ScrollProgressive(Session.Bricks, ref Session.ProgressiveRowPhase);
+            SuperWall.ScrollProgressive(Session.Bricks, ref Session.ProgressiveRowPhase,
+                Session.Balls); // the scroll must not land a brick on the ball
     }
 
     /// <summary>
@@ -40,5 +41,6 @@ public sealed class SuperProgressivePlayingState : SuperPlayingState
     /// state guessing "was that a re-serve?" from the lives counter.
     /// </summary>
     protected override void OnBallLost(Ball ball)
-        => SuperWall.ScrollProgressive(Session.Bricks, ref Session.ProgressiveRowPhase);
+        => SuperWall.ScrollProgressive(Session.Bricks, ref Session.ProgressiveRowPhase,
+            Session.Balls); // empty by now — the lost ball was the only one
 }

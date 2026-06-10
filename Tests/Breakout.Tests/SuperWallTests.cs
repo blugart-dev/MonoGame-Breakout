@@ -103,8 +103,14 @@ public class SuperWallTests
     }
 
     [Fact]
-    public void ScrollProgressive_RetiresRowsAtThePaddleLine()
+    public void ScrollProgressive_RetiresRowsAboveThePaddleWithBallClearance()
     {
+        // The retirement line must leave at least a ball's worth of daylight
+        // above the paddle — culling at the paddle line itself left a slot
+        // the ball could not fit through, so every return met a brick.
+        Assert.True(Paddle.DefaultY - SuperWall.RetirementY >= Ball.Size,
+            "the gap between the lowest brick and the paddle must fit the ball");
+
         List<Brick> board = SuperWall.BuildProgressiveBoard();
         int phase = 0;
 
@@ -112,8 +118,29 @@ public class SuperWallTests
         for (int i = 0; i < 40; i++)
         {
             SuperWall.ScrollProgressive(board, ref phase);
-            Assert.All(board, b => Assert.True(b.Bounds.Bottom < Paddle.DefaultY,
-                "bricks must never share space with the paddle"));
+            Assert.All(board, b => Assert.True(b.Bounds.Bottom < SuperWall.RetirementY,
+                "bricks must never cross the retirement line"));
+        }
+    }
+
+    [Fact]
+    public void ScrollProgressive_NeverLandsABrickOnABall()
+    {
+        // The scroll is an 18 px teleport; a brick that would materialize on
+        // a ball retires uncounted instead, like a row reaching the bottom.
+        List<Brick> board = SuperWall.BuildProgressiveBoard();
+        int phase = 0;
+
+        // Parked just under the opening green wall (bottom edge y = 286),
+        // directly in the conveyor's path.
+        var ball = new Ball { Position = new Vector2(400f, 300f) };
+        var balls = new List<Ball> { ball };
+
+        for (int i = 0; i < 12; i++)
+        {
+            SuperWall.ScrollProgressive(board, ref phase, balls);
+            Assert.All(board, b => Assert.False(b.Bounds.Intersects(ball.Bounds),
+                "no scroll step may leave a brick overlapping a ball"));
         }
     }
 }

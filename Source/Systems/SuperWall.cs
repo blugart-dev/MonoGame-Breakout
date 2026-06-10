@@ -29,6 +29,16 @@ public static class SuperWall
     public const int WallTop = TopY;
     public const int WallBottom = TopY + WallRows * CellHeight;
 
+    /// <summary>
+    /// Where Progressive rows retire (manual Figure 2-9: "the row of bricks
+    /// closest to the paddle disappears"). Just *above* the paddle, with room
+    /// for the ball: culling exactly at the paddle line left a 1 px slot the
+    /// 10 px ball could never fit through, so every paddle return met a brick
+    /// face instantly and the ball rallied between paddle and wall with the
+    /// player as a spectator.
+    /// </summary>
+    public const int RetirementY = Paddle.DefaultY - Ball.Size - 2;
+
     private const int CellWidth = Screen.Width / Columns;
     private static readonly int OffsetX = (Screen.Width - Columns * CellWidth) / 2;
 
@@ -114,7 +124,8 @@ public static class SuperWall
     /// pattern must continue seamlessly across serves, and a playing state
     /// dies with its serve.
     /// </summary>
-    public static void ScrollProgressive(List<Brick> bricks, ref int rowPhase)
+    public static void ScrollProgressive(List<Brick> bricks, ref int rowPhase,
+        IReadOnlyList<Ball> balls = null)
     {
         foreach (Brick brick in bricks)
         {
@@ -122,11 +133,14 @@ public static class SuperWall
             brick.Reclassify(ZoneScore(brick.Bounds.Center.Y), ZoneColor(brick.Bounds.Center.Y));
         }
 
-        // Rows retire at the paddle line ("the row of bricks closest to the
-        // paddle disappears" — the manual's Figure 2-9), uncounted either
-        // way. Culling here, not at the screen edge, also keeps bricks from
-        // ever sharing space with the paddle or a just-bounced ball.
-        bricks.RemoveAll(b => b.Bounds.Bottom >= Paddle.DefaultY);
+        // Rows retire at the line above the paddle, uncounted either way. A
+        // brick that lands ON a ball retires the same way: the scroll is an
+        // 18 px teleport, and discrete collision can only push the ball out
+        // of a brick that materialized around it — often through the bottom
+        // face, flinging a just-returned ball straight back at the gutter.
+        // Same law as the Double/Cavity wall rebuild: nothing may
+        // materialize on top of a ball.
+        bricks.RemoveAll(b => b.Bounds.Bottom >= RetirementY || LandsOnBall(b, balls));
 
         // Phase 0 begins with blanks: the opening board's blue wall has just
         // "entered", so the pattern continues with the gap above it.
@@ -134,7 +148,31 @@ public static class SuperWall
         rowPhase++;
         if (brickRow)
             for (int col = 0; col < Columns; col++)
-                bricks.Add(MakeProgressiveBrick(col, row: 0));
+            {
+                // Spawn one row above the screen and ShiftDown into place, so
+                // a fed row rides the same slide animation as the rest of the
+                // wall instead of popping in. (Row -1's center still maps to
+                // zone 0 — integer division truncates toward zero — so the
+                // brick is priced as if it were already in place.)
+                Brick brick = MakeProgressiveBrick(col, row: -1);
+                brick.ShiftDown(CellHeight);
+                bricks.Add(brick);
+            }
+    }
+
+    private static bool LandsOnBall(Brick brick, IReadOnlyList<Ball> balls)
+    {
+        if (balls == null)
+            return false;
+
+        foreach (Ball ball in balls)
+        {
+            Rectangle space = ball.Bounds;
+            space.Inflate(2, 2); // breathing room, not merely non-overlap
+            if (brick.Bounds.Intersects(space))
+                return true;
+        }
+        return false;
     }
 
     private static Brick MakeProgressiveBrick(int col, int row)

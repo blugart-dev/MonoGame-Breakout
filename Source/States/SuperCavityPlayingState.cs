@@ -51,15 +51,20 @@ public sealed class SuperCavityPlayingState : SuperPlayingState
 
     private void BounceOffBricks(Ball captive)
     {
+        // Resolve EVERY overlapping brick, not first-found-then-stop. A
+        // captive lives walled in, and a corner contact at top speed overlaps
+        // two bricks in the same tick; resolving only one let the other keep
+        // swallowing the ball until it slipped through a sealed wall — and
+        // the freed check below would then bless the escape as a release.
+        // Safe to resolve repeatedly because ReflectAndSeparate sets the
+        // velocity sign outright instead of negating (see its comment).
         foreach (Brick brick in Session.Bricks)
         {
             if (!brick.Alive)
                 continue;
             HitSide side = CollisionHelper.GetCollisionSide(captive.Bounds, brick.Bounds);
-            if (side == HitSide.None)
-                continue;
-            CollisionHelper.ReflectAndSeparate(captive, brick.Bounds, side);
-            break;
+            if (side != HitSide.None)
+                CollisionHelper.ReflectAndSeparate(captive, brick.Bounds, side);
         }
     }
 
