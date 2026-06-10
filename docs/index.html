@@ -835,6 +835,7 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
 ├── Content/
 │   ├── Content.mgcb            <i>pipeline manifest (plain text)</i>
 │   ├── Fonts/Hud.spritefont    <i>XML font description → glyph atlas</i>
+│   ├── Shaders/Crt.fx          <i>HLSL → compiled Effect: scanlines, curvature, vignette</i>
 │   └── Levels/level0*.txt      <i>3 boards, 13-col grids: . empty · 1-5 tier · X unbreakable</i>
 └── Source/
     ├── Screen.cs               <i>virtual resolution constants (800×480)</i>
@@ -844,19 +845,22 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
     │   ├── Paddle.cs           <i>per-paddle actions + court slice (co-op), width lerp</i>
     │   ├── Ball.cs             <i>velocity, speed ramp, aiming bounce, trail, Split()</i>
     │   ├── Brick.cs            <i>tier or row scoring; drop-in entrance; X = unbreakable</i>
-    │   └── PowerUp.cs          <i>falling pickup: wide paddle (pink) · multiball (cyan)</i>
+    │   └── PowerUp.cs          <i>falling pickup: wide (pink) · multiball (cyan) · debris hazard</i>
     ├── Systems/
     │   ├── InputHelper.cs      <i>current/previous snapshots (kbd+pad), virtual mouse, FirstNewKey</i>
     │   ├── GameAction.cs       <i>every input, named by intent (incl. P1/P2 pairs)</i>
     │   ├── ActionMap.cs        <i>action → keys + buttons dictionaries, rebindable at runtime</i>
+    │   ├── InputSnapshot.cs    <i>one tick of gameplay input as bitmasks — the replay format</i>
+    │   ├── Replay.cs           <i>a finished run: mode + level + seed + frames</i>
     │   ├── CollisionHelper.cs  <i>minimal-penetration AABB side detection + reflection</i>
-    │   ├── LevelLoader.cs      <i>TitleContainer runtime loading</i>
+    │   ├── LevelLoader.cs      <i>TitleContainer runtime loading; Parse() takes any TextReader</i>
+    │   ├── BoardGenerator.cs   <i>emits LevelLoader's grid format with difficulty knobs</i>
     │   ├── ClassicWall.cs      <i>the 1976 8×14 wall: 1/3/5/7 row scoring, 448 pts</i>
     │   ├── ClassicRules.cs     <i>the 1976 numbers: 4 speeds, 4 paddle exits, serve</i>
     │   ├── SuperWall.cs        <i>the 1978 playfields: Double/Cavity walls, Progressive conveyor</i>
     │   ├── SuperRules.cs       <i>the 1978 numbers: 5 speeds, pass-through rule, multipliers</i>
-    │   ├── HighScores.cs       <i>top five per mode, JSON under ApplicationData</i>
-    │   ├── VirtualScreen.cs    <i>RenderTarget2D, letterbox, integer scaling, mouse transform</i>
+    │   ├── HighScores.cs       <i>top five per named table, JSON under ApplicationData</i>
+    │   ├── VirtualScreen.cs    <i>RenderTarget2D, letterbox, integer scaling, CRT pass, mouse transform</i>
     │   ├── ParticleSystem.cs   <i>struct pool, premultiplied fade</i>
     │   ├── ScreenShake.cs      <i>trauma² shake as a transform matrix</i>
     │   ├── AudioBank.cs        <i>synthesized square-wave PCM, pitch-varied playback</i>
@@ -865,7 +869,7 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
     │   └── DebugOverlay.cs     <i>F3: fps, ball count + top speed, live counts</i>
     └── States/
         ├── GameState.cs        <i>abstract base: Enter/Update/Draw/FreezesEffects/CapturesAllInput</i>
-        ├── GameStateManager.cs <i>current-state holder, resume, mode-aware new game</i>
+        ├── GameStateManager.cs <i>current-state holder, resume, mode-aware new game, replay record/play</i>
         ├── TitleState.cs       <i>menu before a session exists: mode + level select</i>
         ├── ReadyState.cs       <i>back to one attached ball, waiting for launch</i>
         ├── PlayingState.cs     <i>the modern simulation — biggest file, start here</i>
@@ -910,6 +914,8 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
     <tr><td>built-in particle system</td><td>a list of structs and forty lines</td><td><code>ParticleSystem</code></td></tr>
     <tr><td>built-in pause / time scale</td><td>a state that updates nothing</td><td><code>PauseState</code></td></tr>
     <tr><td>engine pauses the unfocused game</td><td>check <code>IsActive</code> yourself, auto-enter pause</td><td><code>GameStateManager.NotifyFocusLost</code></td></tr>
+    <tr><td>post-processing stack</td><td>one <code>Effect</code> on the draw that presents the render target</td><td><code>Content/Shaders/Crt.fx</code> · <code>VirtualScreen.Present</code></td></tr>
+    <tr><td>built-in replay / demo recording</td><td>seed the <code>Random</code>, keep one input frame per fixed tick, feed them back</td><td><code>Replay</code> · <code>InputSnapshot</code> · <code>GameStateManager</code></td></tr>
   </table>
 </section>
 
@@ -952,16 +958,24 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
   set of controls, one of them one-sided — an effect of the plain rule "a rising
   ball never meets a paddle").</p>
 
-  <p>The rest of the round, for whoever wants to keep going — these are larger, and
-  each opens a new subsystem:</p>
-
-  <table>
-    <tr><th>Exercise</th><th>What it teaches</th></tr>
-    <tr><td><strong>Replay system.</strong> Record the per-tick action states to a list; to replay, feed them back instead of polling. Works because the simulation is a fixed 60 Hz timestep with seeded randomness.</td><td>Determinism as a feature — why fixed timestep + recorded input = a replay for free, and what breaks it (the unseeded <code>Random</code>).</td></tr>
-    <tr><td><strong>CRT shader.</strong> A post-processing <code>Effect</code> (scanlines, slight curvature) applied when VirtualScreen presents the render target.</td><td>The content pipeline's other asset type (.fx → compiled shader) and where a post-process pass slots into a two-pass draw.</td></tr>
-    <tr><td><strong>Falling debris.</strong> Arkanoid-style: destroyed bricks sometimes drop a hazard that shrinks the paddle on contact — the anti-power-up.</td><td>Reusing a pipeline (PowerUp spawn/fall/catch) for the opposite meaning; good-vs-harm readability through color and shape.</td></tr>
-    <tr><td><strong>Procedural boards.</strong> A generator that emits the same grid format LevelLoader parses, with difficulty knobs (tier budget, unbreakable density, symmetry).</td><td>Content as data pays off twice: a generator is just another producer of the format you already read.</td></tr>
-  </table>
+  <p>The rest of the round is now implemented too, one commit each (2026-06-10),
+  closing the appendix. <strong>Falling debris</strong> rode the PowerUp pipeline with
+  the sign flipped — the spawn/fall/catch machinery never knew it was carrying prizes,
+  so the hazard is one enum member, one switch arm, and an inverted look (dark center,
+  ember edge, tumbling silhouette). The <strong>replay system</strong> is the
+  determinism lesson made executable: name the <code>Random</code> seed, keep one
+  <code>InputSnapshot</code> per fixed 60&nbsp;Hz tick, and a whole run becomes a pure
+  function you can re-run from the game-over screen (<code>R</code>) — note in
+  <code>GameStateManager</code> how little machinery "playback" really is, and how
+  pause stays live on both sides because its ticks were never part of the run.
+  <strong>Procedural boards</strong> (the <code>RANDOM</code> slot in level select)
+  cash in the level format a second time: <code>LevelLoader</code> split into
+  Load/Parse, and <code>BoardGenerator</code> is just another producer of the text the
+  parser already reads — drawing from the seeded session stream, so replays re-roll
+  identical boards. And the <strong>CRT shader</strong> opens the pipeline's other
+  asset type: <code>Crt.fx</code> compiles at build time (on Linux, via Wine — see the
+  CI workflow) and applies at the single draw where the whole frame is one texture,
+  <code>VirtualScreen.Present</code>. <code>F9</code> toggles it.</p>
 
   <p style="margin-top:34px">When you've read everything: delete a system —
   the shake, the particles, the speed ramp — run the game, and feel what's missing.
@@ -971,7 +985,7 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
 
 <footer>
   <span>BREAKOUT — MonoGame learning project · built &amp; documented 2026</span>
-  <span>dotnet run · P pause · M music · F11 fullscreen · F10 pixel-perfect · F3 debug · Esc quit</span>
+  <span>dotnet run · P pause · M music · F9 CRT · F11 fullscreen · F10 pixel-perfect · F3 debug · Esc quit</span>
 </footer>
 
 </main>

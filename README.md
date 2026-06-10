@@ -10,7 +10,8 @@ experience is assumed — the repo teaches MonoGame from first principles.
 
 It is also entirely **asset-free**: every visual is a tinted 1×1 white texture,
 every sound — the SFX *and* the looping music track — is synthesized at
-startup, and the only content pipeline asset is the HUD font.
+startup, and the only content pipeline assets are the HUD font and the CRT
+shader (which is source code, not art).
 
 > 📖 **[Read the study guide](https://blugart-dev.github.io/MonoGame-Breakout/)** —
 > ten concept sections, a project map, an engine-concepts glossary, and
@@ -29,20 +30,27 @@ automatically and the content pipeline runs as part of the build.
 > **Linux note:** the HUD font is built from your installed *Arial*. On Linux,
 > either install the MS core fonts (`ttf-mscorefonts-installer`) or change
 > `FontName` in `Content/Fonts/Hud.spritefont` to a font you have.
+> Also, compiling the CRT shader (`Content/Shaders/Crt.fx`) uses Direct3D's
+> shader compiler, which on Linux runs under Wine — run MonoGame's
+> [one-time setup script](https://docs.monogame.net/articles/getting_started/1_setting_up_your_os_for_development_ubuntu.html)
+> (`net9_mgfxc_wine_setup.sh`). See `.github/workflows/build.yml` for the
+> exact CI recipe.
 
 ## Controls
 
 | Input | Action |
 |---|---|
 | `↑` `↓` / `W` `S` (title) | Select mode |
-| `←` `→` (title) | Pick starting level (modern / co-op) |
+| `←` `→` (title) | Pick starting level or `RANDOM` endless boards (modern / co-op) |
 | Mouse / `←` `→` / `A` `D` | Move paddle (gamepad: D-pad / left stick) |
 | `Space` / Left click / `A` button | Launch ball (modern) / serve (classic, super) |
 | `Enter` / Click (on game over) | Play again |
 | `T` (on game over) | Back to the title screen |
+| `R` / `X` button (on game over) | Watch a replay of the run (`T` stops it; `P` pauses it) |
 | `B` (while paused) | Key rebinding screen |
 | `P` | Pause / resume (also auto-pauses when the window loses focus) |
 | `M` | Music on / off |
+| `F9` | CRT shader (scanlines + curvature) on / off |
 | `F11` | Borderless fullscreen |
 | `F10` | Integer ("pixel perfect") scaling toggle |
 | `F3` | Debug overlay (FPS, ball speed, entity counts) |
@@ -63,11 +71,10 @@ the right half (arrows, or a gamepad's D-pad/stick).
 3. **Read the code** — the comments are the textbook. A good order:
    `Program.cs` → `BreakoutGame.cs` → `Source/States/PlayingState.cs`,
    then outward to whatever it touches.
-4. **Study the feature commits.** The guide's original exercises (pause
-   state, multiball, action map, …) are all implemented now — one commit
-   each, so `git log --oneline` doubles as a reading list: check out any
-   commit's diff to see exactly what one feature costs. Appendix C lists
-   the next round of exercises.
+4. **Study the feature commits.** Every exercise from the guide's three
+   Appendix C rounds is implemented now — one commit each, so
+   `git log --oneline` doubles as a reading list: check out any commit's
+   diff to see exactly what one feature costs.
 
 ## Features
 
@@ -100,9 +107,18 @@ the right half (arrows, or a gamepad's D-pad/stick).
 - Three levels as plain-text grids (`Content/Levels/*.txt`);
   tier digit = hit points = color, `X` = unbreakable; score and lives
   carry across levels, ball speed resets per board
+- **Procedural boards:** the level select's `RANDOM` slot plays endless
+  generated boards — `BoardGenerator` emits the same text format
+  `LevelLoader` parses, with difficulty knobs (rows, hit-point budget,
+  unbreakable density, mirroring) scaling per board
 - Paddle-position-controlled bounce angle (the aiming mechanic)
-- Speed ramp per brick; power-up drops: wide paddle (pink) and
-  multiball (cyan) — a life is lost only when the *last* ball drops
+- Speed ramp per brick; power-up drops: wide paddle (pink), multiball
+  (cyan) — a life is lost only when the *last* ball drops — and **falling
+  debris**, the anti-power-up: a dark tumbling hazard that halves the
+  paddle for eight seconds if you catch it
+- **Replays:** every run records itself (RNG seed + one input frame per
+  60 Hz tick); `R` on the game-over screen re-simulates it, `T` stops,
+  `P` pauses — determinism as a feature
 - Juice: brick-break particles, trauma-based screen shake, ball trail,
   synthesized SFX with random pitch variation
 - Music: a synthesized chiptune loop on a looping `SoundEffectInstance` —
@@ -110,8 +126,12 @@ the right half (arrows, or a gamepad's D-pad/stick).
 - Action map: gameplay reads named intents (`GameAction`), not keys —
   bindings live in runtime-rebindable dictionaries (`ActionMap`), with
   full gamepad support and an in-game key rebinding screen (`B` from pause)
-- High scores: top five per mode persisted as JSON under the per-user
+- High scores: top five per table (each mode, with endless random runs
+  scored separately) persisted as JSON under the per-user
   `ApplicationData` folder; game over shows the table, title shows the best
+- **CRT shader** (`F9`): scanlines locked to virtual rows, barrel
+  curvature and vignette in one HLSL `Effect`, applied where the frame is
+  presented — the content pipeline's other asset type
 - Production layer: virtual 800×480 resolution rendered to a `RenderTarget2D`
   and letterboxed to any window size, optional integer ("pixel perfect")
   scaling, resizable window, borderless fullscreen, pause state with
@@ -126,18 +146,20 @@ Source/
   Screen.cs            virtual resolution constants
   GameMode.cs          Modern / Co-op / Classic / 3× Super — which states drive the session
   GameSession.cs       the world: entities, score, lives, level/wall index
-  Entities/            Paddle, Ball, Brick, PowerUp
-  Systems/             input + action map (kbd/pad), collision, levels,
-                       classic 1976 rules + wall, super 1978 rules + walls,
-                       high scores, virtual screen, particles, shake,
+  Entities/            Paddle, Ball, Brick, PowerUp (prizes + debris)
+  Systems/             input + action map (kbd/pad), replay (snapshot + tape),
+                       collision, levels + board generator, classic 1976
+                       rules + wall, super 1978 rules + walls, high scores,
+                       virtual screen (+ CRT pass), particles, shake,
                        audio synth + music, debug overlay
   States/              GameState base + Title/Ready/Playing/ClassicReady/
                        ClassicPlaying/SuperReady/SuperPlaying (abstract,
                        + Double/Cavity/Progressive)/Pause/Rebind/LifeLost/
                        LevelCleared/GameOver
 Content/
-  Content.mgcb         pipeline manifest (font only)
+  Content.mgcb         pipeline manifest (font + CRT shader)
   Fonts/Hud.spritefont rasterized at build time by the pipeline
+  Shaders/Crt.fx       HLSL, compiled to a platform blob at build time
   Levels/level0*.txt   runtime-loaded, copied via csproj — not pipelined
 docs/index.html        the study guide — open in a browser (or via Pages)
 ```
