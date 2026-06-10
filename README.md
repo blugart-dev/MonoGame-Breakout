@@ -35,17 +35,21 @@ automatically and the content pipeline runs as part of the build.
 | Input | Action |
 |---|---|
 | `↑` `↓` / `W` `S` (title) | Select mode |
-| `←` `→` (title, modern) | Pick starting level |
-| Mouse / `←` `→` / `A` `D` | Move paddle |
-| `Space` / Left click | Launch ball (modern) / serve (classic) |
+| `←` `→` (title) | Pick starting level (modern / co-op) |
+| Mouse / `←` `→` / `A` `D` | Move paddle (gamepad: D-pad / left stick) |
+| `Space` / Left click / `A` button | Launch ball (modern) / serve (classic) |
 | `Enter` / Click (on game over) | Play again |
 | `T` (on game over) | Back to the title screen |
+| `B` (while paused) | Key rebinding screen |
 | `P` | Pause / resume (also auto-pauses when the window loses focus) |
 | `M` | Music on / off |
 | `F11` | Borderless fullscreen |
 | `F10` | Integer ("pixel perfect") scaling toggle |
 | `F3` | Debug overlay (FPS, ball speed, entity counts) |
 | `Esc` | Quit |
+
+In **co-op**, player 1 holds the left half (mouse or `A`/`D`) and player 2
+the right half (arrows, or a gamepad's D-pad/stick).
 
 ## How to learn from this repo
 
@@ -67,10 +71,13 @@ automatically and the content pipeline runs as part of the build.
 
 ## Features
 
-- **Two rule sets, one engine.** A title screen picks the mode; each mode is
-  just a different pair of states driving the same entities
+- **Three ways to play, one engine.** A title screen (with level select)
+  picks the mode; a mode is just which states drive the shared entities
 - **Modern mode:** three tiered boards, power-ups, multiball, continuous
-  paddle aiming, per-brick speed ramp
+  paddle aiming, per-brick speed ramp, staggered brick drop-in entrance
+- **Co-op (2P):** modern rules with two paddles — P1 left half
+  (mouse/`A`/`D`), P2 right half (arrows/gamepad); wide-paddle catches are
+  personal, lives are shared
 - **Classic 1976 mode:** the original arcade rules, reconstructed from
   Atari's operation manual — 8×14 one-hit wall scored 1/1/3/3/5/5/7/7 by row
   (448/wall), four discrete ball speeds (4th hit, 12th hit, instant max on
@@ -90,7 +97,10 @@ automatically and the content pipeline runs as part of the build.
 - Music: a synthesized chiptune loop on a looping `SoundEffectInstance` —
   ducks (drops low, doesn't stop) on pause and game over, `M` mutes
 - Action map: gameplay reads named intents (`GameAction`), not keys —
-  bindings live in one runtime-rebindable dictionary (`ActionMap`)
+  bindings live in runtime-rebindable dictionaries (`ActionMap`), with
+  full gamepad support and an in-game key rebinding screen (`B` from pause)
+- High scores: top five per mode persisted as JSON under the per-user
+  `ApplicationData` folder; game over shows the table, title shows the best
 - Production layer: virtual 800×480 resolution rendered to a `RenderTarget2D`
   and letterboxed to any window size, optional integer ("pixel perfect")
   scaling, resizable window, borderless fullscreen, pause state with
@@ -106,11 +116,13 @@ Source/
   GameMode.cs          Modern vs Classic — which states drive the session
   GameSession.cs       the world: entities, score, lives, level/wall index
   Entities/            Paddle, Ball, Brick, PowerUp
-  Systems/             input + action map, collision, levels, classic 1976
-                       rules + wall, virtual screen, particles, shake,
-                       audio synth + music, debug overlay
+  Systems/             input + action map (kbd/pad), collision, levels,
+                       classic 1976 rules + wall, high scores, virtual
+                       screen, particles, shake, audio synth + music,
+                       debug overlay
   States/              GameState base + Title/Ready/Playing/ClassicReady/
-                       ClassicPlaying/Pause/LifeLost/LevelCleared/GameOver
+                       ClassicPlaying/Pause/Rebind/LifeLost/LevelCleared/
+                       GameOver
 Content/
   Content.mgcb         pipeline manifest (font only)
   Fonts/Hud.spritefont rasterized at build time by the pipeline

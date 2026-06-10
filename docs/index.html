@@ -836,18 +836,19 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
     ├── GameMode.cs             <i>Modern vs Classic — which states drive the session</i>
     ├── GameSession.cs          <i>the world: entities, score, lives, level/wall index</i>
     ├── Entities/
-    │   ├── Paddle.cs           <i>mouse+keyboard movement, wide power-up width lerp</i>
+    │   ├── Paddle.cs           <i>per-paddle actions + court slice (co-op), width lerp</i>
     │   ├── Ball.cs             <i>velocity, speed ramp, aiming bounce, trail, Split()</i>
-    │   ├── Brick.cs            <i>tier = HP = color; bevel drawing; X = unbreakable</i>
+    │   ├── Brick.cs            <i>tier or row scoring; drop-in entrance; X = unbreakable</i>
     │   └── PowerUp.cs          <i>falling pickup: wide paddle (pink) · multiball (cyan)</i>
     ├── Systems/
-    │   ├── InputHelper.cs      <i>current/previous snapshots, virtual mouse, action queries</i>
-    │   ├── GameAction.cs       <i>every input, named by intent</i>
-    │   ├── ActionMap.cs        <i>action → keys dictionary, rebindable at runtime</i>
+    │   ├── InputHelper.cs      <i>current/previous snapshots (kbd+pad), virtual mouse, FirstNewKey</i>
+    │   ├── GameAction.cs       <i>every input, named by intent (incl. P1/P2 pairs)</i>
+    │   ├── ActionMap.cs        <i>action → keys + buttons dictionaries, rebindable at runtime</i>
     │   ├── CollisionHelper.cs  <i>minimal-penetration AABB side detection + reflection</i>
     │   ├── LevelLoader.cs      <i>TitleContainer runtime loading</i>
     │   ├── ClassicWall.cs      <i>the 1976 8×14 wall: 1/3/5/7 row scoring, 448 pts</i>
     │   ├── ClassicRules.cs     <i>the 1976 numbers: 4 speeds, 4 paddle exits, serve</i>
+    │   ├── HighScores.cs       <i>top five per mode, JSON under ApplicationData</i>
     │   ├── VirtualScreen.cs    <i>RenderTarget2D, letterbox, integer scaling, mouse transform</i>
     │   ├── ParticleSystem.cs   <i>struct pool, premultiplied fade</i>
     │   ├── ScreenShake.cs      <i>trauma² shake as a transform matrix</i>
@@ -856,7 +857,7 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
     │   ├── SpriteBatchExtensions.cs <i>1×1 pixel DrawRect + centered text</i>
     │   └── DebugOverlay.cs     <i>F3: fps, ball count + top speed, live counts</i>
     └── States/
-        ├── GameState.cs        <i>abstract base: Enter/Update/Draw/FreezesEffects</i>
+        ├── GameState.cs        <i>abstract base: Enter/Update/Draw/FreezesEffects/CapturesAllInput</i>
         ├── GameStateManager.cs <i>current-state holder, resume, mode-aware new game</i>
         ├── TitleState.cs       <i>menu before a session exists: mode + level select</i>
         ├── ReadyState.cs       <i>back to one attached ball, waiting for launch</i>
@@ -864,6 +865,7 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
         ├── ClassicReadyState.cs <i>the hostile 1976 serve: ball materializes mid-screen</i>
         ├── ClassicPlayingState.cs <i>the 1976 rules: discrete speeds, breakout shrink</i>
         ├── PauseState.cs       <i>P: world dimmed, nothing updates — not even effects</i>
+        ├── RebindState.cs      <i>B from pause: poll any-key, ActionMap.Rebind</i>
         ├── LifeLostState.cs    <i>frozen beat + flash, then back to Ready</i>
         ├── LevelClearedState.cs <i>banner + beat, then the next board loads</i>
         └── GameOverState.cs    <i>win/lose overlay, Enter restarts</i></div>
@@ -883,7 +885,8 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
     <tr><td>nodes / sprites that draw themselves</td><td>explicit <code>Draw()</code> every frame via SpriteBatch</td><td>every entity's <code>Draw</code></td></tr>
     <tr><td>a "ready" / scene-load hook</td><td><code>Initialize()</code> / <code>LoadContent()</code></td><td><code>BreakoutGame.LoadContent</code></td></tr>
     <tr><td>"was this just pressed?" input query</td><td>current vs. previous state snapshots</td><td><code>InputHelper</code></td></tr>
-    <tr><td>input action map / key rebinding</td><td>one dictionary: action → bound keys</td><td><code>ActionMap</code>, <code>GameAction</code></td></tr>
+    <tr><td>input action map / key rebinding</td><td>two dictionaries: action → keys, action → gamepad buttons</td><td><code>ActionMap</code>, <code>GameAction</code>, <code>RebindState</code></td></tr>
+    <tr><td>built-in save-data API</td><td>JSON file under <code>Environment.SpecialFolder.ApplicationData</code> (TitleContainer is read-only)</td><td><code>HighScores</code></td></tr>
     <tr><td>asset import system</td><td>Content Pipeline → <code>.xnb</code> → <code>Content.Load&lt;T&gt;</code></td><td><code>Content.mgcb</code>, the font</td></tr>
     <tr><td>raw access to bundled files</td><td><code>TitleContainer.OpenStream</code></td><td><code>LevelLoader</code></td></tr>
     <tr><td>scene / screen switching</td><td>hand-rolled state machine</td><td><code>GameStateManager</code></td></tr>
@@ -916,16 +919,25 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
   manual, running as a parallel pair of states (see §07 and
   <code>ClassicPlayingState.cs</code>).</p>
 
-  <p>The next round, again ordered roughly by how much existing code each one touches —
-  every item is a real feature, not a toy exercise.</p>
+  <p>The second round is now implemented too, one commit each (2026-06-10): brick
+  entrance (tween without a tween library), gamepad support (one more dictionary,
+  zero gameplay changes — the action layer's promise, kept), the rebinding screen
+  (poll <code>GetPressedKeys()</code> diffs; note the <code>CapturesAllInput</code>
+  flag that keeps Esc from quitting mid-bind), high scores (read-only
+  <code>TitleContainer</code> vs. a real writable path under
+  <code>ApplicationData</code>), and local co-op (the paddle's turn for the multiball
+  treatment: <code>Session.Paddle</code> → <code>Session.Paddles</code>).</p>
+
+  <p>The third round, for whoever wants to keep going — these are larger, and each
+  opens a new subsystem:</p>
 
   <table>
     <tr><th>Exercise</th><th>What it teaches</th></tr>
-    <tr><td><strong>Brick entrance.</strong> On level load, drop bricks in from above the screen over ~half a second (lerp from a start offset, staggered by column).</td><td>Tween-style animation without a tween library; one more place where "animate toward target" beats "snap".</td></tr>
-    <tr><td><strong>Gamepad support.</strong> Extend <code>ActionMap</code> with a second dictionary action → <code>Buttons[]</code>, polled from <code>GamePad.GetState(PlayerIndex.One)</code>.</td><td>Why the action layer was worth building: paddle code does not change at all.</td></tr>
-    <tr><td><strong>Rebinding screen.</strong> From PauseState, a menu that waits for "any key just pressed" and calls <code>ActionMap.Rebind</code>.</td><td>Polling for an unknown key (compare full <code>GetPressedKeys()</code> sets) and writing your first menu state.</td></tr>
-    <tr><td><strong>High scores.</strong> Persist the top five to a JSON file under <code>Environment.SpecialFolder.ApplicationData</code> — note <code>TitleContainer</code> is read-only, so saving needs a real path.</td><td>The read side and write side of game data are different problems; where save files actually belong on each OS.</td></tr>
-    <tr><td><strong>Local co-op.</strong> A second paddle (left/right halves or top/bottom), each bound to its own action set.</td><td>Multiplying an entity that input, collision and serve logic all assumed was unique — the paddle's turn for the multiball treatment.</td></tr>
+    <tr><td><strong>Super Breakout variants.</strong> Double, Cavity, Progressive — the 1978 sequel's three games, documented in its operation manual (speed-ups at 4/8/12 hits, shrink on top-boundary contact).</td><td>The classic-mode pattern, stress-tested: three more rule sets sharing the same entities.</td></tr>
+    <tr><td><strong>Replay system.</strong> Record the per-tick action states to a list; to replay, feed them back instead of polling. Works because the simulation is a fixed 60 Hz timestep with seeded randomness.</td><td>Determinism as a feature — why fixed timestep + recorded input = a replay for free, and what breaks it (the unseeded <code>Random</code>).</td></tr>
+    <tr><td><strong>CRT shader.</strong> A post-processing <code>Effect</code> (scanlines, slight curvature) applied when VirtualScreen presents the render target.</td><td>The content pipeline's other asset type (.fx → compiled shader) and where a post-process pass slots into a two-pass draw.</td></tr>
+    <tr><td><strong>Falling debris.</strong> Arkanoid-style: destroyed bricks sometimes drop a hazard that shrinks the paddle on contact — the anti-power-up.</td><td>Reusing a pipeline (PowerUp spawn/fall/catch) for the opposite meaning; good-vs-harm readability through color and shape.</td></tr>
+    <tr><td><strong>Procedural boards.</strong> A generator that emits the same grid format LevelLoader parses, with difficulty knobs (tier budget, unbreakable density, symmetry).</td><td>Content as data pays off twice: a generator is just another producer of the format you already read.</td></tr>
   </table>
 
   <p style="margin-top:34px">When you've read everything: delete a system —
