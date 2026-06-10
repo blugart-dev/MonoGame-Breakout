@@ -23,6 +23,7 @@ public class Paddle
     private float _centerX = Screen.Width / 2f;
     private float _width = BaseWidth;
     private float _wideTimer;
+    private bool _shrunk;
 
     public bool IsWide => _wideTimer > 0f;
 
@@ -45,8 +46,9 @@ public class Paddle
             _wideTimer -= dt;
 
         // Animate toward the target width instead of snapping — exponential
-        // ease via lerp-with-dt, the cheapest smoothing there is.
-        float targetWidth = IsWide ? WideWidth : BaseWidth;
+        // ease via lerp-with-dt, the cheapest smoothing there is. Shrunk wins
+        // over wide: the classic penalty is a rule, not a power-up to outbid.
+        float targetWidth = _shrunk ? BaseWidth / 2f : IsWide ? WideWidth : BaseWidth;
         _width = MathHelper.Lerp(_width, targetWidth, MathF.Min(1f, WidthLerpSpeed * dt));
 
         float half = _width / 2f;
@@ -55,9 +57,23 @@ public class Paddle
 
     public void ApplyWide(float duration) => _wideTimer = duration;
 
+    /// <summary>
+    /// The 1976 penalty: once the ball breaks through to the zone behind the
+    /// wall, the paddle plays the rest of the volley at half width.
+    /// </summary>
+    public void ApplyClassicShrink() => _shrunk = true;
+
+    /// <summary>Back to normal width for a fresh serve (clears wide too).</summary>
+    public void ResetWidth()
+    {
+        _shrunk = false;
+        _wideTimer = 0f;
+    }
+
     public void Draw(SpriteBatch spriteBatch)
     {
-        Color body = IsWide ? new Color(120, 220, 255) : new Color(226, 226, 236);
+        Color body = _shrunk ? new Color(255, 170, 90)
+            : IsWide ? new Color(120, 220, 255) : new Color(226, 226, 236);
         Rectangle b = Bounds;
         spriteBatch.DrawRect(b, body);
         spriteBatch.DrawRect(new Rectangle(b.X, b.Y, b.Width, 2), Color.White);

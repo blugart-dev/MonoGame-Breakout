@@ -1,4 +1,6 @@
+using System;
 using Microsoft.Xna.Framework;
+using Breakout.Entities;
 
 namespace Breakout.Systems;
 
@@ -25,5 +27,36 @@ public static class CollisionHelper
             return moving.Center.X < target.Center.X ? HitSide.Left : HitSide.Right;
 
         return moving.Center.Y < target.Center.Y ? HitSide.Top : HitSide.Bottom;
+    }
+
+    /// <summary>
+    /// Push the ball out of the rectangle along the impact axis, then point
+    /// the velocity away from it. Setting the sign outright (rather than
+    /// negating) makes the response idempotent if we ever resolve twice.
+    /// Shared by both rule sets — how a ball leaves a brick is physics, not
+    /// rules, so it lives here rather than in either playing state.
+    /// </summary>
+    public static void ReflectAndSeparate(Ball ball, Rectangle target, HitSide side)
+    {
+        Rectangle overlap = Rectangle.Intersect(ball.Bounds, target);
+        switch (side)
+        {
+            case HitSide.Left:
+                ball.Position.X -= overlap.Width;
+                ball.Velocity.X = -MathF.Abs(ball.Velocity.X);
+                break;
+            case HitSide.Right:
+                ball.Position.X += overlap.Width;
+                ball.Velocity.X = MathF.Abs(ball.Velocity.X);
+                break;
+            case HitSide.Top:
+                ball.Position.Y -= overlap.Height;
+                ball.Velocity.Y = -MathF.Abs(ball.Velocity.Y);
+                break;
+            case HitSide.Bottom:
+                ball.Position.Y += overlap.Height;
+                ball.Velocity.Y = MathF.Abs(ball.Velocity.Y);
+                break;
+        }
     }
 }

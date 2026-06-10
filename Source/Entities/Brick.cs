@@ -5,9 +5,12 @@ using Breakout.Systems;
 namespace Breakout.Entities;
 
 /// <summary>
-/// One brick. A single number from the level file (the "tier", 1-5) drives
-/// everything: hit points, color, and score value. Bricks never move, so the
-/// bounds rectangle is computed once by the level loader and stays immutable.
+/// One brick. In the modern game a single number from the level file (the
+/// "tier", 1-5) drives everything — hit points, color, and score value; the
+/// classic 1976 wall instead scores by *row*, so the general constructor takes
+/// the three values independently and the tier constructor is just a preset.
+/// Bricks never move, so the bounds rectangle is computed once and stays
+/// immutable.
 /// </summary>
 public class Brick
 {
@@ -24,25 +27,33 @@ public class Brick
     private static readonly Color UnbreakableColor = new(128, 130, 140);
 
     public Rectangle Bounds { get; }
-    public int Tier { get; }
     public bool IsUnbreakable { get; }
     public int HitPoints { get; private set; }
+    public int ScoreValue { get; }
+    public Color BaseColor { get; }
+
+    private readonly int _maxHitPoints; // for the damage tint in Draw
 
     public bool Alive => IsUnbreakable || HitPoints > 0;
-    public int ScoreValue => Tier * 10;
-    public Color BaseColor => IsUnbreakable ? UnbreakableColor : TierColors[Tier];
 
+    /// <summary>Modern preset: tier = hit points = color, score = tier x 10.</summary>
     public Brick(Rectangle bounds, int tier)
+        : this(bounds, hitPoints: tier, scoreValue: tier * 10, TierColors[tier]) { }
+
+    public Brick(Rectangle bounds, int hitPoints, int scoreValue, Color color)
     {
         Bounds = bounds;
-        Tier = tier;
-        HitPoints = tier; // tier doubles as strength: a '3' brick takes three hits
+        HitPoints = hitPoints;
+        _maxHitPoints = hitPoints;
+        ScoreValue = scoreValue;
+        BaseColor = color;
     }
 
     private Brick(Rectangle bounds)
     {
         Bounds = bounds;
         IsUnbreakable = true;
+        BaseColor = UnbreakableColor;
     }
 
     public static Brick Unbreakable(Rectangle bounds) => new(bounds);
@@ -59,9 +70,9 @@ public class Brick
     public void Draw(SpriteBatch spriteBatch)
     {
         Color body = BaseColor;
-        if (!IsUnbreakable && HitPoints < Tier)
+        if (!IsUnbreakable && HitPoints < _maxHitPoints)
         {
-            float damage = 1f - (float)HitPoints / Tier;
+            float damage = 1f - (float)HitPoints / _maxHitPoints;
             body = Color.Lerp(body, Color.Black, damage * 0.45f);
         }
 

@@ -26,7 +26,7 @@ public sealed class LifeLostState : GameState
     {
         _timer += dt;
         if (_timer >= Duration)
-            Manager.ChangeState(new ReadyState(Manager));
+            Manager.ChangeState(Manager.CreateServeState()); // mode decides which Ready
     }
 
     public override void Draw(SpriteBatch spriteBatch)

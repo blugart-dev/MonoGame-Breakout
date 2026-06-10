@@ -27,7 +27,12 @@ public sealed class GameOverState : GameState
         if (input.WasActionJustPressed(GameAction.Restart) || input.WasLeftClickJustPressed)
         {
             MusicPlayer.SetDucked(false);
-            Manager.StartNewGame();
+            Manager.RestartCurrentGame();
+        }
+        else if (input.WasActionJustPressed(GameAction.TitleScreen))
+        {
+            MusicPlayer.SetDucked(false);
+            Manager.GoToTitle();
         }
     }
 
@@ -47,5 +52,7 @@ public sealed class GameOverState : GameState
             center + new Vector2(0, 60), Color.White);
         spriteBatch.DrawCenteredText(Font, "PRESS ENTER OR CLICK TO PLAY AGAIN",
             center + new Vector2(0, 110), new Color(150, 150, 165), 0.75f);
+        spriteBatch.DrawCenteredText(Font, "T FOR TITLE SCREEN",
+            center + new Vector2(0, 140), new Color(150, 150, 165), 0.75f);
     }
 }

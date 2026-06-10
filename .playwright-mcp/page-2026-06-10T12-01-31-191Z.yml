@@ -1,0 +1,474 @@
+- generic [ref=e1]:
+  - dialog "Privacy" [active] [ref=e3]:
+    - figure [ref=e8]:
+      - heading "We value your privacy" [level=2] [ref=e9]
+    - generic [ref=e20]:
+      - button "MORE OPTIONS" [ref=e21] [cursor=pointer]:
+        - generic [ref=e22]: MORE OPTIONS
+      - button [disabled] [ref=e23]
+  - generic [ref=e33]:
+    - generic [ref=e34]:
+      - generic [ref=e39]:
+        - link "This guide is at completion stage 1. Click here for more information." [ref=e41] [cursor=pointer]:
+          - /url: /wiki/Category:Guides_at_completion_stage_1
+          - img "This guide is at completion stage 1. Click here for more information." [ref=e42]
+        - link "Stage 1" [ref=e43] [cursor=pointer]:
+          - /url: /wiki/Category:Guides_at_completion_stage_1
+      - heading "Super Breakout" [level=1] [ref=e44]
+      - generic [ref=e46]:
+        - navigation "Namespaces" [ref=e48]:
+          - list [ref=e49]:
+            - listitem [ref=e50]:
+              - link "Page" [ref=e51] [cursor=pointer]:
+                - /url: /wiki/Super_Breakout
+            - listitem [ref=e52]:
+              - link "Discussion" [ref=e53] [cursor=pointer]:
+                - /url: /w/index.php?title=Talk:Super_Breakout&action=edit&redlink=1
+        - navigation "Views" [ref=e55]:
+          - list [ref=e56]:
+            - listitem [ref=e57]:
+              - link "Read" [ref=e58] [cursor=pointer]:
+                - /url: /wiki/Super_Breakout
+            - listitem [ref=e59]:
+              - link "Edit" [ref=e60] [cursor=pointer]:
+                - /url: /w/index.php?title=Super_Breakout&veaction=edit
+            - listitem [ref=e61]:
+              - link "Edit source" [ref=e62] [cursor=pointer]:
+                - /url: /w/index.php?title=Super_Breakout&action=edit
+            - listitem [ref=e63]:
+              - link "View history" [ref=e64] [cursor=pointer]:
+                - /url: /w/index.php?title=Super_Breakout&action=history
+      - main [ref=e65]:
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - list:
+              - listitem [ref=e68]:
+                - link "Share on Facebook" [ref=e69] [cursor=pointer]:
+                  - /url: https://www.facebook.com/sharer.php?u=
+              - listitem [ref=e70]:
+                - link "Share on reddit.com" [ref=e71] [cursor=pointer]:
+                  - /url: http://reddit.com/submit?url=&title=+-+StrategyWiki
+              - listitem [ref=e72]:
+                - link "Share on twitter.com" [ref=e73] [cursor=pointer]:
+                  - /url: https://twitter.com/intent/tweet?url=Look%20what%20I%20found%20on%20StrategyWiki:%20
+              - listitem [ref=e74]:
+                - link "E-mail this page" [ref=e75] [cursor=pointer]:
+                  - /url: mailto:?subject=&body=:%0A
+              - listitem [ref=e76]:
+                - link "Print this page" [ref=e77] [cursor=pointer]:
+                  - /url: javascript:window.print()
+          - generic [ref=e78]: From StrategyWiki, the video game walkthrough and strategy guide wiki
+          - link "Jump to navigation" [ref=e79] [cursor=pointer]:
+            - /url: "#mw-head"
+          - link "Jump to search" [ref=e80] [cursor=pointer]:
+            - /url: "#searchInput"
+          - generic [ref=e82]:
+            - paragraph [ref=e84]:
+              - generic [ref=e85]: Super Breakout
+            - generic [ref=e86]:
+              - figure "Box artwork for Super Breakout." [ref=e88]:
+                - link "Box artwork for Super Breakout." [ref=e89] [cursor=pointer]:
+                  - /url: /wiki/File:Super_Breakout_flyer.jpg
+                  - img "Box artwork for Super Breakout." [ref=e90]
+              - table [ref=e91]:
+                - rowgroup [ref=e92]:
+                  - row "Super Breakout" [ref=e93]:
+                    - columnheader "Super Breakout" [ref=e94]
+                  - row "Developer(s) Atari" [ref=e95]:
+                    - rowheader "Developer(s)" [ref=e96]
+                    - cell "Atari" [ref=e97]:
+                      - link "Atari" [ref=e98] [cursor=pointer]:
+                        - /url: /wiki/Atari
+                  - row "Publisher(s) Atari" [ref=e99]:
+                    - rowheader "Publisher(s)" [ref=e100]
+                    - cell "Atari" [ref=e101]:
+                      - link "Atari" [ref=e102] [cursor=pointer]:
+                        - /url: /wiki/Atari
+                  - row "Year released 1978" [ref=e103]:
+                    - rowheader "Year released" [ref=e104]
+                    - cell "1978" [ref=e105]:
+                      - link "1978" [ref=e106] [cursor=pointer]:
+                        - /url: /wiki/Category:1978
+                  - row "System(s) Arcade, Atari 2600, Atari 5200, Atari 8-bit, Atari 8-bit, BBC Micro, Atari ST" [ref=e107]:
+                    - rowheader "System(s)" [ref=e108]
+                    - cell "Arcade, Atari 2600, Atari 5200, Atari 8-bit, Atari 8-bit, BBC Micro, Atari ST" [ref=e109]:
+                      - link "Arcade" [ref=e110] [cursor=pointer]:
+                        - /url: /wiki/Category:Arcade
+                      - text: ","
+                      - link "Atari 2600" [ref=e111] [cursor=pointer]:
+                        - /url: /wiki/Category:Atari_2600
+                      - text: ","
+                      - link "Atari 5200" [ref=e112] [cursor=pointer]:
+                        - /url: /wiki/Category:Atari_5200
+                      - text: ","
+                      - link "Atari 8-bit" [ref=e113] [cursor=pointer]:
+                        - /url: /wiki/Category:Atari_8-bit
+                      - text: ","
+                      - link "Atari 8-bit" [ref=e114] [cursor=pointer]:
+                        - /url: /wiki/Category:Atari_8-bit
+                      - text: ","
+                      - link "BBC Micro" [ref=e115] [cursor=pointer]:
+                        - /url: /wiki/Category:BBC_Micro
+                      - text: ","
+                      - link "Atari ST" [ref=e116] [cursor=pointer]:
+                        - /url: /wiki/Category:Atari_ST
+                  - row "Preceded by Breakout" [ref=e117]:
+                    - rowheader "Preceded by" [ref=e118]
+                    - cell "Breakout" [ref=e119]:
+                      - link "Breakout" [ref=e121] [cursor=pointer]:
+                        - /url: /wiki/Breakout
+                  - row "Followed by Breakout 2000" [ref=e122]:
+                    - rowheader "Followed by" [ref=e123]
+                    - cell "Breakout 2000" [ref=e124]:
+                      - link "Breakout 2000" [ref=e126] [cursor=pointer]:
+                        - /url: /w/index.php?title=Breakout_2000&action=edit&redlink=1
+                  - row "Series Breakout" [ref=e127]:
+                    - rowheader "Series" [ref=e128]
+                    - cell "Breakout" [ref=e129]:
+                      - link "Breakout" [ref=e130] [cursor=pointer]:
+                        - /url: /wiki/Category:Breakout
+            - table [ref=e131]:
+              - rowgroup [ref=e132]:
+                - row "Genre(s) Action" [ref=e133]:
+                  - rowheader "Genre(s)" [ref=e134]
+                  - cell "Action" [ref=e135]:
+                    - link "Action" [ref=e136] [cursor=pointer]:
+                      - /url: /wiki/Action
+                - row "Players 1-2" [ref=e137]:
+                  - rowheader "Players" [ref=e138]
+                  - cell "1-2" [ref=e139]
+                - row "Modes Single player, Multiplayer" [ref=e140]:
+                  - rowheader "Modes" [ref=e141]
+                  - cell "Single player, Multiplayer" [ref=e142]:
+                    - link "Single player" [ref=e143] [cursor=pointer]:
+                      - /url: /wiki/Single_player
+                    - text: ","
+                    - link "Multiplayer" [ref=e144] [cursor=pointer]:
+                      - /url: /wiki/Multiplayer
+            - table [ref=e145]:
+              - rowgroup [ref=e146]:
+                - row "Links Super Breakout ChannelSearch" [ref=e147]:
+                  - rowheader "Links" [ref=e148]
+                  - cell "Super Breakout ChannelSearch" [ref=e149]:
+                    - link "Super Breakout Channel" [ref=e152] [cursor=pointer]:
+                      - /url: https://www.twitch.tv/directory/game/Super%20Breakout
+                      - img "Super Breakout Channel" [ref=e153]
+                    - link "Search" [ref=e156] [cursor=pointer]:
+                      - /url: https://www.facebook.com/search/pages/?q=Super%20Breakout
+                      - img "Search" [ref=e157]
+            - definition [ref=e159]:
+              - generic [ref=e160]:
+                - text: This guide is for the
+                - link "1978" [ref=e161] [cursor=pointer]:
+                  - /url: /wiki/1978
+                - link "arcade" [ref=e162] [cursor=pointer]:
+                  - /url: /wiki/Arcade
+                - text: game. For the
+                - link "2004" [ref=e163] [cursor=pointer]:
+                  - /url: /wiki/2004
+                - link "mobile" [ref=e164] [cursor=pointer]:
+                  - /url: /wiki/Mobile
+                - text: game, see
+                - link "Super Breakout (2004)" [ref=e165] [cursor=pointer]:
+                  - /url: /w/index.php?title=Super_Breakout_(2004)&action=edit&redlink=1
+                - text: .
+            - link "Super Breakout marquee" [ref=e168] [cursor=pointer]:
+              - /url: /wiki/File:Super_Breakout_marquee.jpg
+              - img "Super Breakout marquee" [ref=e169]
+            - paragraph [ref=e170]:
+              - text: Super Breakout is an arcade game which was released by
+              - link "Atari" [ref=e171] [cursor=pointer]:
+                - /url: /wiki/Atari
+              - text: in
+              - link "1978" [ref=e172] [cursor=pointer]:
+                - /url: /wiki/1978
+              - text: ; it utilizes a Motorola M6502 (running up at 375 KHz), and, as the name suggests, it is the sequel to
+              - link "Breakout" [ref=e173] [cursor=pointer]:
+                - /url: /wiki/Breakout
+              - text: ", which was released two years earlier. There are three different modes to choose from: Double Breakout, the playfield for which contains in fifty-two orange blocks (5-14 points), fifty-two green blocks (1-6 points), two paddles and two balls, Cavity Breakout, which contains in forty-four orange blocks (7-21 points), and fifty-two green blocks (1-9 points), one paddle, and three balls (the second and third of which have to be freed before they come into play) and Progressive Breakout which contains fifty-two blue blocks (7 points) and fifty-two green blocks (5 points), one paddle, and one ball - and the blocks shall be lowered down towards the paddle, at a rate determined by the number of times the ball lands on your paddle, but as the ball destroys them, additional rows of blocks shall appear at the top of the screen and be lowered down towards the paddle at an increasing rate. This is also the only mode for which it's possible for a player to receive an infinite amount of points by playing, but the score display shall roll over at 10000."
+            - list [ref=e174]:
+              - listitem [ref=e175]:
+                - link "\"Double Breakout\" mode." [ref=e178] [cursor=pointer]:
+                  - /url: /wiki/File:Super_Breakout_gameplay.png
+                  - img "\"Double Breakout\" mode." [ref=e179]
+                - paragraph [ref=e181]: "\"Double Breakout\" mode."
+              - listitem [ref=e182]:
+                - link "\"Cavity Breakout\" mode." [ref=e185] [cursor=pointer]:
+                  - /url: /wiki/File:Super_Breakout_gameplay_2.png
+                  - img "\"Cavity Breakout\" mode." [ref=e186]
+                - paragraph [ref=e188]: "\"Cavity Breakout\" mode."
+              - listitem [ref=e189]:
+                - link "\"Progressive Breakout\"." [ref=e192] [cursor=pointer]:
+                  - /url: /wiki/File:Super_Breakout_gameplay_3.png
+                  - img "\"Progressive Breakout\"." [ref=e193]
+                - paragraph [ref=e195]: "\"Progressive Breakout\"."
+            - generic [ref=e196]:
+              - generic [ref=e197]:
+                - generic [ref=e198]:
+                  - link "view" [ref=e199] [cursor=pointer]:
+                    - /url: //strategywiki.org/w/index.php?title=Template:Breakout&action=view
+                  - text: ·
+                  - link "edit" [ref=e200] [cursor=pointer]:
+                    - /url: //strategywiki.org/w/index.php?title=Template:Breakout&action=edit
+                - generic [ref=e201]:
+                  - link "Breakout" [ref=e202] [cursor=pointer]:
+                    - /url: /wiki/Category:Breakout
+                  - text: series
+              - generic [ref=e203]:
+                - list [ref=e205]:
+                  - listitem [ref=e206]:
+                    - link "Breakout" [ref=e207] [cursor=pointer]:
+                      - /url: /wiki/Breakout
+                  - listitem [ref=e208]: · Super Breakout
+                  - listitem [ref=e209]:
+                    - text: ·
+                    - link "Breakout 2000" [ref=e210] [cursor=pointer]:
+                      - /url: /w/index.php?title=Breakout_2000&action=edit&redlink=1
+                  - listitem [ref=e211]:
+                    - text: ·
+                    - link "Breakout (Hasbro Interactive)" [ref=e212] [cursor=pointer]:
+                      - /url: /w/index.php?title=Breakout_(Hasbro_Interactive)&action=edit&redlink=1
+                  - listitem [ref=e213]:
+                    - text: ·
+                    - link "Super Breakout (2004)" [ref=e214] [cursor=pointer]:
+                      - /url: /w/index.php?title=Super_Breakout_(2004)&action=edit&redlink=1
+                  - listitem [ref=e215]:
+                    - text: ·
+                    - link "Super Breakout Ultra" [ref=e216] [cursor=pointer]:
+                      - /url: /w/index.php?title=Super_Breakout_Ultra&action=edit&redlink=1
+                  - listitem [ref=e217]:
+                    - text: ·
+                    - 'link "Breakout: Boost" [ref=e218] [cursor=pointer]':
+                      - /url: /w/index.php?title=Breakout:_Boost&action=edit&redlink=1
+                  - listitem [ref=e219]:
+                    - text: ·
+                    - 'link "Breakout: Boost Plus" [ref=e220] [cursor=pointer]':
+                      - /url: /w/index.php?title=Breakout:_Boost_Plus&action=edit&redlink=1
+                  - listitem [ref=e221]:
+                    - text: ·
+                    - 'link "Breakout: Recharged" [ref=e222] [cursor=pointer]':
+                      - /url: /w/index.php?title=Breakout:_Recharged&action=edit&redlink=1
+                - generic [ref=e223]:
+                  - text: "Compilation(s):"
+                  - list [ref=e224]:
+                    - listitem [ref=e225]:
+                      - 'link "Arcade Classics: Super Breakout / Battlezone" [ref=e226] [cursor=pointer]':
+                        - /url: /wiki/Arcade_Classics:_Super_Breakout_/_Battlezone
+                    - listitem [ref=e227]:
+                      - text: ·
+                      - link "Asteroids & Super Breakout" [ref=e228] [cursor=pointer]:
+                        - /url: /w/index.php?title=Asteroids_%26_Super_Breakout&action=edit&redlink=1
+                    - listitem [ref=e229]:
+                      - text: ·
+                      - link "Millipede / Super Breakout / Lunar Lander" [ref=e230] [cursor=pointer]:
+                        - /url: /w/index.php?title=Millipede_/_Super_Breakout_/_Lunar_Lander&action=edit&redlink=1
+                    - listitem [ref=e231]:
+                      - text: ·
+                      - link "Centipede / Breakout / Warlords" [ref=e232] [cursor=pointer]:
+                        - /url: /w/index.php?title=Centipede_/_Breakout_/_Warlords&action=edit&redlink=1
+          - generic [ref=e234]:
+            - link "Categories" [ref=e235] [cursor=pointer]:
+              - /url: /wiki/Special:Categories
+            - text: ":"
+            - list [ref=e236]:
+              - listitem [ref=e237]:
+                - link "Arcade" [ref=e238] [cursor=pointer]:
+                  - /url: /wiki/Category:Arcade
+              - listitem [ref=e239]:
+                - link "Atari 2600" [ref=e240] [cursor=pointer]:
+                  - /url: /wiki/Category:Atari_2600
+              - listitem [ref=e241]:
+                - link "Atari 5200" [ref=e242] [cursor=pointer]:
+                  - /url: /wiki/Category:Atari_5200
+              - listitem [ref=e243]:
+                - link "Atari 8-bit" [ref=e244] [cursor=pointer]:
+                  - /url: /wiki/Category:Atari_8-bit
+              - listitem [ref=e245]:
+                - link "BBC Micro" [ref=e246] [cursor=pointer]:
+                  - /url: /wiki/Category:BBC_Micro
+              - listitem [ref=e247]:
+                - link "Atari ST" [ref=e248] [cursor=pointer]:
+                  - /url: /wiki/Category:Atari_ST
+              - listitem [ref=e249]:
+                - link "Games" [ref=e250] [cursor=pointer]:
+                  - /url: /wiki/Category:Games
+              - listitem [ref=e251]:
+                - link "Guides at completion stage 1" [ref=e252] [cursor=pointer]:
+                  - /url: /wiki/Category:Guides_at_completion_stage_1
+              - listitem [ref=e253]:
+                - link "1978" [ref=e254] [cursor=pointer]:
+                  - /url: /wiki/Category:1978
+              - listitem [ref=e255]:
+                - link "Breakout" [ref=e256] [cursor=pointer]:
+                  - /url: /wiki/Category:Breakout
+              - listitem [ref=e257]:
+                - link "Atari" [ref=e258] [cursor=pointer]:
+                  - /url: /wiki/Category:Atari
+              - listitem [ref=e259]:
+                - link "Action" [ref=e260] [cursor=pointer]:
+                  - /url: /wiki/Category:Action
+              - listitem [ref=e261]:
+                - link "Single player" [ref=e262] [cursor=pointer]:
+                  - /url: /wiki/Category:Single_player
+              - listitem [ref=e263]:
+                - link "Multiplayer" [ref=e264] [cursor=pointer]:
+                  - /url: /wiki/Category:Multiplayer
+              - listitem [ref=e265]:
+                - link "MAME" [ref=e266] [cursor=pointer]:
+                  - /url: /wiki/Category:MAME
+      - contentinfo [ref=e269]:
+        - list [ref=e270]:
+          - listitem [ref=e271]: This page was last edited on 11 March 2022, at 16:22.
+          - listitem [ref=e272]:
+            - text: Content is available under
+            - link "Creative Commons Attribution-ShareAlike 4.0" [ref=e273] [cursor=pointer]:
+              - /url: https://creativecommons.org/licenses/by-sa/4.0/
+            - text: unless otherwise noted.
+        - list [ref=e274]:
+          - listitem [ref=e275]:
+            - link "Privacy policy" [ref=e276] [cursor=pointer]:
+              - /url: /wiki/StrategyWiki:Privacy_policy
+          - listitem [ref=e277]:
+            - link "About StrategyWiki" [ref=e278] [cursor=pointer]:
+              - /url: /wiki/StrategyWiki:Guide/About
+          - listitem [ref=e279]:
+            - link "Disclaimers" [ref=e280] [cursor=pointer]:
+              - /url: /wiki/StrategyWiki:General_disclaimer
+          - listitem [ref=e281]:
+            - link "Mobile view" [ref=e282] [cursor=pointer]:
+              - /url: //strategywiki.org/w/index.php?title=Super_Breakout&mobileaction=toggle_view_mobile
+    - generic:
+      - heading "Navigation menu" [level=2] [ref=e283]
+      - generic [ref=e284]:
+        - banner [ref=e285]:
+          - link "Visit the main page" [ref=e286] [cursor=pointer]:
+            - /url: /wiki/Main_Page
+        - navigation "Personal tools" [ref=e287]:
+          - list [ref=e289]:
+            - listitem [ref=e290]: Not logged in
+            - listitem [ref=e291]:
+              - link "Talk" [ref=e292] [cursor=pointer]:
+                - /url: /wiki/Special:MyTalk
+            - listitem [ref=e293]:
+              - link "Contributions" [ref=e294] [cursor=pointer]:
+                - /url: /wiki/Special:MyContributions
+            - listitem [ref=e295]:
+              - link "Create account" [ref=e296] [cursor=pointer]:
+                - /url: /w/index.php?title=Special:CreateAccount&returnto=Super+Breakout
+            - listitem [ref=e297]:
+              - link "Log in" [ref=e298] [cursor=pointer]:
+                - /url: /w/index.php?title=Special:UserLogin&returnto=Super+Breakout
+      - generic [ref=e299]:
+        - search [ref=e300]:
+          - heading "Search" [level=3] [ref=e301]
+          - generic [ref=e303]:
+            - searchbox "Search StrategyWiki" [ref=e304]
+            - button "Search" [ref=e305] [cursor=pointer]
+            - button "Go" [ref=e306] [cursor=pointer]
+        - navigation " Navigation" [ref=e307]:
+          - heading " Navigation" [level=3] [ref=e308]:
+            - button " Navigation" [expanded] [pressed] [ref=e309] [cursor=pointer]
+          - list [ref=e311]:
+            - listitem [ref=e312]:
+              - text: 
+              - link "Main page" [ref=e313] [cursor=pointer]:
+                - /url: /wiki/Main_Page
+            - listitem [ref=e314]:
+              - text: 
+              - link "Games" [ref=e315] [cursor=pointer]:
+                - /url: /wiki/StrategyWiki:Categories
+            - listitem [ref=e316]:
+              - text: 
+              - link "Community" [ref=e317] [cursor=pointer]:
+                - /url: /wiki/StrategyWiki:Community_Portal
+            - listitem [ref=e318]:
+              - text: 
+              - link "Staff lounge" [ref=e319] [cursor=pointer]:
+                - /url: /wiki/StrategyWiki:Staff_lounge
+            - listitem [ref=e320]:
+              - text: 
+              - link "Recent changes" [ref=e321] [cursor=pointer]:
+                - /url: /wiki/Special:RecentChanges
+            - listitem [ref=e322]:
+              - text: 
+              - link "Upload file" [ref=e323] [cursor=pointer]:
+                - /url: /wiki/Special:Upload
+            - listitem [ref=e324]:
+              - text: 
+              - link "Random page" [ref=e325] [cursor=pointer]:
+                - /url: /wiki/Special:Random
+            - listitem [ref=e326]:
+              - text: 
+              - link "Help" [ref=e327] [cursor=pointer]:
+                - /url: /wiki/StrategyWiki:Guide
+            - listitem [ref=e328]:
+              - text: 
+              - link "Facebook" [ref=e329] [cursor=pointer]:
+                - /url: https://www.facebook.com/StrategyWiki
+            - listitem [ref=e330]:
+              - text: 
+              - link "Twitter" [ref=e331] [cursor=pointer]:
+                - /url: https://twitter.com/StrategyWiki
+            - listitem [ref=e332]:
+              - text: 
+              - link "Discord Chat" [ref=e333] [cursor=pointer]:
+                - /url: https://discord.gg/pYghWh3
+        - navigation " Tools" [ref=e334]:
+          - heading " Tools" [level=3] [ref=e335]:
+            - button " Tools" [ref=e336] [cursor=pointer]
+          - text:         
+        - navigation "Categories" [ref=e337]:
+          - heading "Categories" [level=3] [ref=e338]
+          - list [ref=e340]:
+            - listitem [ref=e341]:
+              - text: 
+              - link "PlayStation 3" [ref=e342] [cursor=pointer]:
+                - /url: /wiki/Category:PlayStation_3
+            - listitem [ref=e343]:
+              - text: 
+              - link "PlayStation 4" [ref=e344] [cursor=pointer]:
+                - /url: /wiki/Category:PlayStation_4
+            - listitem [ref=e345]:
+              - text: 
+              - link "PlayStation 5" [ref=e346] [cursor=pointer]:
+                - /url: /wiki/Category:PlayStation_5
+            - listitem [ref=e347]:
+              - text: 
+              - link "Game Boy Advance" [ref=e348] [cursor=pointer]:
+                - /url: /wiki/Category:Game_Boy_Advance
+            - listitem [ref=e349]:
+              - text: 
+              - link "Nintendo DS" [ref=e350] [cursor=pointer]:
+                - /url: /wiki/Category:Nintendo_DS
+            - listitem [ref=e351]:
+              - text: 
+              - link "Nintendo 3DS" [ref=e352] [cursor=pointer]:
+                - /url: /wiki/Category:Nintendo_3DS
+            - listitem [ref=e353]:
+              - text: 
+              - link "Nintendo Switch" [ref=e354] [cursor=pointer]:
+                - /url: /wiki/Category:Nintendo_Switch
+            - listitem [ref=e355]:
+              - text: 
+              - link "Nintendo Switch 2" [ref=e356] [cursor=pointer]:
+                - /url: /wiki/Category:Nintendo_Switch_2
+            - listitem [ref=e357]:
+              - text: 
+              - link "Xbox 360" [ref=e358] [cursor=pointer]:
+                - /url: /wiki/Category:Xbox_360
+            - listitem [ref=e359]:
+              - text: 
+              - link "Xbox One" [ref=e360] [cursor=pointer]:
+                - /url: /wiki/Category:Xbox_One
+            - listitem [ref=e361]:
+              - text: 
+              - link "Xbox Series X" [ref=e362] [cursor=pointer]:
+                - /url: /wiki/Category:Xbox_Series_X
+            - listitem [ref=e363]:
+              - text: 
+              - link "Windows" [ref=e364] [cursor=pointer]:
+                - /url: /wiki/Category:Windows
+            - listitem [ref=e365]:
+              - text: 
+              - link "Other" [ref=e366] [cursor=pointer]:
+                - /url: /wiki/Category:Systems

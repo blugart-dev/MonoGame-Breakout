@@ -120,7 +120,7 @@ public sealed class PlayingState : GameState
             if (side == HitSide.None)
                 continue;
 
-            ReflectAndSeparate(ball, brick.Bounds, side);
+            CollisionHelper.ReflectAndSeparate(ball, brick.Bounds, side);
 
             if (brick.Hit())
             {
@@ -141,35 +141,6 @@ public sealed class PlayingState : GameState
             // simultaneous overlap resolves cleanly on the next 60 Hz step
             // anyway, and processing both would double-flip the velocity.
             break;
-        }
-    }
-
-    /// <summary>
-    /// Push the ball out of the rectangle along the impact axis, then point
-    /// the velocity away from it. Setting the sign outright (rather than
-    /// negating) makes the response idempotent if we ever resolve twice.
-    /// </summary>
-    private static void ReflectAndSeparate(Ball ball, Rectangle target, HitSide side)
-    {
-        Rectangle overlap = Rectangle.Intersect(ball.Bounds, target);
-        switch (side)
-        {
-            case HitSide.Left:
-                ball.Position.X -= overlap.Width;
-                ball.Velocity.X = -MathF.Abs(ball.Velocity.X);
-                break;
-            case HitSide.Right:
-                ball.Position.X += overlap.Width;
-                ball.Velocity.X = MathF.Abs(ball.Velocity.X);
-                break;
-            case HitSide.Top:
-                ball.Position.Y -= overlap.Height;
-                ball.Velocity.Y = -MathF.Abs(ball.Velocity.Y);
-                break;
-            case HitSide.Bottom:
-                ball.Position.Y += overlap.Height;
-                ball.Velocity.Y = MathF.Abs(ball.Velocity.Y);
-                break;
         }
     }
 

@@ -129,6 +129,32 @@ public class Ball
             Velocity = Vector2.Normalize(Velocity) * Speed;
     }
 
+    /// <summary>
+    /// Set the speed outright, rescaling any in-flight velocity to match.
+    /// The classic mode uses this for its four discrete speed steps, where
+    /// RampSpeed's gentle per-brick climb would be the wrong model.
+    /// </summary>
+    public void OverrideSpeed(float speed)
+    {
+        Speed = speed;
+        if (Velocity != Vector2.Zero)
+            Velocity = Vector2.Normalize(Velocity) * Speed;
+    }
+
+    /// <summary>
+    /// Take the ball out of play without removing it from the list: parked
+    /// off-screen, motionless, trail cleared. The classic serve uses this —
+    /// the 1976 ball is not carried on the paddle, it *materializes*
+    /// mid-screen when served, so between serves there is nothing to show.
+    /// </summary>
+    public void Park()
+    {
+        _attachedTo = null;
+        Velocity = Vector2.Zero;
+        Position = new Vector2(-100f, -100f);
+        _trailCount = 0;
+    }
+
     public void Draw(SpriteBatch spriteBatch)
     {
         // Trail first so the ball draws on top of it. Walk from oldest to

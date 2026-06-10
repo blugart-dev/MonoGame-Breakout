@@ -1,0 +1,10 @@
+[     440ms] [LOG] using Relevant Manager @ https://strategywiki.org/wiki/Breakout_(Atari_2600)/Walkthrough:409
+[     444ms] [WARNING] [GPT] PubAdsService.disableInitialLoad is deprecated, use googletag.setConfig({disableInitialLoad: ...}) instead.
+https://goo.gle/gpt-message#170 @ https://8ek6ecdmic556zz77.ay.delivery/client-v2.js:6
+[     446ms] [WARNING] [GPT] Slot.setCollapseEmptyDiv is deprecated, use Slot.setConfig({collapseDiv: ...}) instead.
+https://goo.gle/gpt-message#171 @ https://8ek6ecdmic556zz77.ay.delivery/client-v2.js:6
+[     543ms] [WARNING]  is not a valid value for uspDnsText @ https://8ek6ecdmic556zz77.ay.delivery/client-v2.js:6
+[     574ms] [LOG] uspData set usp out of jurisiction value @ https://cmp.inmobi.com/tcfv2/61/cmp2.js?referer=strategywiki.org:1
+[     578ms] [LOG] Less than 30 minute have passed since the stored timestamp. @ https://cmp.inmobi.com/tcfv2/61/cmp2.js?referer=strategywiki.org:1
+[     806ms] [LOG] 2026/06/10 14:02:51 Welcome to rebounder! Env: prod Version: dbc20d4 @ :1
+[    4578ms] [WARNING] The resource https://cdn.wikimg.net/en/strategywiki/images/5/59/Site-wiki.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://strategywiki.org/wiki/Breakout_(Atari_2600)/Walkthrough:0

@@ -18,14 +18,35 @@ public sealed class GameStateManager
     public GameStateManager(SpriteFont font)
     {
         Font = font;
-        StartNewGame();
+
+        // A session exists even under the title screen: the shell reads
+        // Session.Shake every Draw, and the debug overlay reads its counts.
+        // The title state simply never draws or updates the world.
+        Session = new GameSession(GameMode.Modern);
+        ChangeState(new TitleState(this));
     }
 
-    public void StartNewGame()
+    public void StartNewGame(GameMode mode, int startLevel = 0)
     {
-        Session = new GameSession();
-        ChangeState(new ReadyState(this));
+        Session = new GameSession(mode, startLevel);
+        ChangeState(CreateServeState());
     }
+
+    /// <summary>Same mode, same starting level — the "play again" path.</summary>
+    public void RestartCurrentGame()
+        => StartNewGame(Session.Mode, Session.StartLevelIndex);
+
+    public void GoToTitle() => ChangeState(new TitleState(this));
+
+    /// <summary>
+    /// The one place that maps a mode to its rule-set states. Every "back to
+    /// the serve" transition (life lost, new game) routes through here, so
+    /// adding a mode never means hunting down transitions.
+    /// </summary>
+    public GameState CreateServeState()
+        => Session.Mode == GameMode.Classic
+            ? new ClassicReadyState(this)
+            : new ReadyState(this);
 
     public void ChangeState(GameState next)
     {
@@ -47,7 +68,7 @@ public sealed class GameStateManager
     /// </summary>
     public void NotifyFocusLost()
     {
-        if (_current is PlayingState)
+        if (_current is PlayingState or ClassicPlayingState)
             ChangeState(new PauseState(this, _current));
     }
 

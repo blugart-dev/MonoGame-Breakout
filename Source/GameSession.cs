@@ -27,6 +27,8 @@ public class GameSession
         "Content/Levels/level03.txt",
     };
 
+    public static int LevelCount => LevelPaths.Length; // the title screen's level select needs the range
+
     public readonly Random Rng = new();
     public readonly Paddle Paddle = new();
 
@@ -45,6 +47,16 @@ public class GameSession
     public int Lives = StartingLives;
     public int LevelIndex { get; private set; } // 0-based; the HUD shows +1
 
+    public GameMode Mode { get; }
+    public int StartLevelIndex { get; } // modern: where the title screen started this run
+
+    // Classic-mode wall progression. The 1976 game is exactly two walls: when
+    // the first is cleared, AwaitingSecondWall arms, and the wall materializes
+    // mid-volley on the ball's next paddle-or-backwall contact (the manual's
+    // rule — no interstitial, no new serve).
+    public int WallNumber { get; private set; } = 1;
+    public bool AwaitingSecondWall { get; set; }
+
     public bool HasNextLevel => LevelIndex + 1 < LevelPaths.Length;
 
     // Cached HUD text: $"SCORE {Score}" allocates a new string every call, and
@@ -57,11 +69,20 @@ public class GameSession
     private string _levelText;
     private int _levelTextValue = -1;
 
-    public GameSession()
+    public GameSession(GameMode mode, int startLevel = 0)
     {
+        Mode = mode;
+        StartLevelIndex = startLevel;
+        LevelIndex = startLevel;
         Shake = new ScreenShake(Rng);
-        Bricks = LevelLoader.Load(LevelPaths[0]);
-        ResetForServe();
+        Bricks = mode == GameMode.Classic
+            ? ClassicWall.Build()
+            : LevelLoader.Load(LevelPaths[startLevel]);
+
+        if (mode == GameMode.Classic)
+            PrepareClassicServe();
+        else
+            ResetForServe();
     }
 
     /// <summary>
@@ -72,11 +93,37 @@ public class GameSession
     /// </summary>
     public void ResetForServe()
     {
+        EnsureSingleBall();
+        Balls[0].AttachTo(Paddle);
+    }
+
+    /// <summary>
+    /// The classic counterpart: the 1976 ball is never carried on the paddle —
+    /// it materializes mid-screen on serve — so between serves the ball is
+    /// parked off-screen. The paddle also recovers from the half-width
+    /// breakout penalty here: the manual ties the penalty to the volley.
+    /// </summary>
+    public void PrepareClassicServe()
+    {
+        EnsureSingleBall();
+        Balls[0].Park();
+        Paddle.ResetWidth();
+    }
+
+    private void EnsureSingleBall()
+    {
         if (Balls.Count == 0)
             Balls.Add(new Ball());
         else if (Balls.Count > 1)
             Balls.RemoveRange(1, Balls.Count - 1);
-        Balls[0].AttachTo(Paddle);
+    }
+
+    /// <summary>Classic only: restore the full 8x14 wall as wall two.</summary>
+    public void SpawnSecondWall()
+    {
+        WallNumber = 2;
+        AwaitingSecondWall = false;
+        Bricks = ClassicWall.Build();
     }
 
     /// <summary>
@@ -129,10 +176,13 @@ public class GameSession
         }
         spriteBatch.DrawString(font, _scoreText, new Vector2(12, 8), Color.White);
 
-        if (_levelTextValue != LevelIndex)
+        int levelValue = Mode == GameMode.Classic ? WallNumber : LevelIndex;
+        if (_levelTextValue != levelValue)
         {
-            _levelTextValue = LevelIndex;
-            _levelText = $"LEVEL {LevelIndex + 1}";
+            _levelTextValue = levelValue;
+            _levelText = Mode == GameMode.Classic
+                ? $"CLASSIC - WALL {WallNumber}"
+                : $"LEVEL {LevelIndex + 1}";
         }
         spriteBatch.DrawCenteredText(font, _levelText,
             new Vector2(Screen.Width / 2f, 16), new Color(150, 150, 165), 0.75f);

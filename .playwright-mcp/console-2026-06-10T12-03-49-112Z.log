@@ -1,0 +1,18 @@
+[     377ms] [LOG] using Relevant Manager @ https://strategywiki.org/wiki/Breakout_(Atari_2600)/Walkthrough:409
+[     377ms] [WARNING] [GPT] PubAdsService.setTargeting is deprecated, use googletag.setConfig({targeting: ...}) instead.
+https://goo.gle/gpt-message#170 @ https://8ek6ecdmic556zz77.ay.delivery/client-v2.js:6
+[     393ms] [WARNING]  is not a valid value for uspDnsText @ https://8ek6ecdmic556zz77.ay.delivery/client-v2.js:6
+[     447ms] [LOG] uspData set usp out of jurisiction value @ https://cmp.inmobi.com/tcfv2/61/cmp2.js?referer=strategywiki.org:1
+[     451ms] [LOG] Less than 30 minute have passed since the stored timestamp. @ https://cmp.inmobi.com/tcfv2/61/cmp2.js?referer=strategywiki.org:1
+[     532ms] [WARNING] [GPT] Slot.setCollapseEmptyDiv is deprecated, use Slot.setConfig({collapseDiv: ...}) instead.
+https://goo.gle/gpt-message#171 @ https://8ek6ecdmic556zz77.ay.delivery/client-v2.js:6
+[     779ms] [LOG] 2026/06/10 14:03:49 Welcome to rebounder! Env: prod Version: dbc20d4 @ :1
+[    4818ms] [WARNING] The resource https://cdn.wikimg.net/en/strategywiki/images/5/59/Site-wiki.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://strategywiki.org/wiki/Breakout_(Atari_2600)/Walkthrough:0
+[    8562ms] [WARNING] The resource https://cdn.wikimg.net/en/strategywiki/images/5/59/Site-wiki.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://strategywiki.org/wiki/Breakout_(Atari_2600)/Walkthrough:0
+[   10592ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://id.crwdcntrl.net/id?gdpr_applies=false&c=17614:0
+[   15903ms] [WARNING] The resource https://cdn.wikimg.net/en/strategywiki/images/5/59/Site-wiki.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://strategywiki.org/wiki/Breakout_(Atari_2600)/Walkthrough:0
+[   20084ms] [LOG] addEventListener:  {cmpId: 10, cmpVersion: 61, gdprApplies: true, tcfPolicyVersion: 5, tcString: } true @ https://s.console.adtarget.com.tr/sync.html?aid=954530:0
+[   20139ms] [ERROR] Failed to load resource: the server responded with a status of 451 (Unavailable For Legal Reasons) @ https://s.console.adtarget.com.tr/sync/?aid=954530&gdpr_source=cmpuishown&refer=https://ittpx.eskimi.com/:0
+[   20183ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://secure.adnxs.com/getuid?https://csync.smilewanted.com/set_partner_userid_get/appnexus/$UID?gdpr=0&gdpr_consent=:0
+[   21409ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://cs.admanmedia.com/c899400112bd5b9243b3993d9a074653.gif?puid=[UID]&redir=https%3A%2F%2Fcsync.smilewanted.com%2Fset_partner_userid_get%2Fillumin%2F%5BUID%5D&gdpr=0&gdpr_consent=:0
+[   29265ms] [WARNING] The resource https://cdn.wikimg.net/en/strategywiki/images/5/59/Site-wiki.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://strategywiki.org/wiki/Breakout_(Atari_2600)/Walkthrough:0

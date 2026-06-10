@@ -34,9 +34,12 @@ automatically and the content pipeline runs as part of the build.
 
 | Input | Action |
 |---|---|
+| `↑` `↓` / `W` `S` (title) | Select mode |
+| `←` `→` (title, modern) | Pick starting level |
 | Mouse / `←` `→` / `A` `D` | Move paddle |
-| `Space` / Left click | Launch ball |
+| `Space` / Left click | Launch ball (modern) / serve (classic) |
 | `Enter` / Click (on game over) | Play again |
+| `T` (on game over) | Back to the title screen |
 | `P` | Pause / resume (also auto-pauses when the window loses focus) |
 | `M` | Music on / off |
 | `F11` | Borderless fullscreen |
@@ -64,8 +67,18 @@ automatically and the content pipeline runs as part of the build.
 
 ## Features
 
-- Classic loop: Ready → Playing → LifeLost → GameOver (plus Pause and
-  LevelCleared), 3 lives, score + level HUD
+- **Two rule sets, one engine.** A title screen picks the mode; each mode is
+  just a different pair of states driving the same entities
+- **Modern mode:** three tiered boards, power-ups, multiball, continuous
+  paddle aiming, per-brick speed ramp
+- **Classic 1976 mode:** the original arcade rules, reconstructed from
+  Atari's operation manual — 8×14 one-hit wall scored 1/1/3/3/5/5/7/7 by row
+  (448/wall), four discrete ball speeds (4th hit, 12th hit, instant max on
+  orange/red), four fixed paddle rebound exits (never perpendicular), one
+  brick per trip, half-width paddle after breaking through, hostile
+  mid-screen serve, and exactly two walls: max score 896
+- Arcade loop: Title → Ready → Playing → LifeLost → GameOver (plus Pause and
+  LevelCleared), 3 lives/serves, score + level HUD
 - Three levels as plain-text grids (`Content/Levels/*.txt`);
   tier digit = hit points = color, `X` = unbreakable; score and lives
   carry across levels, ball speed resets per board
@@ -90,12 +103,14 @@ Program.cs             entry point — two lines
 BreakoutGame.cs        application shell: window, loop, two-pass draw
 Source/
   Screen.cs            virtual resolution constants
-  GameSession.cs       the world: entities, score, lives, level index
+  GameMode.cs          Modern vs Classic — which states drive the session
+  GameSession.cs       the world: entities, score, lives, level/wall index
   Entities/            Paddle, Ball, Brick, PowerUp
-  Systems/             input + action map, collision, levels, virtual screen,
-                       particles, shake, audio synth + music, debug overlay
-  States/              GameState base + Ready/Playing/Pause/LifeLost/
-                       LevelCleared/GameOver
+  Systems/             input + action map, collision, levels, classic 1976
+                       rules + wall, virtual screen, particles, shake,
+                       audio synth + music, debug overlay
+  States/              GameState base + Title/Ready/Playing/ClassicReady/
+                       ClassicPlaying/Pause/LifeLost/LevelCleared/GameOver
 Content/
   Content.mgcb         pipeline manifest (font only)
   Fonts/Hud.spritefont rasterized at build time by the pipeline

@@ -1,0 +1,12 @@
+[    1228ms] [LOG] using Relevant Manager @ https://strategywiki.org/wiki/Super_Breakout:420
+[    1229ms] [WARNING] [GPT] PubAdsService.setTargeting is deprecated, use googletag.setConfig({targeting: ...}) instead.
+https://goo.gle/gpt-message#170 @ https://securepubads.g.doubleclick.net/pagead/managed/js/gpt/m202606040101/pubads_impl.js?cb=31098994:18
+[    1270ms] [WARNING]  is not a valid value for uspDnsText @ https://cmp.inmobi.com/tcfv2/61/cmp2.js?referer=strategywiki.org:1
+[    1391ms] [LOG] uspData set usp out of jurisiction value @ https://cmp.inmobi.com/tcfv2/61/cmp2.js?referer=strategywiki.org:1
+[    1400ms] [LOG] Visit event sent successfully. @ https://cmp.inmobi.com/tcfv2/61/cmp2.js?referer=strategywiki.org:1
+[    1665ms] [WARNING] [GPT] Slot.setCollapseEmptyDiv is deprecated, use Slot.setConfig({collapseDiv: ...}) instead.
+https://goo.gle/gpt-message#171 @ https://8ek6ecdmic556zz77.ay.delivery/client-v2.js:6
+[    2354ms] [LOG] 2026/06/10 14:01:31 Welcome to rebounder! Env: prod Version: dbc20d4 @ :1
+[    5811ms] [WARNING] The resource https://cdn.wikimg.net/en/strategywiki/images/5/59/Site-wiki.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://strategywiki.org/wiki/Super_Breakout:0
+[   11723ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://id.crwdcntrl.net/id?gdpr_applies=false&c=17614:0
+[   16922ms] [WARNING] The resource https://cdn.wikimg.net/en/strategywiki/images/5/59/Site-wiki.png was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://strategywiki.org/wiki/Super_Breakout:0

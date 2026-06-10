@@ -1,0 +1,645 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - navigation [ref=e4]:
+        - generic [ref=e5]:
+          - link "ManualsLib" [ref=e7] [cursor=pointer]:
+            - /url: https://www.manualslib.com
+            - img "ManualsLib" [ref=e8]
+          - generic [ref=e9]:
+            - search [ref=e10]:
+              - generic [ref=e11]:
+                - searchbox "Search for manual" [ref=e12]
+                - button [ref=e13] [cursor=pointer]:
+                  - img [ref=e14]
+            - link "Sign In" [ref=e16] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e17]
+              - generic [ref=e19]: Sign In
+      - generic [ref=e21]:
+        - link "Download" [ref=e22] [cursor=pointer]:
+          - /url: /download/1914666/Atari-Breakout.html
+          - img [ref=e23]
+          - generic [ref=e25]: Download
+        - link "Table of Contents" [ref=e26] [cursor=pointer]:
+          - /url: /manual/1914666/Atari-Breakout.html?page=63#manual
+          - img [ref=e27]
+          - generic [ref=e29]: Table of Contents
+        - link "Bookmark this manual" [ref=e31] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e32]
+        - link "Share this manual" [ref=e35] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e36]
+        - link "Bookmark this manual" [ref=e39] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e40]
+        - link "Print this page" [ref=e42] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e43]
+    - generic [ref=e45]:
+      - generic [ref=e47]:
+        - figure [ref=e49]
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - list [ref=e52]:
+              - listitem [ref=e53]:
+                - link "Manuals" [ref=e54] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e55]:
+                - text: /
+                - link "Brands" [ref=e56] [cursor=pointer]:
+                  - /url: /brand/
+              - listitem [ref=e57]:
+                - text: /
+                - link "Atari Manuals" [ref=e58] [cursor=pointer]:
+                  - /url: /brand/atari/
+              - listitem [ref=e59]:
+                - text: /
+                - link "Arcade Game Machines" [ref=e60] [cursor=pointer]:
+                  - /url: /brand/atari/arcade-game-machines.html
+              - listitem [ref=e61]:
+                - text: /
+                - link "Super Breakout" [ref=e62] [cursor=pointer]:
+                  - /url: /products/Atari-Super-Breakout-10588701.html
+              - listitem [ref=e63]:
+                - text: /
+                - link "Operation, maintenance & service manual" [ref=e64] [cursor=pointer]:
+                  - /url: /manual/1914666/Atari-Breakout.html
+            - heading "Attract Mode; Play Mode; Typical Picture During Attract Mode - Atari Breakout Operation, Maintenance & Service Manual" [level=1] [ref=e66]
+          - generic [ref=e67]:
+            - generic [ref=e68]:
+              - text: Also See for Breakout
+              - generic [ref=e69]: ":"
+            - list [ref=e70]:
+              - listitem [ref=e71]:
+                - link "Operation, maintenance and service manual" [ref=e72] [cursor=pointer]:
+                  - /url: /manual/1646814/Atari-Super-Breakout.html
+                - text: (116 pages)
+              - text: ","
+              - listitem [ref=e73]:
+                - link "Operation, maintenance and service manual" [ref=e74] [cursor=pointer]:
+                  - /url: /manual/4138372/Atari-Breakout.html
+                - text: (60 pages)
+      - generic [ref=e76]:
+        - img [ref=e78] [cursor=pointer]
+        - img [ref=e81] [cursor=pointer]
+        - generic [ref=e86]:
+          - link "1" [ref=e88] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html#manual
+            - generic [ref=e90]: "1"
+          - link "2" [ref=e92] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=2#manual
+            - generic [ref=e94]: "2"
+          - link "3" [ref=e96] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=3#manual
+            - generic [ref=e98]: "3"
+          - link "4" [ref=e100] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=4#manual
+            - generic [ref=e102]: "4"
+          - link "5" [ref=e104] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=5#manual
+            - generic [ref=e106]: "5"
+          - link "6" [ref=e108] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=6#manual
+            - generic [ref=e110]: "6"
+          - link "7" [ref=e112] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=7#manual
+            - generic [ref=e114]: "7"
+          - link "8" [ref=e116] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=8#manual
+            - generic [ref=e118]: "8"
+          - link "9" [ref=e120] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=9#manual
+            - generic [ref=e122]: "9"
+          - link "10" [ref=e124] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=10#manual
+            - generic [ref=e126]: "10"
+          - link "11" [ref=e128] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=11#manual
+            - generic [ref=e130]: "11"
+          - link "12" [ref=e132] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=12#manual
+            - generic [ref=e134]: "12"
+          - link "13" [ref=e136] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=13#manual
+            - generic [ref=e138]: "13"
+          - link "14" [ref=e140] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=14#manual
+            - generic [ref=e142]: "14"
+          - link "15" [ref=e144] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=15#manual
+            - generic [ref=e145]: "15"
+          - link "16" [ref=e147] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=16#manual
+            - generic [ref=e148]: "16"
+          - link "17" [ref=e150] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=17#manual
+            - generic [ref=e151]: "17"
+          - link "18" [ref=e153] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=18#manual
+            - generic [ref=e154]: "18"
+          - link "19" [ref=e156] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=19#manual
+            - generic [ref=e157]: "19"
+          - link "20" [ref=e159] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=20#manual
+            - generic [ref=e160]: "20"
+          - link "21" [ref=e162] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=21#manual
+            - generic [ref=e163]: "21"
+          - link "22" [ref=e165] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=22#manual
+            - generic [ref=e166]: "22"
+          - link "23" [ref=e168] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=23#manual
+            - generic [ref=e169]: "23"
+          - link "24" [ref=e171] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=24#manual
+            - generic [ref=e172]: "24"
+          - link "25" [ref=e174] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=25#manual
+            - generic [ref=e175]: "25"
+          - link "26" [ref=e177] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=26#manual
+            - generic [ref=e178]: "26"
+          - link "27" [ref=e180] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=27#manual
+            - generic [ref=e181]: "27"
+          - link "28" [ref=e183] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=28#manual
+            - generic [ref=e184]: "28"
+          - link "29" [ref=e186] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=29#manual
+            - generic [ref=e187]: "29"
+          - link "30" [ref=e189] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=30#manual
+            - generic [ref=e190]: "30"
+          - link "31" [ref=e192] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=31#manual
+            - generic [ref=e193]: "31"
+          - link "32" [ref=e195] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=32#manual
+            - generic [ref=e196]: "32"
+          - link "33" [ref=e198] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=33#manual
+            - generic [ref=e199]: "33"
+          - link "34" [ref=e201] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=34#manual
+            - generic [ref=e202]: "34"
+          - link "35" [ref=e204] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=35#manual
+            - generic [ref=e205]: "35"
+          - link "36" [ref=e207] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=36#manual
+            - generic [ref=e208]: "36"
+          - link "37" [ref=e210] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=37#manual
+            - generic [ref=e211]: "37"
+          - link "38" [ref=e213] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=38#manual
+            - generic [ref=e214]: "38"
+          - link "39" [ref=e216] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=39#manual
+            - generic [ref=e217]: "39"
+          - link "40" [ref=e219] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=40#manual
+            - generic [ref=e220]: "40"
+          - link "41" [ref=e222] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=41#manual
+            - generic [ref=e223]: "41"
+          - link "42" [ref=e225] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=42#manual
+            - generic [ref=e226]: "42"
+          - link "43" [ref=e228] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=43#manual
+            - generic [ref=e229]: "43"
+          - link "44" [ref=e231] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=44#manual
+            - generic [ref=e232]: "44"
+          - link "45" [ref=e234] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=45#manual
+            - generic [ref=e235]: "45"
+          - link "46" [ref=e237] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=46#manual
+            - generic [ref=e238]: "46"
+          - link "47" [ref=e240] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=47#manual
+            - generic [ref=e241]: "47"
+          - link "48" [ref=e243] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=48#manual
+            - generic [ref=e244]: "48"
+          - link "49" [ref=e246] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=49#manual
+            - generic [ref=e247]: "49"
+          - link "50" [ref=e249] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=50#manual
+            - generic [ref=e250]: "50"
+          - link "51" [ref=e252] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=51#manual
+            - generic [ref=e253]: "51"
+          - link "52" [ref=e255] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=52#manual
+            - generic [ref=e256]: "52"
+          - link "53" [ref=e258] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=53#manual
+            - generic [ref=e259]: "53"
+          - link "54" [ref=e261] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=54#manual
+            - generic [ref=e262]: "54"
+          - link "55" [ref=e264] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=55#manual
+            - generic [ref=e265]: "55"
+          - link "56" [ref=e267] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=56#manual
+            - generic [ref=e268]: "56"
+          - link "57" [ref=e270] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=57#manual
+            - generic [ref=e271]: "57"
+          - link "58" [ref=e273] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=58#manual
+            - generic [ref=e274]: "58"
+          - link "59" [ref=e276] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=59#manual
+            - generic [ref=e277]: "59"
+          - link "60" [ref=e279] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=60#manual
+            - generic [ref=e280]: "60"
+          - link "61" [ref=e282] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=61#manual
+            - generic [ref=e283]: "61"
+          - link "62" [ref=e285] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=62#manual
+            - generic [ref=e286]: "62"
+          - link "Table Of Contents 63" [ref=e288] [cursor=pointer]:
+            - /url: /manual/1914666/Atari-Breakout.html?page=63#manual
+            - generic [ref=e289]: Table Of Contents
+            - generic [ref=e290]: "63"
+      - generic [ref=e292]:
+        - tablist [ref=e293]:
+          - tab "page 10 of 63" [ref=e294]:
+            - generic [ref=e297] [cursor=pointer]:
+              - text: page
+              - textbox "Current page" [ref=e298]: "10"
+              - text: of 63
+          - tab "Table of Contents" [ref=e299] [cursor=pointer]:
+            - img [ref=e300]
+            - text: Table of Contents
+          - tab "Troubleshooting" [ref=e302] [cursor=pointer]:
+            - img [ref=e303]
+            - text: Troubleshooting
+          - tab "Bookmarks" [ref=e305] [cursor=pointer]:
+            - img [ref=e306]
+            - text: Bookmarks
+        - generic [ref=e308]:
+          - generic:
+            - textbox "Search in this manual" [ref=e309]
+            - link [ref=e310] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e311]
+      - tabpanel [ref=e315]:
+        - generic [ref=e316]:
+          - generic [ref=e317]:
+            - generic [ref=e318]:
+              - link [ref=e319] [cursor=pointer]:
+                - /url: /manual/1914666/Atari-Breakout.html?page=9#manual
+                - img [ref=e320]
+              - link [ref=e322] [cursor=pointer]:
+                - /url: /manual/1914666/Atari-Breakout.html?page=11#manual
+                - img [ref=e323]
+              - link [ref=e326] [cursor=pointer]:
+                - /url: "#"
+                - img [ref=e327]
+            - link "Table of Contents" [ref=e331] [cursor=pointer]:
+              - /url: /manual/1914666/Atari-Breakout.html?page=63#manual
+          - generic [ref=e334]:
+            - link "Previous Page" [ref=e336] [cursor=pointer]:
+              - /url: /manual/1914666/Atari-Breakout.html?page=9#manual
+              - img [ref=e337]
+              - text: Previous
+              - generic [ref=e339]: Page
+            - link "Next Page" [ref=e341] [cursor=pointer]:
+              - /url: /manual/1914666/Atari-Breakout.html?page=11#manual
+              - text: Next
+              - generic [ref=e342]: Page
+              - img [ref=e343]
+            - list [ref=e346]:
+              - listitem [ref=e347]:
+                - link "1" [ref=e348] [cursor=pointer]:
+                  - /url: /manual/1914666/Atari-Breakout.html#manual
+              - listitem [ref=e349]:
+                - generic [ref=e350]: ...
+              - listitem [ref=e351]:
+                - link "7" [ref=e352] [cursor=pointer]:
+                  - /url: /manual/1914666/Atari-Breakout.html?page=7#manual
+              - listitem [ref=e353]:
+                - link "8" [ref=e354] [cursor=pointer]:
+                  - /url: /manual/1914666/Atari-Breakout.html?page=8#manual
+              - listitem [ref=e355]:
+                - link "9" [ref=e356] [cursor=pointer]:
+                  - /url: /manual/1914666/Atari-Breakout.html?page=9#manual
+              - listitem [ref=e357]:
+                - link "10" [ref=e358]:
+                  - /url: /manual/1914666/Atari-Breakout.html?page=10#manual
+              - listitem [ref=e359]:
+                - link "11" [ref=e360] [cursor=pointer]:
+                  - /url: /manual/1914666/Atari-Breakout.html?page=11#manual
+              - listitem [ref=e361]:
+                - link "12" [ref=e362] [cursor=pointer]:
+                  - /url: /manual/1914666/Atari-Breakout.html?page=12#manual
+              - listitem [ref=e363]:
+                - link "13" [ref=e364] [cursor=pointer]:
+                  - /url: /manual/1914666/Atari-Breakout.html?page=13#manual
+              - listitem [ref=e365]:
+                - link "14" [ref=e366] [cursor=pointer]:
+                  - /url: /manual/1914666/Atari-Breakout.html?page=14#manual
+      - generic [ref=e371]:
+        - img "Need help?" [ref=e373]
+        - generic [ref=e374]:
+          - heading "Need help?" [level=2] [ref=e375]
+          - paragraph [ref=e376]: Do you have a question about the Breakout and is the answer not in the manual?
+          - generic [ref=e377]:
+            - button "Ask a question" [ref=e378] [cursor=pointer]
+            - button "Go to Questions and Answers" [ref=e379] [cursor=pointer]:
+              - img [ref=e380]
+              - text: Go to Questions and Answers
+      - generic [ref=e383]:
+        - heading "Related Manuals for Atari Breakout" [level=4] [ref=e384]
+        - generic [ref=e385]:
+          - list [ref=e386]:
+            - listitem [ref=e387]:
+              - link "Video Gaming Accessories Atari Super Breakout Operation, Maintenance And Service Manual" [ref=e388] [cursor=pointer]:
+                - /url: /manual/1646814/Atari-Super-Breakout.html
+                - img "Video Gaming Accessories Atari Super Breakout Operation, Maintenance And Service Manual" [ref=e389]
+              - generic [ref=e390]:
+                - link "Video Gaming Accessories Atari Super Breakout Operation, Maintenance And Service Manual" [ref=e391] [cursor=pointer]:
+                  - /url: /manual/1646814/Atari-Super-Breakout.html
+                - generic [ref=e392]: (116 pages)
+            - listitem [ref=e393]:
+              - link "Arcade Game Machines Atari BREAKOUT Operation, Maintenance And Service Manual" [ref=e394] [cursor=pointer]:
+                - /url: /manual/4138372/Atari-Breakout.html
+                - img "Arcade Game Machines Atari BREAKOUT Operation, Maintenance And Service Manual" [ref=e395]
+              - generic [ref=e396]:
+                - link "Arcade Game Machines Atari BREAKOUT Operation, Maintenance And Service Manual" [ref=e397] [cursor=pointer]:
+                  - /url: /manual/4138372/Atari-Breakout.html
+                - generic [ref=e398]: (60 pages)
+            - listitem [ref=e399]:
+              - link "Arcade Game Machines Atari BATLEZONE CABARET Maintenance And Service Manual" [ref=e400] [cursor=pointer]:
+                - /url: /manual/4121925/Atari-Batlezone-Cabaret.html
+                - img "Arcade Game Machines Atari BATLEZONE CABARET Maintenance And Service Manual" [ref=e401]
+              - generic [ref=e402]:
+                - link "Arcade Game Machines Atari BATLEZONE CABARET Maintenance And Service Manual" [ref=e403] [cursor=pointer]:
+                  - /url: /manual/4121925/Atari-Batlezone-Cabaret.html
+                - generic [ref=e404]: (64 pages)
+          - list [ref=e405]:
+            - listitem [ref=e406]:
+              - link "Arcade Game Machines Atari BASEBALL Operation, Maintenance And Service Manual" [ref=e407] [cursor=pointer]:
+                - /url: /manual/4158025/Atari-Baseball.html
+                - img "Arcade Game Machines Atari BASEBALL Operation, Maintenance And Service Manual" [ref=e408]
+              - generic [ref=e409]:
+                - link "Arcade Game Machines Atari BASEBALL Operation, Maintenance And Service Manual" [ref=e410] [cursor=pointer]:
+                  - /url: /manual/4158025/Atari-Baseball.html
+                - generic [ref=e411]: (71 pages)
+            - listitem [ref=e412]:
+              - link "Arcade Game Machines Atari VS. Atari R.B.I. Baseball Installation Instructions Manual" [ref=e413] [cursor=pointer]:
+                - /url: /manual/3990210/Atari-Vs-Atari-R-B-I-Baseball.html
+                - img "Arcade Game Machines Atari VS. Atari R.B.I. Baseball Installation Instructions Manual" [ref=e414]
+              - generic [ref=e415]:
+                - link "Arcade Game Machines Atari VS. Atari R.B.I. Baseball Installation Instructions Manual" [ref=e416] [cursor=pointer]:
+                  - /url: /manual/3990210/Atari-Vs-Atari-R-B-I-Baseball.html
+                - generic [ref=e417]: (9 pages)
+      - generic [ref=e418]:
+        - heading "Related Content for Atari Breakout" [level=4] [ref=e419]
+        - generic [ref=e420]:
+          - list [ref=e421]:
+            - listitem [ref=e422]:
+              - link "Atari 4-Player Football" [ref=e423] [cursor=pointer]:
+                - /url: /manual/4206543/Atari-4-Player-Football.html?page=20
+                - img "Atari 4-Player Football" [ref=e424]
+              - generic [ref=e425]:
+                - link "4-Player Football Attract Mode" [ref=e426] [cursor=pointer]:
+                  - /url: /manual/4206543/Atari-4-Player-Football.html?page=20
+                - link "Atari 4-Player Football" [ref=e428] [cursor=pointer]:
+                  - /url: /products/Atari-4-Player-Football-15119543.html
+            - listitem [ref=e429]:
+              - link "Atari NIGHT DRIVER" [ref=e430] [cursor=pointer]:
+                - /url: /manual/4205767/Atari-Night-Driver.html?page=7
+                - img "Atari NIGHT DRIVER" [ref=e431]
+              - generic [ref=e432]:
+                - link "NIGHT DRIVER Attract Mode" [ref=e433] [cursor=pointer]:
+                  - /url: /manual/4205767/Atari-Night-Driver.html?page=7
+                - link "Atari NIGHT DRIVER" [ref=e435] [cursor=pointer]:
+                  - /url: /products/Atari-Night-Driver-14965449.html
+            - listitem [ref=e436]:
+              - link "Atari ROAD RUNNER" [ref=e437] [cursor=pointer]:
+                - /url: /manual/4195258/Atari-Road-Runner.html?page=31
+                - img "Atari ROAD RUNNER" [ref=e438]
+              - generic [ref=e439]:
+                - link "ROAD RUNNER Attract Mode" [ref=e440] [cursor=pointer]:
+                  - /url: /manual/4195258/Atari-Road-Runner.html?page=31
+                - link "Atari ROAD RUNNER" [ref=e442] [cursor=pointer]:
+                  - /url: /products/Atari-Road-Runner-15096859.html
+            - listitem [ref=e443]:
+              - link "Atari PETER PACK RAT" [ref=e444] [cursor=pointer]:
+                - /url: /manual/4174978/Atari-Peter-Pack-Rat.html?page=30
+                - img "Atari PETER PACK RAT" [ref=e445]
+              - generic [ref=e446]:
+                - link "PETER PACK RAT Attract Mode" [ref=e447] [cursor=pointer]:
+                  - /url: /manual/4174978/Atari-Peter-Pack-Rat.html?page=30
+                - link "Atari PETER PACK RAT" [ref=e449] [cursor=pointer]:
+                  - /url: /products/Atari-Peter-Pack-Rat-15057268.html
+            - listitem [ref=e450]:
+              - link "Atari SPACE DUEL" [ref=e451] [cursor=pointer]:
+                - /url: /manual/4174295/Atari-Space-Duel.html?page=20
+                - img "Atari SPACE DUEL" [ref=e452]
+              - generic [ref=e453]:
+                - link "SPACE DUEL Attract Mode" [ref=e454] [cursor=pointer]:
+                  - /url: /manual/4174295/Atari-Space-Duel.html?page=20
+                - link "Atari SPACE DUEL" [ref=e456] [cursor=pointer]:
+                  - /url: /products/Atari-Space-Duel-14883654.html
+            - listitem [ref=e457]:
+              - link "Atari ASTEROIDS" [ref=e458] [cursor=pointer]:
+                - /url: /manual/4171318/Atari-Asteroids.html?page=14
+                - img "Atari ASTEROIDS" [ref=e459]
+              - generic [ref=e460]:
+                - link "ASTEROIDS Attract Mode" [ref=e461] [cursor=pointer]:
+                  - /url: /manual/4171318/Atari-Asteroids.html?page=14
+                - link "Atari ASTEROIDS" [ref=e463] [cursor=pointer]:
+                  - /url: /products/Atari-Asteroids-12285633.html
+            - listitem [ref=e464]:
+              - link "Atari Millipede" [ref=e465] [cursor=pointer]:
+                - /url: /manual/4170379/Atari-Millipede.html?page=15
+                - img "Atari Millipede" [ref=e466]
+              - generic [ref=e467]:
+                - link "Millipede Attract Mode" [ref=e468] [cursor=pointer]:
+                  - /url: /manual/4170379/Atari-Millipede.html?page=15
+                - link "Atari Millipede" [ref=e470] [cursor=pointer]:
+                  - /url: /products/Atari-Millipede-15049593.html
+            - listitem [ref=e471]:
+              - link "Atari COP n' Robbers" [ref=e472] [cursor=pointer]:
+                - /url: /manual/4167278/Atari-Cop-N-Robbers.html?page=11
+                - img "Atari COP n' Robbers" [ref=e473]
+              - generic [ref=e474]:
+                - link "COP n' Robbers Attract Mode" [ref=e475] [cursor=pointer]:
+                  - /url: /manual/4167278/Atari-Cop-N-Robbers.html?page=11
+                - link "Atari COP n' Robbers" [ref=e477] [cursor=pointer]:
+                  - /url: /products/Atari-Cop-N-Robbers-15044218.html
+          - list [ref=e478]:
+            - listitem [ref=e479]:
+              - link "Atari Destroyer" [ref=e480] [cursor=pointer]:
+                - /url: /manual/4165077/Atari-Destroyer.html?page=14
+                - img "Atari Destroyer" [ref=e481]
+              - generic [ref=e482]:
+                - link "Destroyer Attract Mode" [ref=e483] [cursor=pointer]:
+                  - /url: /manual/4165077/Atari-Destroyer.html?page=14
+                - link "Atari Destroyer" [ref=e485] [cursor=pointer]:
+                  - /url: /products/Atari-Destroyer-15040387.html
+            - listitem [ref=e486]:
+              - link "Atari Missile Command Cocktail" [ref=e487] [cursor=pointer]:
+                - /url: /manual/4164507/Atari-Missile-Command-Cocktail.html?page=15
+                - img "Atari Missile Command Cocktail" [ref=e488]
+              - generic [ref=e489]:
+                - link "Missile Command Cocktail Attract Mode" [ref=e490] [cursor=pointer]:
+                  - /url: /manual/4164507/Atari-Missile-Command-Cocktail.html?page=15
+                - link "Atari Missile Command Cocktail" [ref=e492] [cursor=pointer]:
+                  - /url: /products/Atari-Missile-Command-Cocktail-15039610.html
+            - listitem [ref=e493]:
+              - link "Atari SKYDIVER" [ref=e494] [cursor=pointer]:
+                - /url: /manual/4163781/Atari-Skydiver.html?page=20
+                - img "Atari SKYDIVER" [ref=e495]
+              - generic [ref=e496]:
+                - link "SKYDIVER Figure 2-1 Attract Mode" [ref=e497] [cursor=pointer]:
+                  - /url: /manual/4163781/Atari-Skydiver.html?page=20
+                - link "Atari SKYDIVER" [ref=e499] [cursor=pointer]:
+                  - /url: /products/Atari-Skydiver-14203740.html
+            - listitem [ref=e500]:
+              - link "Atari STAR WARS Cockpit" [ref=e501] [cursor=pointer]:
+                - /url: /manual/4161213/Atari-Star-Wars-Cockpit.html?page=17
+                - img "Atari STAR WARS Cockpit" [ref=e502]
+              - generic [ref=e503]:
+                - link "STAR WARS Cockpit Attract Mode" [ref=e504] [cursor=pointer]:
+                  - /url: /manual/4161213/Atari-Star-Wars-Cockpit.html?page=17
+                - link "Atari STAR WARS Cockpit" [ref=e506] [cursor=pointer]:
+                  - /url: /products/Atari-Star-Wars-Cockpit-15034480.html
+            - listitem [ref=e507]:
+              - link "Atari CRASH 'N SCORE" [ref=e508] [cursor=pointer]:
+                - /url: /manual/4158673/Atari-Crash-N-Score.html?page=5
+                - img "Atari CRASH 'N SCORE" [ref=e509]
+              - generic [ref=e510]:
+                - link "CRASH 'N SCORE Attract Mode" [ref=e511] [cursor=pointer]:
+                  - /url: /manual/4158673/Atari-Crash-N-Score.html?page=5
+                - link "Atari CRASH 'N SCORE" [ref=e513] [cursor=pointer]:
+                  - /url: /products/Atari-Crash-N-Score-15030192.html
+            - listitem [ref=e514]:
+              - link "Atari MISSILE COMMAND" [ref=e515] [cursor=pointer]:
+                - /url: /manual/4158566/Atari-Missile-Command.html?page=13
+                - img "Atari MISSILE COMMAND" [ref=e516]
+              - generic [ref=e517]:
+                - link "MISSILE COMMAND Attract Mode" [ref=e518] [cursor=pointer]:
+                  - /url: /manual/4158566/Atari-Missile-Command.html?page=13
+                - link "Atari MISSILE COMMAND" [ref=e520] [cursor=pointer]:
+                  - /url: /products/Atari-Missile-Command-13799613.html
+            - listitem [ref=e521]:
+              - link "Atari BASEBALL" [ref=e522] [cursor=pointer]:
+                - /url: /manual/4158025/Atari-Baseball.html?page=14
+                - img "Atari BASEBALL" [ref=e523]
+              - generic [ref=e524]:
+                - link "BASEBALL Attract Mode" [ref=e525] [cursor=pointer]:
+                  - /url: /manual/4158025/Atari-Baseball.html?page=14
+                - link "Atari BASEBALL" [ref=e527] [cursor=pointer]:
+                  - /url: /products/Atari-Baseball-15029016.html
+            - listitem [ref=e528]:
+              - link "Atari SPACE DUEL" [ref=e529] [cursor=pointer]:
+                - /url: /manual/4156200/Atari-Space-Duel.html?page=18
+                - img "Atari SPACE DUEL" [ref=e530]
+              - generic [ref=e531]:
+                - link "SPACE DUEL Attract Mode" [ref=e532] [cursor=pointer]:
+                  - /url: /manual/4156200/Atari-Space-Duel.html?page=18
+                - link "Atari SPACE DUEL" [ref=e534] [cursor=pointer]:
+                  - /url: /products/Atari-Space-Duel-14883654.html
+    - contentinfo [ref=e535]:
+      - link "manualslib" [ref=e537] [cursor=pointer]:
+        - /url: /
+        - img [ref=e538]
+        - generic [ref=e540]: manualslib
+      - list [ref=e542]:
+        - listitem [ref=e543]:
+          - link "About Us" [ref=e544] [cursor=pointer]:
+            - /url: /about.html
+        - listitem [ref=e545]:
+          - link "F.A.Q." [ref=e546] [cursor=pointer]:
+            - /url: /faq.html
+        - listitem [ref=e547]:
+          - link "What Our Users Say" [ref=e548] [cursor=pointer]:
+            - /url: /user_say.html
+        - listitem [ref=e549]:
+          - link "Press & Media" [ref=e550] [cursor=pointer]:
+            - /url: /press.html
+      - list [ref=e552]:
+        - listitem [ref=e553]:
+          - link "Contacts" [ref=e554] [cursor=pointer]:
+            - /url: /contacts.html
+        - listitem [ref=e555]:
+          - link "Advertise with Us" [ref=e556] [cursor=pointer]:
+            - /url: /advert.html
+      - list [ref=e558]:
+        - listitem [ref=e559]:
+          - link "DMCA Policy" [ref=e560] [cursor=pointer]:
+            - /url: /takedown.html
+        - listitem [ref=e561]:
+          - link "Privacy Policy" [ref=e562] [cursor=pointer]:
+            - /url: /privacy.html
+        - listitem [ref=e563]:
+          - link "Cookie Policy" [ref=e564] [cursor=pointer]:
+            - /url: /cookie_policy.html
+        - listitem [ref=e565]:
+          - link "Terms of Use" [ref=e566] [cursor=pointer]:
+            - /url: /terms.html
+        - listitem [ref=e567]:
+          - link "GDPR Settings" [ref=e568] [cursor=pointer]:
+            - /url: javascript:adconsent('showGUI')
+      - list [ref=e571]:
+        - listitem [ref=e572]:
+          - link "Brands" [ref=e573] [cursor=pointer]:
+            - /url: /brand/
+        - listitem [ref=e574]:
+          - link "manualslib.de" [ref=e575] [cursor=pointer]:
+            - /url: https://www.manualslib.de
+        - listitem [ref=e576]:
+          - link "manualslib.es" [ref=e577] [cursor=pointer]:
+            - /url: https://www.manualslib.es
+        - listitem [ref=e578]:
+          - link "manualslib.fr" [ref=e579] [cursor=pointer]:
+            - /url: https://www.manualslib.fr
+        - listitem [ref=e580]:
+          - link "manualslib.nl" [ref=e581] [cursor=pointer]:
+            - /url: https://www.manualslib.nl
+        - listitem [ref=e582]:
+          - link "manualslib.tech" [ref=e583] [cursor=pointer]:
+            - /url: https://www.manualslib.tech
+  - generic [ref=e587]:
+    - img "Website CMP logo" [ref=e592]
+    - generic [ref=e594]:
+      - heading "We care about your privacy!" [level=1] [ref=e595]
+      - paragraph [ref=e596]:
+        - text: When visiting our site, pre-selected companies may access and use certain information on your device and about this web page to serve relevant ads or personalised content. Please note that ads help keep our service free. Personal data will be processed based on consent in accordance with Art.6(1)(a) of the GDPR framework in
+        - link "EU law" [ref=e597] [cursor=pointer]:
+          - /url: https://eur-lex.europa.eu/legal-content/EN/TXT/?qid=1528874672298&uri=CELEX%3A32016R0679
+        - text: ", or as legitimate interest in accordance with Art.6(1)(f) of the same."
+      - heading "Learn more why you are seeing this" [level=3] [ref=e598]
+      - paragraph [ref=e599]: "To offer you free, high-quality content and deliver the best possible user experience on our website, we and our technology partners (1711) require your consent to store and access personal data on your device. This includes using cookies, unique identifiers and information about your browse activity to show you relevant ads. This may include the following:"
+      - list [ref=e600]:
+        - listitem [ref=e601]: Store and/or access information on a device
+        - listitem [ref=e602]: Personalised advertising and content, advertising and content measurement, audience research and services development
+        - listitem [ref=e603]: Use precise geolocation data
+        - listitem [ref=e604]: Actively scan device characteristics for identification
+      - paragraph
+      - paragraph [ref=e605]: You may consent to the processing described above or access more detailed information and customise your choices. The given consent will apply to this site only. Please take into consideration that some of your personal data processing may rely on legitimate interest which does not require your consent, but you have a right to object to this.
+      - paragraph [ref=e606]:
+        - text: You can change or withdraw your consent anytime via our footer link or
+        - link "privacy policy page" [ref=e607] [cursor=pointer]:
+          - /url: /privacy.html
+        - text: .
+    - generic [ref=e609]:
+      - generic [ref=e610]: Customise choices
+      - generic [ref=e611]: Accept all & visit the site

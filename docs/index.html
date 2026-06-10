@@ -608,7 +608,22 @@ public void Update(float dt, InputHelper input)
   level index, particles. States are <em>modes of operating on</em> that world. That's why the ball
   sits frozen mid-air on the game-over screen and the HUD stays visible during the
   life-lost flash: switching states never copies, rebuilds, or hides the world.
-  "New game" is one line: <code>Session = new GameSession()</code>.</p>
+  "New game" is one line: <code>Session = new GameSession(mode)</code>.</p>
+
+  <h3>Rule sets are states too</h3>
+  <p>The payoff of that split arrived with <strong>Classic 1976 mode</strong> — the
+  original arcade rules, reconstructed from Atari's operation manual, living alongside
+  the modern game. No <code>if (classicMode)</code> sprinkled through gameplay: the
+  entities stay shared and dumb, and a "mode" is simply which state objects drive them —
+  <code>ClassicReadyState</code>/<code>ClassicPlayingState</code> instead of
+  <code>ReadyState</code>/<code>PlayingState</code>, chosen in one place
+  (<code>GameStateManager.CreateServeState</code>). Read the two playing states side by
+  side: discrete four-step speeds vs. a continuous ramp, four fixed paddle exits vs.
+  continuous aiming, one-brick-per-trip vs. chew-through — the diff between two files
+  <em>is</em> thirty years of design history. <code>TitleState</code> is the other
+  lesson: the first state that exists <em>before</em> a session does, which is exactly
+  what forced <code>StartNewGame</code> to take parameters (mode, starting level)
+  instead of assuming them.</p>
 
   <div class="box engine"><span class="tag">MENTAL MODEL</span>
   <p>Engine scene switching usually <em>destroys</em> the old scene — which is why
@@ -818,7 +833,8 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
 │   └── Levels/level0*.txt      <i>3 boards, 13-col grids: . empty · 1-5 tier · X unbreakable</i>
 └── Source/
     ├── Screen.cs               <i>virtual resolution constants (800×480)</i>
-    ├── GameSession.cs          <i>the world: entities, score, lives, level index</i>
+    ├── GameMode.cs             <i>Modern vs Classic — which states drive the session</i>
+    ├── GameSession.cs          <i>the world: entities, score, lives, level/wall index</i>
     ├── Entities/
     │   ├── Paddle.cs           <i>mouse+keyboard movement, wide power-up width lerp</i>
     │   ├── Ball.cs             <i>velocity, speed ramp, aiming bounce, trail, Split()</i>
@@ -828,8 +844,10 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
     │   ├── InputHelper.cs      <i>current/previous snapshots, virtual mouse, action queries</i>
     │   ├── GameAction.cs       <i>every input, named by intent</i>
     │   ├── ActionMap.cs        <i>action → keys dictionary, rebindable at runtime</i>
-    │   ├── CollisionHelper.cs  <i>minimal-penetration AABB side detection</i>
+    │   ├── CollisionHelper.cs  <i>minimal-penetration AABB side detection + reflection</i>
     │   ├── LevelLoader.cs      <i>TitleContainer runtime loading</i>
+    │   ├── ClassicWall.cs      <i>the 1976 8×14 wall: 1/3/5/7 row scoring, 448 pts</i>
+    │   ├── ClassicRules.cs     <i>the 1976 numbers: 4 speeds, 4 paddle exits, serve</i>
     │   ├── VirtualScreen.cs    <i>RenderTarget2D, letterbox, integer scaling, mouse transform</i>
     │   ├── ParticleSystem.cs   <i>struct pool, premultiplied fade</i>
     │   ├── ScreenShake.cs      <i>trauma² shake as a transform matrix</i>
@@ -839,9 +857,12 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
     │   └── DebugOverlay.cs     <i>F3: fps, ball count + top speed, live counts</i>
     └── States/
         ├── GameState.cs        <i>abstract base: Enter/Update/Draw/FreezesEffects</i>
-        ├── GameStateManager.cs <i>current-state holder, resume, new-game reset</i>
+        ├── GameStateManager.cs <i>current-state holder, resume, mode-aware new game</i>
+        ├── TitleState.cs       <i>menu before a session exists: mode + level select</i>
         ├── ReadyState.cs       <i>back to one attached ball, waiting for launch</i>
-        ├── PlayingState.cs     <i>the live simulation — biggest file, start here</i>
+        ├── PlayingState.cs     <i>the modern simulation — biggest file, start here</i>
+        ├── ClassicReadyState.cs <i>the hostile 1976 serve: ball materializes mid-screen</i>
+        ├── ClassicPlayingState.cs <i>the 1976 rules: discrete speeds, breakout shrink</i>
         ├── PauseState.cs       <i>P: world dimmed, nothing updates — not even effects</i>
         ├── LifeLostState.cs    <i>frozen beat + flash, then back to Ready</i>
         ├── LevelClearedState.cs <i>banner + beat, then the next board loads</i>
@@ -887,9 +908,13 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
   second study guide: <code>git log --oneline</code> is the index, and each diff shows
   exactly how much (or little) one real feature costs. Read the multiball commit in
   particular to watch a single-to-many assumption ripple through every consumer.
-  From the round below, <strong>music</strong> has since joined them: the asset-free
-  variant, a synthesized chip-tune loop on a looping <code>SoundEffectInstance</code> —
-  see <code>Source/Systems/MusicPlayer.cs</code> and its commit.</p>
+  From the round below, <strong>music</strong> has since joined them (the asset-free
+  variant: a synthesized chip-tune loop on a looping <code>SoundEffectInstance</code>,
+  <code>MusicPlayer.cs</code>), and so has the <strong>title screen</strong> — with mode
+  select on top of level select, because it arrived together with <strong>Classic 1976
+  mode</strong>: the original arcade rule set, reconstructed from Atari's operation
+  manual, running as a parallel pair of states (see §07 and
+  <code>ClassicPlayingState.cs</code>).</p>
 
   <p>The next round, again ordered roughly by how much existing code each one touches —
   every item is a real feature, not a toy exercise.</p>
@@ -900,7 +925,6 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
     <tr><td><strong>Gamepad support.</strong> Extend <code>ActionMap</code> with a second dictionary action → <code>Buttons[]</code>, polled from <code>GamePad.GetState(PlayerIndex.One)</code>.</td><td>Why the action layer was worth building: paddle code does not change at all.</td></tr>
     <tr><td><strong>Rebinding screen.</strong> From PauseState, a menu that waits for "any key just pressed" and calls <code>ActionMap.Rebind</code>.</td><td>Polling for an unknown key (compare full <code>GetPressedKeys()</code> sets) and writing your first menu state.</td></tr>
     <tr><td><strong>High scores.</strong> Persist the top five to a JSON file under <code>Environment.SpecialFolder.ApplicationData</code> — note <code>TitleContainer</code> is read-only, so saving needs a real path.</td><td>The read side and write side of game data are different problems; where save files actually belong on each OS.</td></tr>
-    <tr><td><strong>Title screen.</strong> A MenuState before ReadyState with level select; "new game from level N" means <code>GameSession</code> needs a starting-level parameter.</td><td>The first state that exists <em>before</em> a session does — flushing out hidden "the game already started" assumptions.</td></tr>
     <tr><td><strong>Local co-op.</strong> A second paddle (left/right halves or top/bottom), each bound to its own action set.</td><td>Multiplying an entity that input, collision and serve logic all assumed was unique — the paddle's turn for the multiball treatment.</td></tr>
   </table>
 
