@@ -33,8 +33,11 @@ public class BreakoutGame : Game
     private Point _windowedSize = new(Screen.Width, Screen.Height);
     private bool _isResizing; // re-entrancy guard: ApplyChanges() re-fires ClientSizeChanged
 
-    public BreakoutGame()
+    private readonly ScreenshotRig _screenshotRig; // null on a normal run
+
+    public BreakoutGame(ScreenshotRig screenshotRig = null)
     {
+        _screenshotRig = screenshotRig;
         _graphics = new GraphicsDeviceManager(this);
 
         // In the constructor the GraphicsDevice doesn't exist yet, so these are
@@ -83,6 +86,11 @@ public class BreakoutGame : Game
         _virtualScreen.SetCrtEffect(Content.Load<Effect>("Shaders/Crt"));
 
         _states = new GameStateManager(_font);
+
+        // A screenshot run skips the title screen and boots straight into the
+        // requested mode's serve screen (null mode = stay on the title).
+        if (_screenshotRig?.Mode is GameMode mode)
+            _states.StartNewGame(mode);
     }
 
     protected override void Update(GameTime gameTime)
@@ -90,7 +98,9 @@ public class BreakoutGame : Game
         // Pause the simulation while the window is unfocused — MonoGame keeps
         // calling Update regardless, and nobody wants to lose a ball while
         // alt-tabbed. base.Update still runs for framework housekeeping.
-        if (!IsActive)
+        // A screenshot run skips the gate: launched from a terminal, the
+        // window may never receive focus, and a paused world can't settle.
+        if (!IsActive && _screenshotRig == null)
         {
             _states.NotifyFocusLost(); // a live game auto-pauses, see PauseState
             base.Update(gameTime);
@@ -123,6 +133,8 @@ public class BreakoutGame : Game
         float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
         _states.Update(dt, _input);
 
+        _screenshotRig?.Tick();
+
         base.Update(gameTime);
     }
 
@@ -144,6 +156,13 @@ public class BreakoutGame : Game
 
         // Pass 2: the render target onto the real back buffer, letterboxed.
         _virtualScreen.Present(_spriteBatch);
+
+        // After Present, so the CRT pass is in the captured pixels.
+        if (_screenshotRig?.CaptureDue == true)
+        {
+            _screenshotRig.Capture(GraphicsDevice);
+            Exit();
+        }
 
         base.Draw(gameTime);
     }

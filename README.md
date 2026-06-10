@@ -176,7 +176,7 @@ Source/
                        collision, levels + board generator, classic 1976
                        rules + wall, super 1978 rules + walls, high scores,
                        virtual screen (+ CRT pass), particles, shake,
-                       audio synth + music, debug overlay
+                       audio synth + music, debug overlay, screenshot rig
   States/              GameState base + Title/Ready/Playing/ClassicReady/
                        ClassicPlaying/SuperReady/SuperPlaying (abstract,
                        + Double/Cavity/Progressive)/Pause/Rebind/LifeLost/
@@ -200,6 +200,9 @@ dotnet build                      # compile (content pipeline runs as part of th
 dotnet run                        # play
 dotnet test Tests/Breakout.Tests  # unit tests (the pure game logic)
 dotnet format                     # code style
+dotnet run -- --screenshot classic out.png   # boot a mode, save one settled frame, exit
+                                             # (how docs/media stays honest; also: title,
+                                             #  modern, coop, double, cavity, progressive)
 ```
 
 ## Tests
