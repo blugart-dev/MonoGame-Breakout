@@ -28,6 +28,14 @@ public class Ball
     public Vector2 Position;
     public Vector2 Velocity;
 
+    // Presentation-only flag, written by the 1978 states: true while the
+    // pass-through rule says this ball cannot break bricks (not yet returned
+    // by the paddle, or "boring" after a kill). The rule itself lives in
+    // SuperPlayingState's side table; the ball only *wears* it. The tell
+    // matters: an invisible rule and a collision bug look identical from the
+    // player's chair, so a ball that sails through bricks must say so.
+    public bool IsPhantom;
+
     public float Speed { get; private set; } = InitialSpeed;
 
     private Paddle _attachedTo;
@@ -51,6 +59,7 @@ public class Ball
         Velocity = Vector2.Zero;
         Speed = InitialSpeed; // losing a life also resets the speed ramp
         _trailCount = 0;      // no ghost trail on the freshly served ball
+        IsPhantom = false;    // pass-through is per-serve state; a new serve clears it
     }
 
     public void Launch(Random rng)
@@ -153,10 +162,16 @@ public class Ball
         Velocity = Vector2.Zero;
         Position = new Vector2(-100f, -100f);
         _trailCount = 0;
+        IsPhantom = false;
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
+        // A phantom ball draws at 40% strength, trail and all — "cannot break
+        // bricks right now" rendered as a state the player can see coming,
+        // and the snap back to full white is the "armed again" cue.
+        float strength = IsPhantom ? 0.4f : 1f;
+
         // Trail first so the ball draws on top of it. Walk from oldest to
         // newest: index back from the head, oldest sample = furthest back.
         for (int i = 0; i < _trailCount; i++)
@@ -172,9 +187,9 @@ public class Ball
 
             // `Color * float` premultiplies — fades cleanly under SpriteBatch's
             // default blend, same trick as the particles.
-            spriteBatch.DrawRect(rect, Color.White * (t * t * 0.30f));
+            spriteBatch.DrawRect(rect, Color.White * (t * t * 0.30f * strength));
         }
 
-        spriteBatch.DrawRect(Bounds, Color.White);
+        spriteBatch.DrawRect(Bounds, Color.White * strength);
     }
 }

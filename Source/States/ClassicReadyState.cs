@@ -49,6 +49,11 @@ public sealed class ClassicReadyState : GameState
     public override void Draw(SpriteBatch spriteBatch)
     {
         DrawWorldAndHud(spriteBatch);
+
+        // Same prompt strip as the modern ready screen — see ReadyState.Draw.
+        spriteBatch.DrawRect(new Rectangle(0, 282, Screen.Width, 124),
+            Color.Black * 0.45f);
+
         spriteBatch.DrawCenteredText(Font, "PRESS SPACE OR CLICK TO SERVE",
             new Vector2(Screen.Width / 2f, 300), Color.White);
 
@@ -59,7 +64,13 @@ public sealed class ClassicReadyState : GameState
             $"BALL {ballNumber} OF {GameSession.StartingLives}",
             new Vector2(Screen.Width / 2f, 332), new Color(150, 150, 165), 0.75f);
 
+        // The cabinet put its rules on the bezel card; the serve screen is
+        // ours. One line for the law a player cannot infer from watching.
+        spriteBatch.DrawCenteredText(Font,
+            "ONE BRICK PER TRIP - THE BALL RE-ARMS AT THE PADDLE OR BACKWALL",
+            new Vector2(Screen.Width / 2f, 362), new Color(150, 150, 165), 0.7f);
+
         spriteBatch.DrawCenteredText(Font, "MOVE: MOUSE / ARROWS / A-D / GAMEPAD",
-            new Vector2(Screen.Width / 2f, 364), new Color(150, 150, 165), 0.75f);
+            new Vector2(Screen.Width / 2f, 390), new Color(150, 150, 165), 0.75f);
     }
 }

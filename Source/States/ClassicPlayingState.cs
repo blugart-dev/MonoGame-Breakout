@@ -186,6 +186,11 @@ public sealed class ClassicPlayingState : GameState
 
         _speedLevel = newLevel;
         ball.OverrideSpeed(ClassicRules.Speeds[_speedLevel]);
+
+        // Same cue as the 1978 state: the discrete jump needs announcing or
+        // it feels like a glitch, not a rule.
+        AudioBank.SpeedUp?.Play();
+        Session.Particles.Emit(ball.Position, Color.White, 8, Session.Rng);
     }
 
     private void DetectBreakout(Ball ball)

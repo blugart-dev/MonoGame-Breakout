@@ -149,7 +149,7 @@ public abstract class SuperPlayingState : GameState
         // the HUD's no-garbage habit (see GameSession's cached score text)
         // applies here too. At most three balls can ever exist.
         if (Multiplier > 1)
-            spriteBatch.DrawString(Font, Multiplier == 2 ? "x2" : "x3",
+            spriteBatch.DrawShadowedText(Font, Multiplier == 2 ? "x2" : "x3",
                 new Vector2(12, 40), Color.Gold);
     }
 
@@ -272,6 +272,11 @@ public abstract class SuperPlayingState : GameState
                 >= SuperRules.BoreRows * SuperWall.CellHeight)
             rules.Boring = false;
 
+        // Keep the ball's ghost rendering in lockstep with the rule. Set
+        // every tick rather than at each transition — arming, boring and
+        // bore-expiry all change it, and one assignment can't drift.
+        ball.IsPhantom = !rules.Armed || rules.Boring;
+
         // The pass-through rule: an unarmed or boring ball ignores bricks —
         // no rebound, no damage. (1976's dis-armed ball: rebound, no damage.
         // Two games, two answers to "what may a ball that cannot score do?")
@@ -295,6 +300,7 @@ public abstract class SuperPlayingState : GameState
 
             rules.Boring = true;
             rules.BoreStartY = ball.Position.Y;
+            ball.IsPhantom = true; // ghost this frame too, not from next tick
 
             Session.Particles.Emit(brick.Bounds.Center.ToVector2(), brick.BaseColor, 18, Session.Rng);
             Session.Shake.Add(0.3f);
@@ -310,9 +316,18 @@ public abstract class SuperPlayingState : GameState
             return;
 
         SpeedLevel = newLevel;
+        // The ladder stepping is a discrete event the player must react to —
+        // especially the instant jump to top speed off a 5/7 brick, which
+        // with no cue reads as the game glitching. A zip and a white spark
+        // on each ball mark the moment. (Sparks draw from Session.Rng like
+        // all effects, so replays consume the same stream.)
+        AudioBank.SpeedUp?.Play();
         // One serve, one speed: every ball in play jumps together, so
         // Double's pair and Cavity's freed captives stay on the same rung.
         foreach (Ball ball in Session.Balls)
+        {
             ball.OverrideSpeed(SuperRules.Speeds[SpeedLevel]);
+            Session.Particles.Emit(ball.Position, Color.White, 8, Session.Rng);
+        }
     }
 }

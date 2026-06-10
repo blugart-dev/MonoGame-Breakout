@@ -24,6 +24,7 @@ public static class AudioBank
     public static SoundEffect LifeLost { get; private set; }
     public static SoundEffect LevelClear { get; private set; }
     public static SoundEffect Win { get; private set; }
+    public static SoundEffect SpeedUp { get; private set; }
 
     /// <summary>
     /// Play with a small random pitch offset. MonoGame's pitch parameter is in
@@ -60,6 +61,7 @@ public static class AudioBank
             LifeLost = CreateTone(400, 110, 0.45, 0.50f);
             LevelClear = CreateTone(392, 784, 0.30, 0.45f); // shorter sibling of Win
             Win = CreateTone(523, 1046, 0.40, 0.45f);
+            SpeedUp = CreateTone(700, 1400, 0.09, 0.40f); // a short upward zip: the speed ladder stepping
         }
         catch (NoAudioHardwareException)
         {

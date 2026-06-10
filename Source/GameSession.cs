@@ -321,11 +321,12 @@ public class GameSession
         Particles.Update(dt);
         Shake.Update(dt);
 
-        // The brick entrance is presentation, not simulation — it animates a
-        // draw offset while Bounds stay put — so it ticks with the effects
-        // (and therefore freezes correctly when PauseState freezes them).
+        // Brick entrance and scroll-slide are presentation, not simulation —
+        // they animate a draw offset while Bounds stay authoritative — so
+        // they tick with the effects (and therefore freeze correctly when
+        // PauseState freezes them).
         foreach (Brick brick in Bricks)
-            brick.UpdateDropIn(dt);
+            brick.UpdateAnimations(dt);
     }
 
     public void DrawWorld(SpriteBatch spriteBatch)
@@ -350,7 +351,7 @@ public class GameSession
             _scoreTextValue = Score;
             _scoreText = $"SCORE {Score}";
         }
-        spriteBatch.DrawString(font, _scoreText, new Vector2(12, 8), Color.White);
+        spriteBatch.DrawShadowedText(font, _scoreText, new Vector2(12, 8), Color.White);
 
         int levelValue = Mode == GameMode.Classic ? WallNumber : LevelIndex;
         if (_levelTextValue != levelValue)

@@ -47,6 +47,14 @@ public class Brick
     private float _dropTimer;
     private bool _dropping;
 
+    // Scroll presentation: ShiftDown moves Bounds instantly (the conveyor is
+    // simulation), but an instant 18 px jump on screen reads as a glitch, not
+    // motion. So the draw borrows the entrance trick in reverse: the offset
+    // starts at the OLD position and decays to zero, sliding the picture down
+    // to where the collision rectangle already is.
+    private const float SlideTau = 0.05f; // seconds to shed ~63% of the offset
+    private float _slideOffset;
+
     public bool Alive => IsUnbreakable || HitPoints > 0;
 
     /// <summary>Modern preset: tier = hit points = color, score = tier x 10.</summary>
@@ -79,8 +87,19 @@ public class Brick
         _dropping = true;
     }
 
-    public void UpdateDropIn(float dt)
+    public void UpdateAnimations(float dt)
     {
+        if (_slideOffset != 0f)
+        {
+            // Exponential chase toward zero — the paddle width lerp's idiom,
+            // not the drop-in's fixed tween, because slides can stack: a
+            // second scroll mid-slide just deepens the offset and the chase
+            // absorbs it. Snap the last half pixel so it actually arrives.
+            _slideOffset *= MathF.Exp(-dt / SlideTau);
+            if (MathF.Abs(_slideOffset) < 0.5f)
+                _slideOffset = 0f;
+        }
+
         if (!_dropping)
             return;
         _dropTimer += dt;
@@ -118,6 +137,7 @@ public class Brick
         Rectangle moved = Bounds;
         moved.Y += pixels;
         Bounds = moved;
+        _slideOffset -= pixels; // draw from where it was, slide to where it is
     }
 
     /// <summary>
@@ -151,7 +171,7 @@ public class Brick
         }
 
         Rectangle drawRect = Bounds;
-        drawRect.Y += (int)DropOffsetY;
+        drawRect.Y += (int)(DropOffsetY + _slideOffset);
 
         spriteBatch.DrawRect(drawRect, body);
         // 2 px bevel: lighter top edge, darker bottom edge — cheap depth.

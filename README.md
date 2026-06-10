@@ -78,6 +78,12 @@ ambiguities the manuals leave open are flagged in the code, and the test suite
 pins the lot ([study guide §11](https://blugart-dev.github.io/MonoGame-Breakout/#history)
 puts the three rule sets side by side).
 
+The cabinets explained these laws on a printed bezel card; here they explain
+themselves in play: the 1978 ball draws **translucent** while the pass-through
+rule has it immaterial, the discrete speed ladders announce each step with an
+audible zip and a spark, Progressive's wall visibly *slides* on each advance,
+and every arcade serve screen carries a one-line rule card for its mode.
+
 ## Controls
 
 | Input | Action |

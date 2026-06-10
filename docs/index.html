@@ -737,8 +737,8 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
   <h3>SFX from raw PCM</h3>
   <p><code>SoundEffect</code> happily accepts a byte buffer of 16-bit PCM — so
   <code>AudioBank</code> synthesizes every sound at startup: square waves with a 2 ms
-  attack (kills the click) and linear decay, frequency sweeps for the life-lost fall and
-  power-up rise. The normal route is .wav files through the pipeline; this is the
+  attack (kills the click) and linear decay, frequency sweeps for the life-lost fall,
+  the power-up rise and the short zip that announces an arcade speed-ladder step. The normal route is .wav files through the pipeline; this is the
   "asset-free retro" route, and it teaches what a sound <em>is</em>.</p>
 
   <div class="box gotcha"><span class="tag">GOTCHA</span>
@@ -860,7 +860,7 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
       <td>continuous angle from hit position (§06)</td></tr>
     <tr><td><strong>Brick law</strong></td>
       <td>one brick per trip — a dis-armed ball rebounds, the brick survives</td>
-      <td>pass-through — an unreturned ball sails through; after a kill it <em>bores</em> for four rows</td>
+      <td>pass-through — an unreturned ball sails through; after a kill it <em>bores</em> for four rows (the ball draws translucent while immaterial)</td>
       <td>chew through everything; multi-hit tiers</td></tr>
     <tr><td><strong>Half-paddle penalty</strong></td>
       <td>on breaking out behind the wall, for the rest of the volley</td>
@@ -1196,7 +1196,7 @@ public void SpeedLevel_FollowsTheManualThresholds(
     │   ├── ScreenShake.cs      <i>trauma² shake as a transform matrix</i>
     │   ├── AudioBank.cs        <i>synthesized square-wave PCM, pitch-varied playback</i>
     │   ├── MusicPlayer.cs      <i>synthesized chip-tune loop on a SoundEffectInstance</i>
-    │   ├── SpriteBatchExtensions.cs <i>1×1 pixel DrawRect + centered text</i>
+    │   ├── SpriteBatchExtensions.cs <i>1×1 pixel DrawRect + drop-shadowed text</i>
     │   └── DebugOverlay.cs     <i>F3: fps, ball count + top speed, live counts</i>
     └── States/
         ├── GameState.cs        <i>abstract base: Enter/Update/Draw/FreezesEffects/CapturesAllInput</i>
@@ -1244,7 +1244,7 @@ public void SpeedLevel_FollowsTheManualThresholds(
     <tr><td>one audio player for everything</td><td><code>SoundEffect</code> (SFX) vs <code>Song</code>+<code>MediaPlayer</code> (music) vs <code>SoundEffectInstance</code> (the controllable handle)</td><td><code>AudioBank</code> · <code>MusicPlayer</code></td></tr>
     <tr><td>project display settings</td><td><code>GraphicsDeviceManager</code> preferences + <code>ApplyChanges()</code></td><td><code>BreakoutGame</code> ctor</td></tr>
     <tr><td>built-in particle system</td><td>a list of structs and forty lines</td><td><code>ParticleSystem</code></td></tr>
-    <tr><td>built-in tween / animation player</td><td>a timer, an easing function, an offset applied at draw time</td><td><code>Brick.UpdateDropIn</code> (cubic ease-out) · <code>Paddle</code>'s width lerp</td></tr>
+    <tr><td>built-in tween / animation player</td><td>a timer, an easing function, an offset applied at draw time</td><td><code>Brick.UpdateAnimations</code> (cubic ease-out drop-in, exponential scroll-slide) · <code>Paddle</code>'s width lerp</td></tr>
     <tr><td>procedural generation helpers</td><td>a seeded <code>Random</code> plus a data format both sides agree on</td><td><code>BoardGenerator</code> → <code>LevelLoader.Parse</code></td></tr>
     <tr><td>built-in pause / time scale</td><td>a state that updates nothing</td><td><code>PauseState</code></td></tr>
     <tr><td>engine pauses the unfocused game</td><td>check <code>IsActive</code> yourself, auto-enter pause</td><td><code>GameStateManager.NotifyFocusLost</code></td></tr>
