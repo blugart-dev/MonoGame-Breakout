@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Breakout.Entities;
@@ -298,8 +297,20 @@ public class GameSession
         => LevelLoader.Parse(new StringReader(BoardGenerator.Generate(Rng, LevelIndex)));
 
     // Destroyed bricks are removed from the list, so "cleared" means only
-    // unbreakable ones remain.
-    public bool LevelCleared => Bricks.All(b => b.IsUnbreakable);
+    // unbreakable ones remain. A plain loop rather than LINQ's All():
+    // PlayingState asks this every simulation tick, and Enumerable methods
+    // box List<T>'s struct enumerator — a small allocation, 60 times a
+    // second. Same no-garbage habit as the cached HUD strings below.
+    public bool LevelCleared
+    {
+        get
+        {
+            foreach (Brick brick in Bricks)
+                if (!brick.IsUnbreakable)
+                    return false;
+            return true;
+        }
+    }
 
     /// <summary>
     /// Effects animate in every state — particles keep falling and the shake
