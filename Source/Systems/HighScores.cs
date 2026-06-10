@@ -1,0 +1,109 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+
+namespace Breakout.Systems;
+
+/// <summary>
+/// Top-five score tables, one per game mode, persisted as JSON. The key
+/// lesson: reading and writing game data are different problems. Levels load
+/// through TitleContainer, which is READ-ONLY by design (on some platforms
+/// the game's install directory cannot be written at all). Save data needs a
+/// real, writable, per-user path — Environment.SpecialFolder.ApplicationData
+/// resolves to the right place on each OS (AppData\Roaming on Windows,
+/// ~/.config on Linux, ~/Library/Application Support on macOS).
+///
+/// All IO is wrapped in try/catch and failure degrades to "no high scores" —
+/// same philosophy as the audio: a broken disk should never crash the game.
+/// </summary>
+public static class HighScores
+{
+    private const int Capacity = 5;
+
+    private static readonly string FilePath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "Breakout", "highscores.json");
+
+    // Mode name → scores, descending. Loaded lazily on first use.
+    private static Dictionary<string, List<int>> _tables;
+
+    public static IReadOnlyList<int> For(GameMode mode)
+    {
+        Load();
+        return _tables.TryGetValue(mode.ToString(), out List<int> list)
+            ? list
+            : Array.Empty<int>();
+    }
+
+    public static int Best(GameMode mode)
+    {
+        IReadOnlyList<int> list = For(mode);
+        return list.Count > 0 ? list[0] : 0;
+    }
+
+    /// <summary>
+    /// Submit a finished run. Returns the 0-based rank it earned in the
+    /// mode's top five, or -1 if it didn't place (or scored nothing).
+    /// </summary>
+    public static int Record(GameMode mode, int score)
+    {
+        if (score <= 0)
+            return -1;
+
+        Load();
+        string key = mode.ToString();
+        if (!_tables.TryGetValue(key, out List<int> list))
+            _tables[key] = list = new List<int>();
+
+        int rank = list.FindIndex(s => score > s);
+        if (rank < 0)
+        {
+            if (list.Count >= Capacity)
+                return -1;
+            rank = list.Count;
+        }
+
+        list.Insert(rank, score);
+        if (list.Count > Capacity)
+            list.RemoveAt(Capacity);
+
+        Save();
+        return rank;
+    }
+
+    private static void Load()
+    {
+        if (_tables != null)
+            return;
+
+        try
+        {
+            if (File.Exists(FilePath))
+                _tables = JsonSerializer.Deserialize<Dictionary<string, List<int>>>(
+                    File.ReadAllText(FilePath));
+        }
+        catch (Exception)
+        {
+            // Corrupt or unreadable file: start fresh rather than crash.
+            // (Production code would log this; we have nowhere to log to.)
+        }
+
+        _tables ??= new Dictionary<string, List<int>>();
+    }
+
+    private static void Save()
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(FilePath));
+            File.WriteAllText(FilePath, JsonSerializer.Serialize(_tables,
+                new JsonSerializerOptions { WriteIndented = true }));
+        }
+        catch (Exception)
+        {
+            // Read-only disk or denied permissions: scores just don't persist
+            // this session. Never let a save failure take the game down.
+        }
+    }
+}

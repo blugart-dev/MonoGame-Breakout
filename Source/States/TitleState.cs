@@ -70,6 +70,12 @@ public sealed class TitleState : GameState
         DrawEntry(spriteBatch, modernLabel, 280, _selected == ModernEntry);
         DrawEntry(spriteBatch, "CLASSIC 1976", 320, _selected == ClassicEntry);
 
+        // The highlighted mode's record, straight from the JSON save file.
+        int best = HighScores.Best(_selected == ClassicEntry ? GameMode.Classic : GameMode.Modern);
+        if (best > 0)
+            spriteBatch.DrawCenteredText(Font, $"BEST  {best}",
+                center + new Vector2(0, 360), Color.Gold, 0.75f);
+
         spriteBatch.DrawCenteredText(Font,
             "UP/DOWN SELECT   LEFT/RIGHT START LEVEL   SPACE PLAY",
             center + new Vector2(0, 400), DimColor, 0.75f);
