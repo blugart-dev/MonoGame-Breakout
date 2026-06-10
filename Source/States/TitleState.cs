@@ -96,7 +96,7 @@ public sealed class TitleState : GameState
             "UP/DOWN SELECT   LEFT/RIGHT START LEVEL   SPACE PLAY",
             center + new Vector2(0, 442), DimColor, 0.7f);
         spriteBatch.DrawCenteredText(Font,
-            "P PAUSE   M MUSIC   F9 CRT   F11 FULLSCREEN   ESC QUIT",
+            "P PAUSE   M MUSIC   F9 CRT   F10 PIXEL-PERFECT   F11 FULLSCREEN   ESC QUIT",
             center + new Vector2(0, 462), DimColor, 0.7f);
     }
 

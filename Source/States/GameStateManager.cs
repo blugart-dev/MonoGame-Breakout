@@ -191,8 +191,10 @@ public sealed class GameStateManager
 
         // The movie must announce itself — a perfect reproduction of play is,
         // by definition, indistinguishable from play. 1 Hz arcade-style blink.
+        // The banner is also where the viewer learns the movie controls: both
+        // are live (unrecorded) actions, so they work mid-playback by design.
         if (IsPlayingBack && (int)(_replayBannerTimer * 2f) % 2 == 0)
-            spriteBatch.DrawCenteredText(Font, "REPLAY - T TO STOP",
+            spriteBatch.DrawCenteredText(Font, "REPLAY - T STOP / P PAUSE",
                 new Vector2(Screen.Width / 2f, Screen.Height - 20),
                 Color.Gold, 0.75f);
     }

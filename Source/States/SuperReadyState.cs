@@ -93,5 +93,8 @@ public sealed class SuperReadyState : GameState
         spriteBatch.DrawCenteredText(Font,
             $"BALL {ballNumber} OF {GameSession.StartingLives}",
             new Vector2(Screen.Width / 2f, 332), new Color(150, 150, 165), 0.75f);
+
+        spriteBatch.DrawCenteredText(Font, "MOVE: MOUSE / ARROWS / A-D / GAMEPAD",
+            new Vector2(Screen.Width / 2f, 364), new Color(150, 150, 165), 0.75f);
     }
 }
