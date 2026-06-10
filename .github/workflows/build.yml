@@ -1,0 +1,43 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # The game targets net9.0, but the MGCB content tools ship for net8.0,
+      # so the build machine needs both runtimes.
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+
+      # The HUD spritefont is rasterized from Arial at build time. Windows
+      # ships Arial; Linux needs the MS core fonts package (same setup the
+      # README's Linux note describes).
+      - name: Install Microsoft core fonts (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
+          sudo apt-get update
+          sudo apt-get install -y ttf-mscorefonts-installer
+          sudo fc-cache -f
+
+      - name: Build (content pipeline runs as part of the build)
+        run: dotnet build --configuration Release
+
+      - name: Verify formatting
+        if: runner.os == 'Linux'
+        run: dotnet format --verify-no-changes

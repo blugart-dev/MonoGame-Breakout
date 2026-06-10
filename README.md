@@ -1,5 +1,8 @@
 # Breakout — Learn MonoGame by Reading One Small Game
 
+[![Build](https://github.com/blugart-dev/MonoGame-Breakout/actions/workflows/build.yml/badge.svg)](https://github.com/blugart-dev/MonoGame-Breakout/actions/workflows/build.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 A complete Breakout clone built with **MonoGame 3.8 (DesktopGL)**, written to be
 *read*: every file carries pedagogical comments explaining the MonoGame idioms
 it uses and the reasoning behind non-obvious choices. No prior game-engine
