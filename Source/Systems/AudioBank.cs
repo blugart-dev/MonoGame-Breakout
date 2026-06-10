@@ -35,8 +35,16 @@ public static class AudioBank
     public static void PlayVaried(this SoundEffect effect, Random rng,
         float maxPitchOffset = 0.08f)
     {
+        // Roll BEFORE the null check. The pitch comes from the session's
+        // seeded stream, and the simulation's RNG consumption must never
+        // depend on output devices: with `effect?.PlayVaried(...)` at the
+        // call sites, a machine with no sound card would skip these draws,
+        // shifting every roll after them — drop chances, serve angles — and
+        // a replay recorded with audio would desync on a machine without.
+        // (Extension methods accept a null receiver, so call sites invoke
+        // this unconditionally and the null check lives here, after the roll.)
         float pitch = ((float)rng.NextDouble() * 2f - 1f) * maxPitchOffset;
-        effect.Play(volume: 1f, pitch: pitch, pan: 0f);
+        effect?.Play(volume: 1f, pitch: pitch, pan: 0f);
     }
 
     public static void Initialize()
@@ -55,8 +63,9 @@ public static class AudioBank
         }
         catch (NoAudioHardwareException)
         {
-            // Machines with no audio device: the properties stay null and all
-            // call sites use `?.Play()`, so the game runs silent instead of crashing.
+            // Machines with no audio device: the properties stay null, plain
+            // call sites use `?.Play()`, and PlayVaried tolerates null itself
+            // (see why above), so the game runs silent instead of crashing.
         }
     }
 

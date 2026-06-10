@@ -189,7 +189,7 @@ public abstract class SuperPlayingState : GameState
         }
 
         if (bounced)
-            AudioBank.WallHit?.PlayVaried(Session.Rng);
+            AudioBank.WallHit.PlayVaried(Session.Rng);
     }
 
     private void OnTopBoundary(Ball ball)
@@ -242,7 +242,7 @@ public abstract class SuperPlayingState : GameState
 
             WallTouchPoint();
             OnPaddleHit(ball);
-            AudioBank.PaddleHit?.PlayVaried(Session.Rng);
+            AudioBank.PaddleHit.PlayVaried(Session.Rng);
             return;
         }
     }
@@ -298,7 +298,7 @@ public abstract class SuperPlayingState : GameState
 
             Session.Particles.Emit(brick.Bounds.Center.ToVector2(), brick.BaseColor, 18, Session.Rng);
             Session.Shake.Add(0.3f);
-            AudioBank.BrickBreak?.PlayVaried(Session.Rng);
+            AudioBank.BrickBreak.PlayVaried(Session.Rng);
             break; // one resolution per tick, as everywhere else
         }
     }
