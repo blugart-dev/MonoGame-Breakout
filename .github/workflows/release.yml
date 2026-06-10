@@ -1,9 +1,9 @@
 name: Release
 
 # Pushing a version tag (v1.0.0, v1.1.0, …) builds self-contained,
-# playable folders for every desktop platform and attaches them to a
-# GitHub Release — a player downloads an archive, unpacks, and runs the
-# executable inside. No .NET SDK or runtime needed on their machine.
+# playable builds for every desktop platform and attaches them to a
+# GitHub Release — a player downloads an archive, unpacks, and plays.
+# No .NET SDK or runtime needed on their machine.
 on:
   push:
     tags: ["v*"]
@@ -77,21 +77,85 @@ jobs:
               --runtime $rid --self-contained --output publish/$rid
           done
 
-      # Each archive unpacks to a single named folder. Windows gets a zip;
-      # Linux/macOS get tar.gz because it preserves the executable bit.
+      # macOS wants an .icns icon inside the app bundle. Apple's icon tools
+      # only run on macOS, but the format is open: resize the existing
+      # window icon (Icon.bmp, 256×256) to the standard sizes and let
+      # png2icns pack them. PNG32: forces RGBA output — png2icns rejects
+      # palette-format PNGs.
+      - name: Build the macOS icon
+        run: |
+          sudo apt-get install -y icnsutils imagemagick
+          for size in 16 32 128 256; do
+            convert Icon.bmp -resize ${size}x${size} PNG32:icon_${size}.png
+          done
+          png2icns Breakout.icns icon_16.png icon_32.png icon_128.png icon_256.png
+
+      # Windows and Linux unpack to a plain named folder. macOS gets a real
+      # .app bundle per architecture, laid out the way the MonoGame packaging
+      # guide shows: the publish output in Contents/MacOS, the content in
+      # Contents/Resources (MonoGame's TitleContainer looks for ../Resources
+      # next to the executable on macOS, so both the .xnb assets and the
+      # runtime-loaded level files resolve there).
+      #
+      # Why two bundles instead of the guide's single universal app: its lipo
+      # step merges only the apphost, but a self-contained .NET publish is
+      # arch-specific throughout — the runtime's native dylibs AND ~100
+      # precompiled managed assemblies differ between osx-x64 and osx-arm64
+      # (verified by diffing the two publish folders), and managed PE files
+      # cannot be lipo'd. .NET does not support universal binaries; one app
+      # per architecture is the correct shape.
+      #
+      # tar.gz (not zip) for the unix targets because it reliably preserves
+      # the executable bit.
       - name: Package
         run: |
           mkdir dist
-          for rid in win-x64 linux-x64 osx-x64 osx-arm64; do
-            name="Breakout-$GITHUB_REF_NAME-$rid"
-            cp -r publish/$rid "$name"
-            if [ "$rid" = "win-x64" ]; then
-              zip -qr "dist/$name.zip" "$name"
-            else
-              chmod +x "$name/Breakout"
-              tar czf "dist/$name.tar.gz" "$name"
-            fi
+
+          name="Breakout-$GITHUB_REF_NAME-win-x64"
+          cp -r publish/win-x64 "$name"
+          zip -qr "dist/$name.zip" "$name"
+
+          name="Breakout-$GITHUB_REF_NAME-linux-x64"
+          cp -r publish/linux-x64 "$name"
+          chmod +x "$name/Breakout"
+          tar czf "dist/$name.tar.gz" "$name"
+
+          for rid in osx-x64 osx-arm64; do
+            app="staging-$rid/Breakout.app"
+            mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
+            cp -r publish/$rid/. "$app/Contents/MacOS/"
+            mv "$app/Contents/MacOS/Content" "$app/Contents/Resources/Content"
+            cp Breakout.icns "$app/Contents/Resources/Breakout.icns"
+            chmod +x "$app/Contents/MacOS/Breakout"
+            cat > "$app/Contents/Info.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleExecutable</key>
+            <string>Breakout</string>
+            <key>CFBundleIdentifier</key>
+            <string>io.github.blugart-dev.Breakout</string>
+            <key>CFBundleName</key>
+            <string>Breakout</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>CFBundleIconFile</key>
+            <string>Breakout</string>
+            <key>CFBundleShortVersionString</key>
+            <string>${GITHUB_REF_NAME#v}</string>
+            <key>CFBundleVersion</key>
+            <string>${GITHUB_REF_NAME#v}</string>
+            <key>LSMinimumSystemVersion</key>
+            <string>10.15</string>
+            <key>NSHighResolutionCapable</key>
+            <true/>
+          </dict>
+          </plist>
+          EOF
+            tar czf "dist/Breakout-$GITHUB_REF_NAME-$rid.tar.gz" -C "staging-$rid" Breakout.app
           done
+
           ls -l dist
 
       - name: Create the GitHub Release with builds attached

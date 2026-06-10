@@ -60,18 +60,19 @@ carries self-contained builds — no .NET SDK or runtime needed. Download the
 archive for your OS, unpack it, and run the `Breakout` executable inside
 (it must stay next to its `Content` folder):
 
-| Platform | Archive |
-|---|---|
-| Windows x64 | `Breakout-v*-win-x64.zip` |
-| Linux x64 | `Breakout-v*-linux-x64.tar.gz` |
-| macOS (Intel) | `Breakout-v*-osx-x64.tar.gz` |
-| macOS (Apple Silicon) | `Breakout-v*-osx-arm64.tar.gz` |
+| Platform | Archive | Unpacks to |
+|---|---|---|
+| Windows x64 | `Breakout-v*-win-x64.zip` | a folder — run `Breakout.exe` |
+| Linux x64 | `Breakout-v*-linux-x64.tar.gz` | a folder — run `./Breakout` |
+| macOS (Apple Silicon) | `Breakout-v*-osx-arm64.tar.gz` | `Breakout.app` — double-click |
+| macOS (Intel) | `Breakout-v*-osx-x64.tar.gz` | `Breakout.app` — double-click |
 
-> **macOS note:** the builds are unsigned, so Gatekeeper quarantines the
-> download. After unpacking, clear it once with
-> `xattr -dr com.apple.quarantine Breakout-v1.0.0-osx-arm64` (or approve the
-> app under System Settings → Privacy & Security after the first launch
-> attempt).
+> **macOS note:** the app is unsigned, so Gatekeeper quarantines the
+> download. After unpacking, either clear it once with
+> `xattr -dr com.apple.quarantine Breakout.app`, or approve the app under
+> System Settings → Privacy & Security after the first launch attempt.
+> (Two separate apps rather than one universal binary: .NET self-contained
+> publishes are architecture-specific throughout and cannot be `lipo`-merged.)
 
 That said, this is a learning repo — running from source (above) is the
 intended path. Builds come out of
