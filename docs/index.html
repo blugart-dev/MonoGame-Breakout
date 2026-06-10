@@ -487,13 +487,16 @@ using var reader = new StreamReader(stream);</code></pre></div>
 {
     _previousKeyboard = _keyboard;
     _previousMouse = _mouse;
+    _previousGamePad = _gamePad;
     _keyboard = Keyboard.GetState();
     _mouse = Mouse.GetState();
+    _gamePad = GamePad.GetState(PlayerIndex.One);
     // ...
 }
 
-public bool WasKeyJustPressed(Keys key)
-    => _keyboard.IsKeyDown(key) && _previousKeyboard.IsKeyUp(key);</code></pre></div>
+// the heart of WasActionJustPressed, for each key bound to the action:
+if (_keyboard.IsKeyDown(keys[i]) && _previousKeyboard.IsKeyUp(keys[i]))
+    return true;</code></pre></div>
 
   <p>Down now + up last frame = pressed this frame. That two-line comparison is
   exactly what any engine's built-in "just pressed" query does internally. Every
@@ -542,9 +545,10 @@ return moving.Center.Y &lt; target.Center.Y ? HitSide.Top : HitSide.Bottom;</cod
 
   <p>If the overlap rectangle is wider than it is tall, the ball came in vertically, and
   vice versa. Relative centers disambiguate which of the two sides. After detection,
-  <code>PlayingState.ReflectAndSeparate</code> pushes the ball out by the overlap and
+  <code>CollisionHelper.ReflectAndSeparate</code> pushes the ball out by the overlap and
   <em>sets</em> the velocity sign (rather than negating it) — setting is idempotent if a
-  collision ever resolves twice.</p>
+  collision ever resolves twice. It lives in the helper, not in a playing state, because
+  all three rule sets share it: how a ball leaves a brick is physics, not rules.</p>
 
   <div class="box why"><span class="tag">DESIGN NOTE</span>
   <p>This discrete test is only safe because the numbers say so: max ball speed 560 px/s
@@ -799,7 +803,9 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
       <td><strong>Graceful degradation</strong></td>
       <td><code>AudioBank.Initialize</code></td>
       <td>No audio device? Catch <code>NoAudioHardwareException</code>, leave the
-      properties null, and every call site uses <code>?.Play()</code>. The game runs
+      properties null, and play through <code>?.Play()</code> or a null-tolerant
+      <code>PlayVaried</code> (which rolls its pitch <em>before</em> the null check, so
+      the simulation's RNG draws never depend on hardware). The game runs
       silent instead of crashing. <code>MusicPlayer.Initialize</code> makes the same
       promise: a null instance turns every music call into a no-op.</td>
     </tr>
@@ -872,7 +878,7 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
         ├── GameStateManager.cs <i>current-state holder, resume, mode-aware new game, replay record/play</i>
         ├── TitleState.cs       <i>menu before a session exists: mode + level select</i>
         ├── ReadyState.cs       <i>back to one attached ball, waiting for launch</i>
-        ├── PlayingState.cs     <i>the modern simulation — biggest file, start here</i>
+        ├── PlayingState.cs     <i>the modern simulation — start here</i>
         ├── ClassicReadyState.cs <i>the hostile 1976 serve: ball materializes mid-screen</i>
         ├── ClassicPlayingState.cs <i>the 1976 rules: discrete speeds, breakout shrink</i>
         ├── SuperReadyState.cs  <i>one 1978 serve for all three variants</i>
