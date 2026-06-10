@@ -509,9 +509,11 @@ public bool WasKeyJustPressed(Keys key)
 
   <div class="box engine"><span class="tag">WORTH KNOWING</span>
   <p>There is also no <em>action map</em> — no built-in layer that turns "the jump
-  action" into "Space or W or gamepad A". The moment you want rebindable controls, you
-  build a dictionary from action name to <code>Keys[]</code> on top of this same
-  helper (Appendix C has it as an exercise).</p></div>
+  action" into "Space or W or gamepad A". This project builds one on top of this same
+  helper: <code>ActionMap</code> is a dictionary from <code>GameAction</code> to
+  <code>Keys[]</code>, and gameplay only ever asks <code>IsActionDown</code> /
+  <code>WasActionJustPressed</code> — no gameplay file names a key. It began as an
+  Appendix C exercise; its commit shows how little the whole layer costs.</p></div>
 </section>
 
 <div class="brickrow"><i style="background:var(--tier2)"></i><i style="background:var(--tier3)"></i><i style="background:var(--tier4)"></i><i style="background:var(--tier5)"></i><i style="background:var(--tier1)"></i></div>
