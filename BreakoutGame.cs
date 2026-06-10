@@ -103,7 +103,10 @@ public class BreakoutGame : Game
         // key", none of these shortcuts may steal the press.
         if (!_states.CurrentCapturesAllInput)
         {
-            if (_input.IsActionDown(GameAction.Quit))
+            // Just-pressed, not held: Esc also cancels a rebind wait, and a
+            // human still holds the key on the tick after the capture drops —
+            // a level-triggered quit here would close the game on that tick.
+            if (_input.WasActionJustPressed(GameAction.Quit))
                 Exit();
             if (_input.WasActionJustPressed(GameAction.ToggleFullscreen))
                 ToggleFullscreen();
