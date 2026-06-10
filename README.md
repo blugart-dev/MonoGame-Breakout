@@ -55,9 +55,11 @@ automatically and the content pipeline runs as part of the build.
 3. **Read the code** — the comments are the textbook. A good order:
    `Program.cs` → `BreakoutGame.cs` → `Source/States/PlayingState.cs`,
    then outward to whatever it touches.
-4. **Do the exercises** in the study guide's Appendix C — each is a real feature
-   (second level, pause state, multiball, …), ordered by how much code it
-   touches.
+4. **Study the feature commits.** The guide's original exercises (pause
+   state, multiball, action map, …) are all implemented now — one commit
+   each, so `git log --oneline` doubles as a reading list: check out any
+   commit's diff to see exactly what one feature costs. Appendix C lists
+   the next round of exercises.
 
 ## Features
 
@@ -69,10 +71,14 @@ automatically and the content pipeline runs as part of the build.
 - Paddle-position-controlled bounce angle (the aiming mechanic)
 - Speed ramp per brick; power-up drops: wide paddle (pink) and
   multiball (cyan) — a life is lost only when the *last* ball drops
-- Juice: brick-break particles, trauma-based screen shake, synthesized SFX
+- Juice: brick-break particles, trauma-based screen shake, ball trail,
+  synthesized SFX with random pitch variation
+- Action map: gameplay reads named intents (`GameAction`), not keys —
+  bindings live in one runtime-rebindable dictionary (`ActionMap`)
 - Production layer: virtual 800×480 resolution rendered to a `RenderTarget2D`
-  and letterboxed to any window size, resizable window, borderless
-  fullscreen, pause-when-unfocused, debug overlay
+  and letterboxed to any window size, optional integer ("pixel perfect")
+  scaling, resizable window, borderless fullscreen, pause state with
+  auto-pause on focus loss, debug overlay
 
 ## Project layout
 
@@ -81,15 +87,16 @@ Program.cs             entry point — two lines
 BreakoutGame.cs        application shell: window, loop, two-pass draw
 Source/
   Screen.cs            virtual resolution constants
-  GameSession.cs       the world: entities, score, lives, effects
+  GameSession.cs       the world: entities, score, lives, level index
   Entities/            Paddle, Ball, Brick, PowerUp
-  Systems/             input, collision, levels, virtual screen,
+  Systems/             input + action map, collision, levels, virtual screen,
                        particles, shake, audio synth, debug overlay
-  States/              GameState base + Ready/Playing/LifeLost/GameOver
+  States/              GameState base + Ready/Playing/Pause/LifeLost/
+                       LevelCleared/GameOver
 Content/
   Content.mgcb         pipeline manifest (font only)
   Fonts/Hud.spritefont rasterized at build time by the pipeline
-  Levels/level01.txt   runtime-loaded, copied via csproj — not pipelined
+  Levels/level0*.txt   runtime-loaded, copied via csproj — not pipelined
 docs/index.html        the study guide — open in a browser (or via Pages)
 ```
 

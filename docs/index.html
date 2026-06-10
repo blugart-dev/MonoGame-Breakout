@@ -579,10 +579,13 @@ Velocity = new Vector2(MathF.Sin(angle), -MathF.Cos(angle)) * Speed;</code></pre
   <h2>States Without Scenes</h2>
   <p class="files">open: <code>Source/States/*.cs</code> · <code>Source/GameSession.cs</code></p>
 
-  <p>Ready → Playing → LifeLost → GameOver. Engines ship a scene system or a state
-  machine node for exactly this; MonoGame ships neither, so you write the pattern
-  yourself — about 30 lines — and in exchange you see exactly what a "screen change"
-  is: <em>swapping which object gets the Update and Draw calls.</em></p>
+  <p>Ready → Playing → LifeLost → GameOver, with Pause and LevelCleared joining the
+  loop where needed. Engines ship a scene system or a state machine node for exactly
+  this; MonoGame ships neither, so you write the pattern yourself — about 30 lines —
+  and in exchange you see exactly what a "screen change" is: <em>swapping which object
+  gets the Update and Draw calls.</em> Two refinements worth tracing: PauseState keeps
+  the state it interrupted and swaps it back without re-running Enter(), and the
+  FreezesEffects flag lets pause stop even the particles every other state animates.</p>
 
   <div class="code"><div class="head"><span class="fn">Source/States/GameStateManager.cs</span><span class="note">a scene changer is just a field assignment</span></div>
 <pre><code>public void ChangeState(GameState next)
@@ -593,13 +596,14 @@ Velocity = new Vector2(MathF.Sin(angle), -MathF.Cos(angle)) * Speed;</code></pre
 
 public void Update(float dt, InputHelper input)
 {
-    Session.UpdateEffects(dt); // effects run in every state
+    if (!_current.FreezesEffects)
+        Session.UpdateEffects(dt); // effects run in (almost) every state
     _current.Update(dt, input);
 }</code></pre></div>
 
   <h3>The crucial split: data vs. behavior</h3>
-  <p><code>GameSession</code> owns the world — paddle, ball, bricks, score, lives,
-  particles. States are <em>modes of operating on</em> that world. That's why the ball
+  <p><code>GameSession</code> owns the world — paddle, balls, bricks, score, lives,
+  level index, particles. States are <em>modes of operating on</em> that world. That's why the ball
   sits frozen mid-air on the game-over screen and the HUD stays visible during the
   life-lost flash: switching states never copies, rebuilds, or hides the world.
   "New game" is one line: <code>Session = new GameSession()</code>.</p>
@@ -796,31 +800,35 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
 ├── Content/
 │   ├── Content.mgcb            <i>pipeline manifest (plain text)</i>
 │   ├── Fonts/Hud.spritefont    <i>XML font description → glyph atlas</i>
-│   └── Levels/level01.txt      <i>13×8 char grid: . empty · 1-5 tier · X unbreakable</i>
+│   └── Levels/level0*.txt      <i>3 boards, 13-col grids: . empty · 1-5 tier · X unbreakable</i>
 └── Source/
     ├── Screen.cs               <i>virtual resolution constants (800×480)</i>
-    ├── GameSession.cs          <i>the world: entities, score, lives, effects</i>
+    ├── GameSession.cs          <i>the world: entities, score, lives, level index</i>
     ├── Entities/
     │   ├── Paddle.cs           <i>mouse+keyboard movement, wide power-up width lerp</i>
-    │   ├── Ball.cs             <i>velocity, speed ramp, the aiming bounce</i>
+    │   ├── Ball.cs             <i>velocity, speed ramp, aiming bounce, trail, Split()</i>
     │   ├── Brick.cs            <i>tier = HP = color; bevel drawing; X = unbreakable</i>
-    │   └── PowerUp.cs          <i>falling pickup, pulse animation</i>
+    │   └── PowerUp.cs          <i>falling pickup: wide paddle (pink) · multiball (cyan)</i>
     ├── Systems/
-    │   ├── InputHelper.cs      <i>current/previous snapshots, virtual mouse</i>
+    │   ├── InputHelper.cs      <i>current/previous snapshots, virtual mouse, action queries</i>
+    │   ├── GameAction.cs       <i>every input, named by intent</i>
+    │   ├── ActionMap.cs        <i>action → keys dictionary, rebindable at runtime</i>
     │   ├── CollisionHelper.cs  <i>minimal-penetration AABB side detection</i>
     │   ├── LevelLoader.cs      <i>TitleContainer runtime loading</i>
-    │   ├── VirtualScreen.cs    <i>RenderTarget2D, letterbox, mouse transform</i>
+    │   ├── VirtualScreen.cs    <i>RenderTarget2D, letterbox, integer scaling, mouse transform</i>
     │   ├── ParticleSystem.cs   <i>struct pool, premultiplied fade</i>
     │   ├── ScreenShake.cs      <i>trauma² shake as a transform matrix</i>
-    │   ├── AudioBank.cs        <i>synthesized square-wave PCM SoundEffects</i>
+    │   ├── AudioBank.cs        <i>synthesized square-wave PCM, pitch-varied playback</i>
     │   ├── SpriteBatchExtensions.cs <i>1×1 pixel DrawRect + centered text</i>
-    │   └── DebugOverlay.cs     <i>F3: fps, ball speed, live counts</i>
+    │   └── DebugOverlay.cs     <i>F3: fps, ball count + top speed, live counts</i>
     └── States/
-        ├── GameState.cs        <i>abstract base: Enter/Update/Draw</i>
-        ├── GameStateManager.cs <i>current-state holder, new-game reset</i>
-        ├── ReadyState.cs       <i>ball attached, waiting for launch</i>
+        ├── GameState.cs        <i>abstract base: Enter/Update/Draw/FreezesEffects</i>
+        ├── GameStateManager.cs <i>current-state holder, resume, new-game reset</i>
+        ├── ReadyState.cs       <i>back to one attached ball, waiting for launch</i>
         ├── PlayingState.cs     <i>the live simulation — biggest file, start here</i>
+        ├── PauseState.cs       <i>P: world dimmed, nothing updates — not even effects</i>
         ├── LifeLostState.cs    <i>frozen beat + flash, then back to Ready</i>
+        ├── LevelClearedState.cs <i>banner + beat, then the next board loads</i>
         └── GameOverState.cs    <i>win/lose overlay, Enter restarts</i></div>
 </section>
 
@@ -838,6 +846,7 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
     <tr><td>nodes / sprites that draw themselves</td><td>explicit <code>Draw()</code> every frame via SpriteBatch</td><td>every entity's <code>Draw</code></td></tr>
     <tr><td>a "ready" / scene-load hook</td><td><code>Initialize()</code> / <code>LoadContent()</code></td><td><code>BreakoutGame.LoadContent</code></td></tr>
     <tr><td>"was this just pressed?" input query</td><td>current vs. previous state snapshots</td><td><code>InputHelper</code></td></tr>
+    <tr><td>input action map / key rebinding</td><td>one dictionary: action → bound keys</td><td><code>ActionMap</code>, <code>GameAction</code></td></tr>
     <tr><td>asset import system</td><td>Content Pipeline → <code>.xnb</code> → <code>Content.Load&lt;T&gt;</code></td><td><code>Content.mgcb</code>, the font</td></tr>
     <tr><td>raw access to bundled files</td><td><code>TitleContainer.OpenStream</code></td><td><code>LevelLoader</code></td></tr>
     <tr><td>scene / screen switching</td><td>hand-rolled state machine</td><td><code>GameStateManager</code></td></tr>
@@ -847,7 +856,8 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
     <tr><td>one audio player for everything</td><td><code>SoundEffect</code> (SFX) vs <code>Song</code>+<code>MediaPlayer</code> (music)</td><td><code>AudioBank</code></td></tr>
     <tr><td>project display settings</td><td><code>GraphicsDeviceManager</code> preferences + <code>ApplyChanges()</code></td><td><code>BreakoutGame</code> ctor</td></tr>
     <tr><td>built-in particle system</td><td>a list of structs and forty lines</td><td><code>ParticleSystem</code></td></tr>
-    <tr><td>engine pauses the unfocused game</td><td>check <code>IsActive</code> yourself</td><td><code>BreakoutGame.Update</code></td></tr>
+    <tr><td>built-in pause / time scale</td><td>a state that updates nothing</td><td><code>PauseState</code></td></tr>
+    <tr><td>engine pauses the unfocused game</td><td>check <code>IsActive</code> yourself, auto-enter pause</td><td><code>GameStateManager.NotifyFocusLost</code></td></tr>
   </table>
 </section>
 
@@ -855,18 +865,25 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
 <section id="next">
   <div class="kicker" style="color:var(--tier2)">APPENDIX C</div>
   <h2>Where to Go Next</h2>
-  <p>Ordered roughly by how much of the existing code each one touches — every item is
-  a real feature, not a toy exercise.</p>
+  <p>The original seven exercises that lived here — second level, pause state,
+  multiball, pitch variation, integer scaling, ball trail, action map — are now
+  <em>implemented in the codebase, one commit each</em>. That makes the git history a
+  second study guide: <code>git log --oneline</code> is the index, and each diff shows
+  exactly how much (or little) one real feature costs. Read the multiball commit in
+  particular to watch a single-to-many assumption ripple through every consumer.</p>
+
+  <p>The next round, again ordered roughly by how much existing code each one touches —
+  every item is a real feature, not a toy exercise.</p>
 
   <table>
     <tr><th>Exercise</th><th>What it teaches</th></tr>
-    <tr><td><strong>Level 2.</strong> Write <code>level02.txt</code> with <code>X</code> bricks, load it after clearing level 1 (a <code>LevelIndex</code> on GameSession, advance instead of winning).</td><td>How little the "win" condition is coupled to anything — and your first design decision: carry score and speed across levels, or reset?</td></tr>
-    <tr><td><strong>Pause state.</strong> P toggles a PauseState that draws the world dimmed but updates nothing.</td><td>The state machine pays off: it's ~25 lines and touches no gameplay code. Notice you must decide what happens to <code>UpdateEffects</code>.</td></tr>
-    <tr><td><strong>Multiball power-up.</strong> Second <code>PowerUpType</code> spawning two extra balls; life is lost only when the <em>last</em> ball drops.</td><td>Refactoring a single <code>Ball</code> field into a <code>List&lt;Ball&gt;</code> — feel how far one assumption ripples.</td></tr>
-    <tr><td><strong>Pitch variation.</strong> <code>SoundEffect.Play(volume, pitch, pan)</code> with a small random pitch per brick hit.</td><td>The cheapest audio juice there is; one line, huge repetition-fatigue payoff.</td></tr>
-    <tr><td><strong>Integer scaling mode.</strong> In <code>VirtualScreen.DestinationBounds</code>, floor the scale to a whole number when the window is large enough.</td><td>Why pixel-art games offer "pixel perfect" toggles, and what shimmer is.</td></tr>
-    <tr><td><strong>Ball trail.</strong> Ring buffer of recent positions, drawn as fading rects behind the ball.</td><td>Another GC-free pattern (fixed-size array + write index), more premultiplied-alpha practice.</td></tr>
-    <tr><td><strong>Action map.</strong> Dictionary from action names to <code>Keys[]</code> over InputHelper; rebind at runtime.</td><td>Rebuilding the input-mapping layer big engines ship built in.</td></tr>
+    <tr><td><strong>Music.</strong> A looping background track via <code>Song</code> + <code>MediaPlayer</code> (or keep it asset-free: write a longer PCM buffer and loop a <code>SoundEffectInstance</code>).</td><td>The other half of MonoGame's audio split — and why SFX and music go through different APIs at all.</td></tr>
+    <tr><td><strong>Brick entrance.</strong> On level load, drop bricks in from above the screen over ~half a second (lerp from a start offset, staggered by column).</td><td>Tween-style animation without a tween library; one more place where "animate toward target" beats "snap".</td></tr>
+    <tr><td><strong>Gamepad support.</strong> Extend <code>ActionMap</code> with a second dictionary action → <code>Buttons[]</code>, polled from <code>GamePad.GetState(PlayerIndex.One)</code>.</td><td>Why the action layer was worth building: paddle code does not change at all.</td></tr>
+    <tr><td><strong>Rebinding screen.</strong> From PauseState, a menu that waits for "any key just pressed" and calls <code>ActionMap.Rebind</code>.</td><td>Polling for an unknown key (compare full <code>GetPressedKeys()</code> sets) and writing your first menu state.</td></tr>
+    <tr><td><strong>High scores.</strong> Persist the top five to a JSON file under <code>Environment.SpecialFolder.ApplicationData</code> — note <code>TitleContainer</code> is read-only, so saving needs a real path.</td><td>The read side and write side of game data are different problems; where save files actually belong on each OS.</td></tr>
+    <tr><td><strong>Title screen.</strong> A MenuState before ReadyState with level select; "new game from level N" means <code>GameSession</code> needs a starting-level parameter.</td><td>The first state that exists <em>before</em> a session does — flushing out hidden "the game already started" assumptions.</td></tr>
+    <tr><td><strong>Local co-op.</strong> A second paddle (left/right halves or top/bottom), each bound to its own action set.</td><td>Multiplying an entity that input, collision and serve logic all assumed was unique — the paddle's turn for the multiball treatment.</td></tr>
   </table>
 
   <p style="margin-top:34px">When you've read everything: delete a system —
@@ -877,7 +894,7 @@ _virtualScreen.Present(_spriteBatch); // SetRenderTarget(null) + draw scaled</co
 
 <footer>
   <span>BREAKOUT — MonoGame learning project · built &amp; documented 2026</span>
-  <span>dotnet run · F11 fullscreen · F3 debug · Esc quit</span>
+  <span>dotnet run · P pause · F11 fullscreen · F10 pixel-perfect · F3 debug · Esc quit</span>
 </footer>
 
 </main>
